@@ -5,7 +5,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".MainActivity"
+    tools:context=".ui.activities.MainActivity"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
     tools:showIn="@layout/activity_main">
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/searchLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:layout_marginTop="46dp"
+        android:layout_marginBottom="4dp" >
+
+        <EditText
+            android:id="@+id/search"
+            android:inputType="textUri|textCapWords"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Search" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/songRecyclerView"
+        tools:listitem="@layout/item_result"
+        android:layout_below="@id/searchLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <include
+        android:layout_below="@+id/searchLayout"
+        layout="@layout/empty_content"
+        android:id="@+id/empty_result"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="20dp"/>
 
 </RelativeLayout>

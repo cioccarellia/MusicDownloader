@@ -4,19 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".ui.activities.MainActivity">
 
     <android.support.design.widget.AppBarLayout
+        app:elevation="0dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
+            android:elevation="0dp"
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:layout_height="?android:attr/actionBarSize"
+            app:theme="@style/ThemeOverlay.AppCompat"
+            app:popupTheme="@style/ThemeOverlay.AppCompat" />
 
     </android.support.design.widget.AppBarLayout>
 
@@ -24,10 +26,11 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
+        app:fabSize="normal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        app:srcCompat="@drawable/next" />
 
 </android.support.design.widget.CoordinatorLayout>

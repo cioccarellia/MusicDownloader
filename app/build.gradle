@@ -3,14 +3,17 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
+    buildToolsVersion "28.0.2"
+
     defaultConfig {
-        applicationId "andreacioccarelli.musicdownloader"
-        minSdkVersion 15
-        targetSdkVersion 27
+        applicationId "com.andreacioccarelli.musicdownloader"
+        minSdkVersion 21
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -18,35 +21,69 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/library_release.kotlin_module'
+    }
 }
 
 ext {
-    support = '27.1.1'
+    gson = '2.8.5'
+    okhttp = '3.11.0'
+
+    support = '28.0.0-rc01'
     prefs = '1.1.2.0'
-    dialog = '0.9.6.0'
+    log = '1.0.0'
+    dialog = '2.0.0-alpha05'
     alerter = '2.0.6'
-    glide = '4.7.1'
+    glide = '4.8.0'
+    snacky = '1.0.3'
+    assent = '1.0.1'
+    youtube = '8.0.1'
+    toasty = '1.3.0'
+
+    junit = '4.12'
+    runner = '1.0.2'
+    espresso = '3.0.2'
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "org.jetbrains.anko:anko-sdk15:$anko_version"
+    implementation "org.jetbrains.anko:anko-sdk21:$anko_version"
     implementation "org.jetbrains.anko:anko-common:$anko_version"
     implementation "org.jetbrains.anko:anko-coroutines:$anko_version"
 
     implementation "com.android.support:appcompat-v7:$support"
+    implementation "com.android.support:support-v13:$support"
     implementation "com.android.support:cardview-v7:$support"
     implementation "com.android.support:design:$support"
+    implementation "com.android.support:animated-vector-drawable:$support"
+
+    implementation "com.google.code.gson:gson:$gson"
+    implementation "com.squareup.okhttp3:okhttp:$okhttp"
+    implementation "com.afollestad:assent:$assent"
 
     implementation "com.github.AndreaCioccarelli:CryptoPrefs:$prefs"
-    implementation "com.afollestad.material-dialogs:commons:$dialog"
+    implementation "com.github.AndreaCioccarelli:LogKit:$log"
+
+    implementation "com.afollestad.material-dialogs:core:$dialog"
     implementation "com.tapadoo.android:alerter:$alerter"
     implementation "com.github.bumptech.glide:glide:$glide"
     annotationProcessor "com.github.bumptech.glide:compiler:$glide"
+    implementation "com.pierfrancescosoffritti.androidyoutubeplayer:core:$youtube"
+    implementation "com.github.GrenderG:Toasty:$toasty"
 
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    testImplementation "junit:junit:$junit"
+    androidTestImplementation "com.android.support.test:runner:$runner"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$espresso"
 }

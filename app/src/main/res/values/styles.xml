@@ -1,22 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/Grey_1000</item>
-        <item name="colorPrimaryDark">@color/Grey_1000</item>
-        <item name="colorAccent">@color/LightBlue_A400</item>
-        <item name="android:windowBackground">@color/Grey_1000</item>
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/Grey_900</item>
+        <item name="colorPrimaryDark">@color/Grey_925</item>
+        <item name="colorAccent">@color/Orange_600</item>
 
-    </style>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@color/Grey_900</item>
+        <item name="android:textColorPrimary">@color/Grey_100</item>
+        <item name="android:textColorSecondary">@color/Grey_150</item>
+        <item name="android:textColorTertiary">@color/Grey_200</item>
+        <item name="md_corner_radius">16dp</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
+
+    <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/bottom_sheet</item>
+    </style>
+
+    <style name="BottomSheetTheme" parent="@style/Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheet</item>
+    </style>
 
 </resources>
