@@ -1,8 +1,12 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
 
-    <dimen name="bottom_sheet_title">20sp</dimen>
-    <dimen name="bottom_sheet_image_size">90dp</dimen>
+    <dimen name="result_thumb_height">70dp</dimen>
+    <dimen name="result_thumb_width">50dp</dimen>
+
+    <dimen name="bottom_sheet_title">19sp</dimen>
+    <dimen name="bottom_sheet_image_size_width">120dp</dimen>
+    <dimen name="bottom_sheet_image_size_height">90dp</dimen>
     <dimen name="bottom_sheet_image_margin">16dp</dimen>
 
     <dimen name="bottom_sheet_thumb_size">34dp</dimen>

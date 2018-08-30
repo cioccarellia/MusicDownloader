@@ -1,17 +1,6 @@
 package com.andreacioccarelli.musicdownloader.ui.activities
 
-import com.andreacioccarelli.musicdownloader.R
-import com.andreacioccarelli.musicdownloader.data.requests.YoutubeRequestBuilder
-import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchResponse
-import com.andreacioccarelli.musicdownloader.extensions.dismissKeyboard
-import com.andreacioccarelli.musicdownloader.extensions.onSubmit
-import com.andreacioccarelli.musicdownloader.extensions.toEditable
-import com.andreacioccarelli.musicdownloader.ui.adapters.ListAdapter
-import com.andreacioccarelli.musicdownloader.ui.drawables.GradientGenerator
-import com.andreacioccarelli.musicdownloader.util.ConnectionStatus
-import com.andreacioccarelli.musicdownloader.util.DownloadListUtil
-import com.andreacioccarelli.musicdownloader.util.NetworkUtil
-import com.andreacioccarelli.musicdownloader.util.VibrationUtil
+import android.app.DownloadManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -19,6 +8,7 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.support.design.widget.Snackbar
@@ -31,8 +21,30 @@ import com.afollestad.assent.Assent
 import com.afollestad.assent.AssentActivity
 import com.afollestad.assent.Permission
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
+import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
 import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.list.listItems
+import com.afollestad.materialdialogs.list.customListAdapter
+import com.andreacioccarelli.cryptoprefs.CryptoPrefs
+import com.andreacioccarelli.logkit.loge
+import com.andreacioccarelli.logkit.logw
+import com.andreacioccarelli.musicdownloader.BuildConfig
+import com.andreacioccarelli.musicdownloader.R
+import com.andreacioccarelli.musicdownloader.constants.APK_URL
+import com.andreacioccarelli.musicdownloader.constants.FILE
+import com.andreacioccarelli.musicdownloader.constants.KEY
+import com.andreacioccarelli.musicdownloader.constants.Keys
+import com.andreacioccarelli.musicdownloader.data.requests.UpdateRequestBuilder
+import com.andreacioccarelli.musicdownloader.data.requests.YoutubeRequestBuilder
+import com.andreacioccarelli.musicdownloader.data.serializers.UpdateCheck
+import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchResponse
+import com.andreacioccarelli.musicdownloader.extensions.dismissKeyboard
+import com.andreacioccarelli.musicdownloader.extensions.onSubmit
+import com.andreacioccarelli.musicdownloader.extensions.onceOutOf3
+import com.andreacioccarelli.musicdownloader.ui.adapters.ChecklistAdapter
+import com.andreacioccarelli.musicdownloader.ui.adapters.ResultsAdapter
+import com.andreacioccarelli.musicdownloader.ui.drawables.GradientGenerator
+import com.andreacioccarelli.musicdownloader.util.*
 import com.google.gson.Gson
 import com.tapadoo.alerter.Alerter
 import kotlinx.android.synthetic.main.activity_main.*
@@ -40,9 +52,12 @@ import kotlinx.android.synthetic.main.content_main.*
 import okhttp3.OkHttpClient
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import java.io.IOException
 
 
 class MainActivity : AssentActivity() {
+
+    val prefs by lazy { CryptoPrefs(this, FILE, KEY) }
 
     private var wasOffline = false
     private var isOffline = false
@@ -71,7 +86,7 @@ class MainActivity : AssentActivity() {
                 Alerter.create(this@MainActivity)
                         .setTitle("Device offline")
                         .setText("You need an active internet connection to use this app")
-                        .setDuration(8_000)
+                        .setDuration(7_000)
                         .setIcon(R.drawable.download_error)
                         .enableSwipeToDismiss()
                         .setBackgroundDrawable(GradientGenerator.errorGradient)
@@ -93,12 +108,25 @@ class MainActivity : AssentActivity() {
         initToolbar()
         initFab()
         initNetwork()
+        initUpdateChecker()
     }
 
-    private fun initInput() {
-        search.onSubmit {
+    private fun initInput() = with(search) {
+        onSubmit {
             fab.performClick()
             search.dismissKeyboard()
+        }
+
+        setOnClickListener {
+            if (isSearching) {
+                isSearching = false
+                snack?.dismiss()
+                fab.show()
+            }
+
+            if (isInError) {
+                fab.show()
+            }
         }
     }
 
@@ -109,13 +137,14 @@ class MainActivity : AssentActivity() {
                     Alerter.create(this@MainActivity)
                             .setTitle("Cannot read external storage")
                             .setText("You have to grant the requested permission to correctly use this up")
-                            .setDuration(8_000)
+                            .setDuration(5_000)
                             .setIcon(R.drawable.folder)
                             .setBackgroundDrawable(GradientGenerator.errorGradient)
                             .setOnClickListener { _ -> initPermissions() }
                             .show()
                     false
                 } else {
+                    Alerter.clearCurrent(this)
                     true
                 }
             }
@@ -127,6 +156,9 @@ class MainActivity : AssentActivity() {
         title = "Music Downloader"
     }
 
+    var snack: Snackbar? = null
+    val searches = mutableListOf<Int>()
+    var searchId = 0
 
     private fun initFab() = with(fab) {
         setOnClickListener { view ->
@@ -163,10 +195,12 @@ class MainActivity : AssentActivity() {
 
             searchLayout.isErrorEnabled = false
             search.dismissKeyboard()
-            search.isEnabled = false
+            resultsRecyclerView.smoothScrollToPosition(0)
+
+            searches.add(searchId++)
             isSearching = true
 
-            val snack = Snackbar.make(view, "Searching", Snackbar.LENGTH_INDEFINITE)
+            snack = Snackbar.make(view, "Searching", Snackbar.LENGTH_INDEFINITE)
                     .setAction("CANCEL") {
                         isSearching = false
                         search.isEnabled = true
@@ -175,57 +209,154 @@ class MainActivity : AssentActivity() {
                     .setActionTextColor(ContextCompat.getColor(this@MainActivity, R.color.Orange_600))
 
             fab.hide()
-            snack.show()
-            VibrationUtil.medium()
+            snack!!.show()
 
             doAsync {
-                val requestBuilder = YoutubeRequestBuilder.get(search.text)
-                val request = OkHttpClient().newCall(requestBuilder).execute()
+                try {
+                    val requestBuilder = YoutubeRequestBuilder.get(search.text)
+                    val request = OkHttpClient().newCall(requestBuilder).execute()
 
-                val jsonRequest = request.body()!!.string()
+                    val jsonRequest = request.body()!!.string()
+                    logw(jsonRequest)
 
-                uiThread {
-                    if (!isSearching) return@uiThread
+                    uiThread {
+                        if (!isSearching || searches.contains(searchId)) return@uiThread
 
-                    val gson = Gson()
-                    val response = gson.fromJson(
-                            jsonRequest,
-                            YoutubeSearchResponse::class.java)
+                        val gson = Gson()
+                        val response = gson.fromJson(
+                                jsonRequest,
+                                YoutubeSearchResponse::class.java)
 
-                    if (response.pageInfo.totalResults == 0) {
-                        empty_result.visibility = View.VISIBLE
-                        songRecyclerView.visibility = View.GONE
-                    } else {
-                        empty_result.visibility = View.GONE
+                        if (response.pageInfo.totalResults == 0) {
+                            empty_result.visibility = View.VISIBLE
+                            resultsRecyclerView.visibility = View.GONE
+                        } else {
+                            empty_result.visibility = View.GONE
 
-                        with(songRecyclerView) {
-                            visibility = View.VISIBLE
-                            adapter = ListAdapter(response, this@MainActivity, supportFragmentManager)
-                            layoutManager = LinearLayoutManager(this@MainActivity)
+                            with(resultsRecyclerView) {
+                                visibility = View.VISIBLE
+                                adapter = ResultsAdapter(response, this@MainActivity, supportFragmentManager)
+                                layoutManager = LinearLayoutManager(this@MainActivity)
+                            }
                         }
-                    }
 
-                    fab.show()
-                    snack.dismiss()
-                    VibrationUtil.medium()
-                    search.isEnabled = true
+                        fab.show()
+                        snack!!.dismiss()
+                    }
+                } catch (timeout: IOException) {
+                    uiThread {
+                        fab.show()
+                        snack!!.dismiss()
+                        VibrationUtil.medium()
+
+                        Alerter.create(this@MainActivity)
+                                .setTitle("Weak internet connection")
+                                .setText("Cannot reach youtube servers, please check your connection")
+                                .setIcon(ContextCompat.getDrawable(this@MainActivity, R.drawable.warning)!!)
+                                .setBackgroundDrawable(GradientGenerator.appThemeGradient)
+                                .show()
+                    }
                 }
             }
         }
     }
 
+    var isInError = false
+
     private fun displayFormError() {
+        isInError = true
         fab.hide()
         VibrationUtil.strong()
 
         Handler().postDelayed({
             fab.show()
             searchLayout.isErrorEnabled = false
+            isInError = false
         }, 2500)
     }
 
+    private val onPackageDownloadCompleated: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(ctxt: Context, intent: Intent) {
+            val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+            if (id == -1L) return
+
+            UpdateUtil.openFileInPackageManager()
+        }
+    }
+
+    private fun initUpdateChecker() = onceOutOf3 {
+        doAsync {
+            val requestBuilder = UpdateRequestBuilder.get()
+            val request = OkHttpClient().newCall(requestBuilder).execute()
+
+            val jsonRequest = request.body()!!.string()
+
+            val gson = Gson()
+            val updateCheck = gson.fromJson(
+                    jsonRequest,
+                    UpdateCheck::class.java)
+
+            if (updateCheck.versionCode > BuildConfig.VERSION_CODE && !prefs.getBoolean(Keys.ignoring + updateCheck.versionCode, false)) {
+                uiThread {
+                    MaterialDialog(this@MainActivity)
+                            .title(text = "Version ${updateCheck.versionName} found!")
+                            .message(text = updateCheck.changelog)
+                            .positiveButton(text = if (UpdateUtil.hasPackageBeenDownloaded())
+                                "INSTALL UPDATE" else "DOWNLOAD UPDATE") { dialog ->
+                                if (UpdateUtil.hasPackageBeenDownloaded()) {
+                                    UpdateUtil.openFileInPackageManager()
+                                } else {
+                                    val uri = Uri.parse(APK_URL)
+                                    val downloadRequest = DownloadManager.Request(uri)
+
+                                    with(downloadRequest) {
+                                        setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+                                        setAllowedOverRoaming(true)
+                                        setVisibleInDownloadsUi(true)
+                                        setTitle(UpdateUtil.getNotificationTitle(updateCheck))
+                                        setDescription(UpdateUtil.getNotificationContent())
+                                        setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+
+                                        setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
+                                                UpdateUtil.getDestinationSubpath(updateCheck))
+                                    }
+
+                                    val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                                    downloadManager.enqueue(downloadRequest)
+
+                                    registerReceiver(onPackageDownloadCompleated, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+                                    dialog.dismiss()
+                                    
+                                    Alerter.create(this@MainActivity)
+                                            .setTitle(UpdateUtil.getNotificationContent())
+                                            .setText(UpdateUtil.getNotificationTitle(updateCheck))
+                                            .setBackgroundDrawable(GradientGenerator.successGradient)
+                                            .setIcon(R.drawable.download)
+                                            .setDuration(7_000)
+                                            .show()
+                                }
+                            }
+                            .negativeButton(text = "NO") { dialog ->
+                                if (dialog.isCheckPromptChecked() && UpdateUtil.hasPackageBeenDownloaded()) {
+                                    UpdateUtil.cleanDuplicatedInstallationPackage()
+                                }
+                                dialog.dismiss()
+                            }
+                            .checkBoxPrompt(text = "Ignore this version", isCheckedDefault = false) { state ->
+                                prefs.put(Keys.ignoring + updateCheck.versionCode, state)
+                            }
+                            .noAutoDismiss()
+                            .show()
+                }
+            }
+        }
+    }
+
     private fun initNetwork() = registerReceiver(networkConnectionListener, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
-    private fun unregisterReceivers() = unregisterReceiver(networkConnectionListener)
+    private fun unregisterReceivers() = try {
+        unregisterReceiver(networkConnectionListener)
+        unregisterReceiver(onPackageDownloadCompleated)
+    } catch (notReg: IllegalArgumentException) { loge(notReg) }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -237,29 +368,25 @@ class MainActivity : AssentActivity() {
         return true
     }
 
+    lateinit var checklistDialog: MaterialDialog
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
             R.id.action_list -> {
-
-                if (DownloadListUtil.isEmpty(this)) {
-                    MaterialDialog(this)
+                if (ChecklistUtil.isEmpty(this)) {
+                    checklistDialog = MaterialDialog(this)
                             .customView(R.layout.empty_checklist)
-                            .show()
+                    checklistDialog.show()
                 } else {
-                    MaterialDialog(this)
+                    checklistDialog = MaterialDialog(this)
                             .title(text = "Checklist")
-                            .listItems(items = DownloadListUtil.get(this), selection = { dialog, id, title ->
-                                search.text = title.toEditable()
-                                fab.performClick()
-                                dialog.dismiss()
-                            })
-                            .show()
+                            .customListAdapter(ChecklistAdapter(ChecklistUtil.get(this).toMutableList(), this))
+                    checklistDialog.show()
                 }
             }
         }
 
         return super.onOptionsItemSelected(item)
     }
-
 }

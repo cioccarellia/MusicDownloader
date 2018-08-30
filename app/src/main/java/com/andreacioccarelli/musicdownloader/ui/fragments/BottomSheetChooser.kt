@@ -10,16 +10,23 @@ import android.os.Environment
 import android.support.design.widget.BottomSheetDialog
 import android.support.design.widget.BottomSheetDialogFragment
 import android.support.v7.widget.CardView
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.WhichButton
+import com.afollestad.materialdialogs.actions.setActionButtonEnabled
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
+import com.afollestad.materialdialogs.input.getInputField
+import com.afollestad.materialdialogs.input.input
 import com.andreacioccarelli.cryptoprefs.CryptoPrefs
 import com.andreacioccarelli.logkit.logd
 import com.andreacioccarelli.logkit.loge
+import com.andreacioccarelli.logkit.logw
 import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.constants.*
@@ -27,10 +34,11 @@ import com.andreacioccarelli.musicdownloader.data.formats.Format
 import com.andreacioccarelli.musicdownloader.data.requests.DownloadLinkRequestsBuilder
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
+import com.andreacioccarelli.musicdownloader.extensions.sanitize
 import com.andreacioccarelli.musicdownloader.extensions.toUri
 import com.andreacioccarelli.musicdownloader.extensions.updateState
 import com.andreacioccarelli.musicdownloader.ui.drawables.GradientGenerator
-import com.andreacioccarelli.musicdownloader.util.DownloadListUtil
+import com.andreacioccarelli.musicdownloader.util.ChecklistUtil
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
@@ -55,6 +63,7 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
 
     private val prefs by lazy { CryptoPrefs(App.instance.baseContext, FILE, KEY) }
     private var isInChecklist = false
+    lateinit var title: TextView
 
     override fun getTheme() = R.style.BottomSheetTheme
 
@@ -64,27 +73,79 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
         val view = inflater.inflate(R.layout.bottom_sheet, container, false)
         VibrationUtil.strong()
 
-        view.find<TextView>(R.id.thumb_title).text = remoteResult.snippet.title
+        title = view.find(R.id.thumb_title)
+        title.text = remoteResult.snippet.title
+
         Glide.with(this)
-                .load(remoteResult.snippet.thumbnails.medium.url)
+                .load(remoteResult.snippet.thumbnails.default.url)
                 .thumbnail(0.1F)
                 .into(view.find(R.id.thumb_icon))
+
+        view.find<CardView>(R.id.thumbCard).setOnClickListener {
+            val dialog = MaterialDialog(requireContext())
+                    .title(text = "Change file name")
+                    .input(prefill = title.text, waitForPositiveButton = true) { dialog, text ->
+                        title.text = text
+                    }
+                    .positiveButton(text = "SUBMIT")
+
+            with(dialog) {
+                show()
+                getInputField()?.let { input ->
+                    input.selectAll()
+                    input.addTextChangedListener(object : TextWatcher {
+                        override fun afterTextChanged(p0: Editable?) {
+                            if (p0.isNullOrBlank()) {
+                                dialog.setActionButtonEnabled(WhichButton.POSITIVE, false)
+                                return
+                            }
+
+                            val text = p0.toString()
+                            val inputField = dialog.getInputField()!!
+
+                            if (text.contains("/")) {
+                                inputField.error = "File name cannot contain /"
+                                dialog.setActionButtonEnabled(WhichButton.POSITIVE, false)
+                                return
+                            }
+
+                            if (text.endsWith(".mp3") || text.endsWith(".mp4")) {
+                                inputField.error = "We will think about putting an extension, just enter the file name"
+                                dialog.setActionButtonEnabled(WhichButton.POSITIVE, false)
+                                return
+                            }
+
+                            dialog.setActionButtonEnabled(WhichButton.POSITIVE, true)
+                        }
+
+                        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                        }
+
+                        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                        }
+
+                    })
+                }
+            }
+        }
 
         view.find<CardView>(R.id.play).setOnClickListener { openVideo() }
         view.find<CardView>(R.id.view_channel).setOnClickListener { openChannel() }
         view.find<CardView>(R.id.copy_link).setOnClickListener { copyLink() }
         view.find<CardView>(R.id.share_link).setOnClickListener { shareLink() }
-        view.find<CardView>(R.id.mp3).setOnClickListener { v ->  handleClick(Format.MP3, v) }
-        view.find<CardView>(R.id.mp4).setOnClickListener { v -> handleClick(Format.MP4, v) }
+        view.find<CardView>(R.id.mp3).setOnClickListener { handleClick(Format.MP3) }
+        view.find<CardView>(R.id.mp4).setOnClickListener { handleClick(Format.MP4) }
 
         val addTo = view.find<CardView>(R.id.add_to_list)
         val removeFrom = view.find<CardView>(R.id.remove_from_list)
 
-        isInChecklist = DownloadListUtil.contains(requireContext(), remoteResult.snippet.title)
+        isInChecklist = ChecklistUtil.contains(requireContext(), remoteResult.snippet.title)
 
         if (isInChecklist) {
             removeFrom.setOnClickListener {
-                DownloadListUtil.remove(requireContext(), remoteResult.snippet.title)
+                ChecklistUtil.remove(requireContext(), remoteResult.snippet.title)
                 dismiss()
                 VibrationUtil.medium()
             }
@@ -92,7 +153,7 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
             addTo.visibility = View.GONE
         } else {
             addTo.setOnClickListener {
-                DownloadListUtil.add(requireContext(), remoteResult.snippet.title)
+                ChecklistUtil.add(requireContext(), remoteResult.snippet.title, remoteResult.snippet.thumbnails.default.url)
                 dismiss()
                 VibrationUtil.medium()
             }
@@ -134,8 +195,8 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
             intent.run {
                 intent.data = channelUrl
                 setPackage("com.google.android.youtube")
-
             }
+
             startActivity(intent)
         } catch (err: ActivityNotFoundException) {
             val intent = Intent(Intent.ACTION_VIEW)
@@ -145,7 +206,7 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
 
     }
 
-    private val watchLink = "$YOUTUBE_URL${remoteResult.id.videoId}"
+    private val watchLink = "$YOUTUBE_SEARCH_URL${remoteResult.id.videoId}"
 
     private fun copyLink() {
         val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -171,7 +232,7 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
 
     private lateinit var conversionAlert: Alerter
 
-    private fun handleClick(format: Format, view: View) {
+    private fun handleClick(format: Format) {
         VibrationUtil.medium()
         dismiss()
         val act = requireActivity()
@@ -182,10 +243,7 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
             val request = OkHttpClient().newCall(requestBuilder).execute()
             val gson = Gson()
 
-            val json = request.body()!!.string()
-            logd(json)
-
-            val response = gson.fromJson(json, DirectLinkResponse::class.java)
+            val response = gson.fromJson(request.body()!!.string(), DirectLinkResponse::class.java)
 
             when {
                 response.state == RESPONSE_OK -> processDownloadForReadyFile(act, response, downloadManager)
@@ -196,7 +254,7 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
                         setTitle("Preparing download")
                         setText("Waiting server to process file...")
                         enableInfiniteDuration(true)
-                        setBackgroundDrawable(GradientGenerator.infoGradient)
+                        setBackgroundDrawable(GradientGenerator.appThemeGradient)
                         setIcon(R.drawable.download)
                         enableProgress(true)
                         show()
@@ -208,8 +266,8 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
                     Alerter.create(act)
                             .setTitle("Error while downloading")
                             .setText(response.reason)
-                            .setDuration(8_000)
-                            .setBackgroundDrawable(GradientGenerator.infoGradient)
+                            .setDuration(7_000)
+                            .setBackgroundDrawable(GradientGenerator.appThemeGradient)
                             .setIcon(R.drawable.download_error)
                             .show()
                 }
@@ -223,23 +281,28 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
 
     private fun processDownloadForReadyFile(act: Activity, response: DirectLinkResponse, downloadManager: DownloadManager) {
         act.runOnUiThread {
-            if (isInChecklist) DownloadListUtil.remove(act, remoteResult.snippet.title)
-            val fileName = "${response.title}.${response.format}"
-            val fileDownloadLink = response.download
-                    .replace("\"", "")
-                    .replace("\"", "")
-                    .replace("\\/", "/")
+            if (isInChecklist) ChecklistUtil.remove(act, remoteResult.snippet.title)
 
+            //TODO cleanup
+            val SDCARD_PATH = Environment.getExternalStorageDirectory().absolutePath!!
+            val DOWNLOAD_PATH = Environment.DIRECTORY_DOWNLOADS!!
+
+            val DEFAULT_PATH = "$SDCARD_PATH/$DOWNLOAD_PATH/"
+
+            val fileName = if (title.text.isBlank() || title.text.isEmpty()) response.title else title.text
+            val compleateFileName = "$fileName.${response.format}"
+            val fileDownloadLink = response.download.sanitize()
             val filePath = prefs.getString(Keys.folder, DEFAULT_PATH) + fileName
 
-            logd(filePath, fileName, fileDownloadLink)
+            logw(response)
+            logd(filePath, compleateFileName, fileDownloadLink)
 
             Alerter.hide()
             Alerter.create(act)
-                    .setTitle("Downloading file!")
-                    .setText(fileName)
-                    .setDuration(8_000)
-                    .setBackgroundDrawable(GradientGenerator.infoGradient)
+                    .setTitle("Downloading file")
+                    .setText(compleateFileName)
+                    .setDuration(7_000)
+                    .setBackgroundDrawable(GradientGenerator.appThemeGradient)
                     .setIcon(R.drawable.download)
                     .show()
 
@@ -252,11 +315,11 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
                     setAllowedOverRoaming(true)
                     setVisibleInDownloadsUi(true)
                     setTitle("Downloading ${response.format} file")
-                    setDescription(remoteResult.snippet.title)
+                    setDescription(fileName)
                     allowScanningByMediaScanner()
                     setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
 
-                    setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "MusicDownloader/$fileName")
+                    setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "MusicDownloader/$compleateFileName")
                 }
 
                 downloadManager.enqueue(downloadRequest)
@@ -287,7 +350,7 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
                     Alerter.create(act)
                             .setTitle("Cannot download file")
                             .setText("Video length exceeds 3 hours")
-                            .setDuration(8_000)
+                            .setDuration(7_000)
                             .setBackgroundDrawable(GradientGenerator.errorGradient)
                             .setIcon(R.drawable.ic_error_outline_white_48dp)
                             .show()

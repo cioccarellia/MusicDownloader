@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
@@ -21,20 +22,18 @@
         android:theme="@style/AppTheme"
         tools:replace="android:label">
 
+        <!--android:configChanges="orientation|keyboardHidden|screenLayout|screenSize"-->
+
         <activity
             android:name=".ui.activities.MainActivity"
-            android:supportsPictureInPicture="false"
-            android:resizeableActivity="false"
-            android:label="Music Downloader"
-            android:theme="@style/AppTheme"
             android:screenOrientation="portrait"
-            tools:targetApi="n">
+            android:label="Music Downloader"
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

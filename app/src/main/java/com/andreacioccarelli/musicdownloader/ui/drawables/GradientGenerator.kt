@@ -30,7 +30,7 @@ object GradientGenerator {
         }
 
 
-    val infoGradient: Drawable
+    val appThemeGradient: Drawable
         get() {
             val gd = GradientDrawable(GradientDrawable.Orientation.TL_BR,
                     intArrayOf(ContextCompat.getColor(App.instance.applicationContext, R.color.Yellow_700),

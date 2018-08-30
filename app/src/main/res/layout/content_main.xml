@@ -18,8 +18,7 @@
         android:layout_centerHorizontal="true"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
-        android:layout_marginTop="46dp"
-        android:layout_marginBottom="4dp" >
+        android:layout_marginTop="48dp">
 
         <EditText
             android:id="@+id/search"
@@ -31,7 +30,8 @@
     </android.support.design.widget.TextInputLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/songRecyclerView"
+        android:paddingTop="4dp"
+        android:id="@+id/resultsRecyclerView"
         tools:listitem="@layout/item_result"
         android:layout_below="@id/searchLayout"
         android:layout_width="match_parent"
@@ -42,7 +42,6 @@
         layout="@layout/empty_content"
         android:id="@+id/empty_result"
         android:visibility="gone"
-        tools:visibility="visible"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:layout_marginBottom="20dp"/>

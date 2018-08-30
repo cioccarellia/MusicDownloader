@@ -1,7 +1,5 @@
 package com.andreacioccarelli.musicdownloader.constants
 
-import android.os.Environment
-
 /**
  * Created by andrea on 2018/Aug.
  * Part of the package andreacioccarelli.musicdownloader.constants
@@ -10,13 +8,13 @@ import android.os.Environment
 const val KEY = "c29maWFuZHJl"
 const val FILE = "settings"
 
-val SDCARD_PATH = Environment.getExternalStorageDirectory().absolutePath!!
-val DOWNLOAD_PATH = Environment.DIRECTORY_DOWNLOADS!!
-
-val DEFAULT_PATH = "$SDCARD_PATH/$DOWNLOAD_PATH/"
-
-
 object Keys {
-    const val folder = "folder"
-    const val list = "list"
+    const val folder = "@folder"
+    const val ignoring = "@ignoring->"
+    const val list = "@checklist"
+    const val updateSubpath = "@sub"
+
+    const val oneOf2 = "@1oo2"
+    const val oneOf3 = "@1oo3"
+    const val oneOf4 = "@1oo4"
 }

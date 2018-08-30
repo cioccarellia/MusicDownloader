@@ -12,7 +12,7 @@
     <android.support.v7.widget.CardView
         android:foreground="?android:attr/selectableItemBackground"
         android:drawSelectorOnTop="false"
-        android:id="@+id/card"
+        android:id="@+id/thumbCard"
         android:clickable="false"
         android:focusable="false"
         app:cardBackgroundColor="@color/Grey_850"
@@ -28,14 +28,15 @@
             <ImageView
                 android:id="@+id/thumb_icon"
                 tools:src="@mipmap/ic_launcher"
-                android:layout_width="@dimen/bottom_sheet_image_size"
-                android:layout_height="@dimen/bottom_sheet_image_size" />
+                android:layout_width="@dimen/bottom_sheet_image_size_width"
+                android:layout_height="@dimen/bottom_sheet_image_size_height" />
 
             <TextView
                 android:id="@+id/thumb_title"
                 android:textColor="@color/Grey_200"
-                android:padding="10dp"
+                android:padding="8dp"
                 android:paddingStart="14dp"
+                android:paddingEnd="0dp"
                 android:textSize="@dimen/bottom_sheet_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
