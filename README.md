@@ -1,4 +1,4 @@
-<div></div><img src="https://raw.githubusercontent.com/AndreaCioccarelli/MusicDownloader/master/media/launcher.png" height="100" width="100" align="right">
+<img src="https://raw.githubusercontent.com/AndreaCioccarelli/MusicDownloader/master/media/launcher.png" height="100" width="100" align="right">
 
 
 # MusicDownloader
