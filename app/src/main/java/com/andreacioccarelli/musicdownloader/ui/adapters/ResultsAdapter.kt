@@ -39,7 +39,7 @@ class ResultsAdapter(response: YoutubeSearchResponse, private val activity: Acti
 
     override fun onBindViewHolder(holder: ViewHolder, i: Int) {
         Glide.with(activity)
-                .load(data[i].snippet.thumbnails.default.url)
+                .load(data[i].snippet.thumbnails.medium.url)
                 .thumbnail(0.1F)
                 .into(holder.icon)
 
@@ -54,6 +54,8 @@ class ResultsAdapter(response: YoutubeSearchResponse, private val activity: Acti
             if (holder.title.lineCount == 1) {
                 holder.title.height = activity.resources.getDimension(R.dimen.result_thumb_width).toInt()
             }
+
+            holder.titleLayout.visibility = View.VISIBLE
         }
     }
 

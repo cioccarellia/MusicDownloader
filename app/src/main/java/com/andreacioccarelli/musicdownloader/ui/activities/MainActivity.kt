@@ -250,7 +250,7 @@ class MainActivity : AssentActivity() {
                         VibrationUtil.medium()
 
                         Alerter.create(this@MainActivity)
-                                .setTitle("Weak internet connection")
+                                .setTitle("No internet connection")
                                 .setText("Cannot reach youtube servers, please check your connection")
                                 .setIcon(ContextCompat.getDrawable(this@MainActivity, R.drawable.warning)!!)
                                 .setBackgroundDrawable(GradientGenerator.appThemeGradient)

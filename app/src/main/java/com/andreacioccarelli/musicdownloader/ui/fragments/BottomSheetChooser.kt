@@ -77,7 +77,7 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
         title.text = remoteResult.snippet.title
 
         Glide.with(this)
-                .load(remoteResult.snippet.thumbnails.default.url)
+                .load(remoteResult.snippet.thumbnails.medium.url)
                 .thumbnail(0.1F)
                 .into(view.find(R.id.thumb_icon))
 
@@ -153,7 +153,7 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
             addTo.visibility = View.GONE
         } else {
             addTo.setOnClickListener {
-                ChecklistUtil.add(requireContext(), remoteResult.snippet.title, remoteResult.snippet.thumbnails.default.url)
+                ChecklistUtil.add(requireContext(), remoteResult.snippet.title, remoteResult.snippet.thumbnails.medium.url)
                 dismiss()
                 VibrationUtil.medium()
             }

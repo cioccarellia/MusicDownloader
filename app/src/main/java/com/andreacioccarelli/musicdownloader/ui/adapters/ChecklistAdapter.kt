@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import com.andreacioccarelli.logkit.logd
 import com.andreacioccarelli.musicdownloader.R
@@ -40,6 +41,7 @@ class ChecklistAdapter(private val data: MutableList<Pair<String, String>>, priv
         logd(data, holder.adapterPosition)
 
         holder.title.text = data[holder.adapterPosition].first
+
         with(holder.card) {
             setOnClickListener {
                 val ref = (activity as MainActivity)
@@ -68,18 +70,19 @@ class ChecklistAdapter(private val data: MutableList<Pair<String, String>>, priv
             }
         }
 
-
-
         Handler().post {
             if (holder.title.lineCount == 1) {
                 holder.title.height = activity.resources.getDimension(R.dimen.result_thumb_width).toInt()
             }
+
+            holder.titleLayout.visibility = View.VISIBLE
         }
     }
 
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         var icon: ImageView = v.findViewById(R.id.icon)
+        var titleLayout: RelativeLayout = v.findViewById(R.id.titleLayout)
         var title: TextView = v.findViewById(R.id.title)
         var card: CardView = v.findViewById(R.id.card)
     }

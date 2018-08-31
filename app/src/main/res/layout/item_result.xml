@@ -25,6 +25,8 @@
             android:layout_height="@dimen/result_thumb_width" />
 
         <RelativeLayout
+            android:visibility="invisible"
+            tools:visibility="visible"
             android:id="@+id/titleLayout"
             android:gravity="start"
             android:paddingEnd="10dp"

@@ -22,12 +22,10 @@
         android:theme="@style/AppTheme"
         tools:replace="android:label">
 
-        <!--android:configChanges="orientation|keyboardHidden|screenLayout|screenSize"-->
-
         <activity
             android:name=".ui.activities.MainActivity"
-            android:screenOrientation="portrait"
             android:label="Music Downloader"
+            android:configChanges="orientation|keyboardHidden|screenLayout|screenSize"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
