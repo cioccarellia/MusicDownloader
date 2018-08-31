@@ -272,11 +272,15 @@ class MainActivity : AssentActivity() {
     }
 
     private val onPackageDownloadCompleated: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(ctxt: Context, intent: Intent) {
+        override fun onReceive(context: Context, intent: Intent) {
             val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
             if (id == -1L) return
 
-            UpdateUtil.openUpdateInPackageManager()
+            UpdateUtil.openUpdateInPackageManager(context)
+
+            try {
+                Alerter.clearCurrent(this@MainActivity)
+            } catch (invalid: IllegalArgumentException) { logw(invalid) }
         }
     }
 
@@ -297,10 +301,11 @@ class MainActivity : AssentActivity() {
                     MaterialDialog(this@MainActivity)
                             .title(text = "Version ${updateCheck.versionName} found!")
                             .message(text = updateCheck.changelog)
-                            .positiveButton(text = if (UpdateUtil.hasPackageBeenDownloaded())
+                            .positiveButton(text = if (UpdateUtil.hasPackageBeenDownloaded(updateCheck.versionName))
                                 "INSTALL UPDATE" else "DOWNLOAD UPDATE") { dialog ->
-                                if (UpdateUtil.hasPackageBeenDownloaded()) {
-                                    UpdateUtil.openUpdateInPackageManager()
+                                if (UpdateUtil.hasPackageBeenDownloaded(updateCheck.versionName)) {
+                                    UpdateUtil.openUpdateInPackageManager(this@MainActivity)
+                                    dialog.dismiss()
                                 } else {
                                     val uri = Uri.parse(if (updateCheck.downloadInfo.useBundledUpdateLink)
                                         APK_URL else updateCheck.downloadInfo.updateLink!!)
@@ -334,8 +339,8 @@ class MainActivity : AssentActivity() {
                                 }
                             }
                             .negativeButton(text = "NO") { dialog ->
-                                if (dialog.isCheckPromptChecked() && UpdateUtil.hasPackageBeenDownloaded()) {
-                                    UpdateUtil.cleanDuplicatedInstallationPackage()
+                                if (dialog.isCheckPromptChecked() && UpdateUtil.hasPackageBeenDownloaded(updateCheck.versionName)) {
+                                    UpdateUtil.clearDuplicatedInstallationPackage()
                                 }
                                 dialog.dismiss()
                             }
