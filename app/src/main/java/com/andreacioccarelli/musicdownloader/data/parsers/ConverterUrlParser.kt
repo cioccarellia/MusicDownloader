@@ -10,7 +10,7 @@ import com.andreacioccarelli.musicdownloader.data.formats.Format.MP4
  * Created by andrea on 2018/Aug.
  * Part of the package andreacioccarelli.musicdownloader.data.parsers
  */
-object FreedsoundUrlParser {
+object ConverterUrlParser {
     fun parse(id: String, format: Format): String = Base64.decode(DIRECT_LINK_GENERATOR_URL, Base64.DEFAULT)
             .toString(Charsets.UTF_8)+ "?"
             .plus("v=$id")

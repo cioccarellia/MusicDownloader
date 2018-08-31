@@ -131,8 +131,9 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
             }
         }
 
-        view.find<CardView>(R.id.play).setOnClickListener { openVideo() }
-        view.find<CardView>(R.id.view_channel).setOnClickListener { openChannel() }
+        view.find<CardView>(R.id.play).setOnClickListener { openVideoInDialog() }
+        view.find<CardView>(R.id.open_video).setOnClickListener { openVideo() }
+        view.find<CardView>(R.id.open_channel).setOnClickListener { openChannel() }
         view.find<CardView>(R.id.copy_link).setOnClickListener { copyLink() }
         view.find<CardView>(R.id.share_link).setOnClickListener { shareLink() }
         view.find<CardView>(R.id.mp3).setOnClickListener { handleClick(Format.MP3) }
@@ -164,7 +165,7 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
         return view
     }
 
-    private fun openVideo() {
+    private fun openVideoInDialog() {
         val dialog = MaterialDialog(requireContext())
                 .customView(R.layout.video_player, scrollable = false)
 
@@ -187,6 +188,24 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
         }
     }
 
+    private val watchLink = "$YOUTUBE_WATCH_URL${remoteResult.id.videoId}"
+
+    private fun openVideo() {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.run {
+                intent.data = watchLink.toUri()
+                setPackage("com.google.android.youtube")
+            }
+
+            startActivity(intent)
+        } catch (err: ActivityNotFoundException) {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = watchLink.toUri()
+            startActivity(intent)
+        }
+    }
+
     private fun openChannel() {
         val channelUrl = "$YOUTUBE_CHANNEL_URL${remoteResult.snippet.channelId}".toUri()
 
@@ -203,10 +222,8 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
             intent.data = channelUrl
             startActivity(intent)
         }
-
     }
 
-    private val watchLink = "$YOUTUBE_SEARCH_URL${remoteResult.id.videoId}"
 
     private fun copyLink() {
         val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager

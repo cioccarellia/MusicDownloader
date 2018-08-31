@@ -79,7 +79,6 @@ class ChecklistAdapter(private val data: MutableList<Pair<String, String>>, priv
         }
     }
 
-
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         var icon: ImageView = v.findViewById(R.id.icon)
         var titleLayout: RelativeLayout = v.findViewById(R.id.titleLayout)

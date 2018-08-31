@@ -12,7 +12,6 @@ object Delegates {
 }
 
 class SingleValue<T> {
-
     private var value: T? = null
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T =

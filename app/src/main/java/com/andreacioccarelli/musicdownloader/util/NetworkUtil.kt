@@ -1,9 +1,9 @@
 package com.andreacioccarelli.musicdownloader.util
 
-import com.andreacioccarelli.musicdownloader.App
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
+import com.andreacioccarelli.musicdownloader.App
 
 /**
  * Created by andrea on 2018/Aug.
@@ -36,7 +36,6 @@ object NetworkUtil {
         }
 
     private fun isDataOn(connectionsManager: ConnectivityManager): Boolean {
-
         connectionsManager.allNetworks.map {
             if (connectionsManager.getNetworkInfo(it).isConnected) return true
         }

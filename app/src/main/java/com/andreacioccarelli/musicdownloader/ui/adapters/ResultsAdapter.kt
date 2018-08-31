@@ -59,7 +59,6 @@ class ResultsAdapter(response: YoutubeSearchResponse, private val activity: Acti
         }
     }
 
-
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         var card: CardView = v.findViewById(R.id.card)
         var icon: ImageView = v.findViewById(R.id.icon)

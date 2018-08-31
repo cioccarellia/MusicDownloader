@@ -1,8 +1,8 @@
 package com.andreacioccarelli.musicdownloader.util
 
-import com.andreacioccarelli.musicdownloader.App
 import android.os.Build
 import android.os.VibrationEffect
+import com.andreacioccarelli.musicdownloader.App
 import org.jetbrains.anko.vibrator
 
 /**
@@ -21,7 +21,6 @@ object VibrationUtil {
         }
     }
 
-
     private const val VIBRATION_MEDIUM = 50L
     private const val AMPLITUDE_MEDIUM = 180
 
@@ -32,7 +31,6 @@ object VibrationUtil {
             App.instance.baseContext.vibrator.vibrate(VIBRATION_MEDIUM)
         }
     }
-
 
     private const val VIBRATION_STRONG = 100L
     private const val AMPLITUDE_STRONG = 255

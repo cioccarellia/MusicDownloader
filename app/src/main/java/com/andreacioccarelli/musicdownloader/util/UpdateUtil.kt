@@ -45,7 +45,7 @@ object UpdateUtil {
     fun hasPackageBeenDownloaded() = File("${Environment.getExternalStorageDirectory().absolutePath}/" +
             "${Environment.DIRECTORY_DOWNLOADS}/" + App.prefs.getString(Keys.updateSubpath, "")).exists()
 
-    fun openFileInPackageManager() {
+    fun openUpdateInPackageManager() {
         val mostRecentDownload = UpdateUtil.getPackagePath()
         logd(mostRecentDownload)
 

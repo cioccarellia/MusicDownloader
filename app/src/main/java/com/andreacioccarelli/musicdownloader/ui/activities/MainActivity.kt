@@ -25,14 +25,12 @@ import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.list.customListAdapter
-import com.andreacioccarelli.cryptoprefs.CryptoPrefs
 import com.andreacioccarelli.logkit.loge
 import com.andreacioccarelli.logkit.logw
+import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.BuildConfig
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.constants.APK_URL
-import com.andreacioccarelli.musicdownloader.constants.FILE
-import com.andreacioccarelli.musicdownloader.constants.KEY
 import com.andreacioccarelli.musicdownloader.constants.Keys
 import com.andreacioccarelli.musicdownloader.data.requests.UpdateRequestBuilder
 import com.andreacioccarelli.musicdownloader.data.requests.YoutubeRequestBuilder
@@ -56,8 +54,6 @@ import java.io.IOException
 
 
 class MainActivity : AssentActivity() {
-
-    val prefs by lazy { CryptoPrefs(this, FILE, KEY) }
 
     private var wasOffline = false
     private var isOffline = false
@@ -280,7 +276,7 @@ class MainActivity : AssentActivity() {
             val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
             if (id == -1L) return
 
-            UpdateUtil.openFileInPackageManager()
+            UpdateUtil.openUpdateInPackageManager()
         }
     }
 
@@ -296,7 +292,7 @@ class MainActivity : AssentActivity() {
                     jsonRequest,
                     UpdateCheck::class.java)
 
-            if (updateCheck.versionCode > BuildConfig.VERSION_CODE && !prefs.getBoolean(Keys.ignoring + updateCheck.versionCode, false)) {
+            if (updateCheck.versionCode > BuildConfig.VERSION_CODE && !App.prefs.getBoolean(Keys.ignoring + updateCheck.versionCode, false)) {
                 uiThread {
                     MaterialDialog(this@MainActivity)
                             .title(text = "Version ${updateCheck.versionName} found!")
@@ -304,7 +300,7 @@ class MainActivity : AssentActivity() {
                             .positiveButton(text = if (UpdateUtil.hasPackageBeenDownloaded())
                                 "INSTALL UPDATE" else "DOWNLOAD UPDATE") { dialog ->
                                 if (UpdateUtil.hasPackageBeenDownloaded()) {
-                                    UpdateUtil.openFileInPackageManager()
+                                    UpdateUtil.openUpdateInPackageManager()
                                 } else {
                                     val uri = Uri.parse(APK_URL)
                                     val downloadRequest = DownloadManager.Request(uri)
@@ -343,7 +339,7 @@ class MainActivity : AssentActivity() {
                                 dialog.dismiss()
                             }
                             .checkBoxPrompt(text = "Ignore this version", isCheckedDefault = false) { state ->
-                                prefs.put(Keys.ignoring + updateCheck.versionCode, state)
+                                App.prefs.put(Keys.ignoring + updateCheck.versionCode, state)
                             }
                             .noAutoDismiss()
                             .show()
@@ -353,10 +349,11 @@ class MainActivity : AssentActivity() {
     }
 
     private fun initNetwork() = registerReceiver(networkConnectionListener, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+
     private fun unregisterReceivers() = try {
         unregisterReceiver(networkConnectionListener)
         unregisterReceiver(onPackageDownloadCompleated)
-    } catch (notReg: IllegalArgumentException) { loge(notReg) }
+    } catch (notRegistered: IllegalArgumentException) { loge(notRegistered) }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -370,9 +367,7 @@ class MainActivity : AssentActivity() {
 
     lateinit var checklistDialog: MaterialDialog
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        when (item.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
             R.id.action_list -> {
                 if (ChecklistUtil.isEmpty(this)) {
                     checklistDialog = MaterialDialog(this)
@@ -384,9 +379,9 @@ class MainActivity : AssentActivity() {
                             .customListAdapter(ChecklistAdapter(ChecklistUtil.get(this).toMutableList(), this))
                     checklistDialog.show()
                 }
+                true
             }
-        }
 
-        return super.onOptionsItemSelected(item)
+            else -> super.onOptionsItemSelected(item)
     }
 }

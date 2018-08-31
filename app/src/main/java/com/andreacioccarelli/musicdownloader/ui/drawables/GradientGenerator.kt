@@ -47,5 +47,4 @@ object GradientGenerator {
             gd.cornerRadius = 0F
             return gd
         }
-
 }

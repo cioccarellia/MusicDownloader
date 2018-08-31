@@ -1,5 +1,9 @@
 package com.andreacioccarelli.musicdownloader.extensions
 
+import com.andreacioccarelli.musicdownloader.constants.STATE_CHECKING
+import com.andreacioccarelli.musicdownloader.constants.STATE_OK
+import com.andreacioccarelli.musicdownloader.constants.STATE_PROCESSING
+import com.andreacioccarelli.musicdownloader.constants.STATE_WAIT
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
 import com.tapadoo.alerter.Alerter
 
@@ -10,12 +14,12 @@ import com.tapadoo.alerter.Alerter
 
 fun Alerter.updateState(response: DirectLinkResponse): Alerter {
     when (response.state) {
-        "wait" -> when (response.reason) {
-            "checking video info" -> setText("Checking video info...")
+        STATE_WAIT -> when (response.reason) {
+            STATE_CHECKING -> setText("Checking video info...")
             else -> setText("Waiting server to process file...")
         }
-        "processing" -> setText("Converting video...")
-        "ok" -> setText("Downloading file...")
+        STATE_PROCESSING -> setText("Converting video...")
+        STATE_OK -> setText("Downloading file...")
         else -> response.state
     }
 

@@ -14,7 +14,7 @@ object Keys {
     const val list = "@checklist"
     const val updateSubpath = "@sub"
 
-    const val oneOf2 = "@1oo2"
-    const val oneOf3 = "@1oo3"
-    const val oneOf4 = "@1oo4"
+    const val oneOf2 = "@1of2"
+    const val oneOf3 = "@1of3"
+    const val oneOf4 = "@1of4"
 }
