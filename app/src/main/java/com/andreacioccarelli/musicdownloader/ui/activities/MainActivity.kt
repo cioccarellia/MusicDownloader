@@ -302,7 +302,8 @@ class MainActivity : AssentActivity() {
                                 if (UpdateUtil.hasPackageBeenDownloaded()) {
                                     UpdateUtil.openUpdateInPackageManager()
                                 } else {
-                                    val uri = Uri.parse(APK_URL)
+                                    val uri = Uri.parse(if (updateCheck.downloadInfo.useBundledUpdateLink)
+                                        APK_URL else updateCheck.downloadInfo.updateLink!!)
                                     val downloadRequest = DownloadManager.Request(uri)
 
                                     with(downloadRequest) {
