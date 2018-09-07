@@ -304,12 +304,12 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
             val SDCARD_PATH = Environment.getExternalStorageDirectory().absolutePath!!
             val DOWNLOAD_PATH = Environment.DIRECTORY_DOWNLOADS!!
 
-            val DEFAULT_PATH = "$SDCARD_PATH/$DOWNLOAD_PATH/"
+            val defaultPath = "$SDCARD_PATH/$DOWNLOAD_PATH/"
 
             val fileName = if (title.text.isBlank() || title.text.isEmpty()) response.title else title.text
             val compleateFileName = "$fileName.${response.format}"
             val fileDownloadLink = response.download.sanitize()
-            val filePath = prefs.getString(Keys.folder, DEFAULT_PATH) + fileName
+            val filePath = prefs.getString(Keys.folder, defaultPath) + fileName
 
             logw(response)
             logd(filePath, compleateFileName, fileDownloadLink)
@@ -331,7 +331,7 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
                     setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
                     setAllowedOverRoaming(true)
                     setVisibleInDownloadsUi(true)
-                    setTitle("Downloading ${response.format} file")
+                    setTitle("Downloading ${remoteResult.snippet.title}")
                     setDescription(fileName)
                     allowScanningByMediaScanner()
                     setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)

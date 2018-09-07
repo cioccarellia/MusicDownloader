@@ -152,9 +152,9 @@ class MainActivity : AssentActivity() {
         title = "Music Downloader"
     }
 
-    var snack: Snackbar? = null
-    val searches = mutableListOf<Int>()
-    var searchId = 0
+    private var snack: Snackbar? = null
+    private val searches = mutableListOf<Int>()
+    private var searchId = 0
 
     private fun initFab() = with(fab) {
         setOnClickListener { view ->
@@ -257,7 +257,7 @@ class MainActivity : AssentActivity() {
         }
     }
 
-    var isInError = false
+    private var isInError = false
 
     private fun displayFormError() {
         isInError = true

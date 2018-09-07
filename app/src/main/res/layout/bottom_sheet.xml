@@ -27,7 +27,7 @@
 
             <ImageView
                 android:id="@+id/thumb_icon"
-                tools:src="@mipmap/ic_launcher"
+                tools:src="@mipmap/ic_launcher_round"
                 android:layout_width="@dimen/bottom_sheet_image_size_width"
                 android:layout_height="@dimen/bottom_sheet_image_size_height" />
 
