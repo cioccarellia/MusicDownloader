@@ -42,7 +42,7 @@ ext {
     support = '28.0.0-rc01'
     prefs = '1.1.2.0'
     log = '1.1.1'
-    dialog = '2.0.0-alpha06'
+    dialog = '2.0.0-alpha07'
     alerter = '2.0.6'
     glide = '4.8.0'
     assent = '1.0.1'
