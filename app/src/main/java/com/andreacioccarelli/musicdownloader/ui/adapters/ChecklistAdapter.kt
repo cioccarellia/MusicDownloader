@@ -26,7 +26,7 @@ import org.jetbrains.anko.find
 class ChecklistAdapter(private val data: MutableList<Pair<String, String>>, private val activity: Activity) : RecyclerView.Adapter<ChecklistAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_result, parent, false)
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.result_layout, parent, false)
         return ViewHolder(v)
     }
 

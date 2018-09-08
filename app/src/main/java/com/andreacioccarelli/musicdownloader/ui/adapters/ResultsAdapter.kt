@@ -14,7 +14,7 @@ import android.widget.TextView
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchResponse
-import com.andreacioccarelli.musicdownloader.ui.fragments.BottomSheetChooser
+import com.andreacioccarelli.musicdownloader.ui.fragments.DownloadBottomDialog
 import com.bumptech.glide.Glide
 
 /**
@@ -31,7 +31,7 @@ class ResultsAdapter(response: YoutubeSearchResponse, private val activity: Acti
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_result, parent, false)
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.result_layout, parent, false)
         return ViewHolder(v)
     }
 
@@ -46,7 +46,7 @@ class ResultsAdapter(response: YoutubeSearchResponse, private val activity: Acti
         holder.title.text = data[i].snippet.title
 
         holder.card.setOnClickListener {
-            val bottomSheetFragment = BottomSheetChooser(data[i])
+            val bottomSheetFragment = DownloadBottomDialog(data[i])
             bottomSheetFragment.show(fm, bottomSheetFragment.tag)
         }
 

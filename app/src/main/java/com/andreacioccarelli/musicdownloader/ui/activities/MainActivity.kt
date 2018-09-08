@@ -45,8 +45,8 @@ import com.andreacioccarelli.musicdownloader.ui.drawables.GradientGenerator
 import com.andreacioccarelli.musicdownloader.util.*
 import com.google.gson.Gson
 import com.tapadoo.alerter.Alerter
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.activity_content.*
+import kotlinx.android.synthetic.main.activity_layout.*
 import okhttp3.OkHttpClient
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -97,7 +97,7 @@ class MainActivity : AssentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_layout)
 
         initInput()
         initPermissions()
@@ -315,6 +315,8 @@ class MainActivity : AssentActivity() {
                                         setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
                                         setAllowedOverRoaming(true)
                                         setVisibleInDownloadsUi(true)
+                                        setAllowedOverMetered(true)
+                                        setShowRunningNotification(true)
                                         setTitle(UpdateUtil.getNotificationTitle(updateCheck))
                                         setDescription(UpdateUtil.getNotificationContent())
                                         setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
@@ -374,20 +376,20 @@ class MainActivity : AssentActivity() {
     lateinit var checklistDialog: MaterialDialog
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-            R.id.action_list -> {
-                if (ChecklistUtil.isEmpty(this)) {
-                    checklistDialog = MaterialDialog(this)
-                            .customView(R.layout.empty_checklist)
-                    checklistDialog.show()
-                } else {
-                    checklistDialog = MaterialDialog(this)
-                            .title(text = "Checklist")
-                            .customListAdapter(ChecklistAdapter(ChecklistUtil.get(this).toMutableList(), this))
-                    checklistDialog.show()
-                }
-                true
+        R.id.action_list -> {
+            if (ChecklistUtil.isEmpty(this)) {
+                checklistDialog = MaterialDialog(this)
+                        .customView(R.layout.empty_view_checklist)
+                checklistDialog.show()
+            } else {
+                checklistDialog = MaterialDialog(this)
+                        .title(text = "Checklist")
+                        .customListAdapter(ChecklistAdapter(ChecklistUtil.get(this).toMutableList(), this))
+                checklistDialog.show()
             }
+            true
+        }
 
-            else -> super.onOptionsItemSelected(item)
+        else -> super.onOptionsItemSelected(item)
     }
 }

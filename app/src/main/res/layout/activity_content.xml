@@ -6,9 +6,9 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ui.activities.MainActivity"
-    android:paddingStart="60dp"
-    android:paddingEnd="60dp"
-    tools:showIn="@layout/activity_main">
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    tools:showIn="@layout/activity_layout">
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/searchLayout"
@@ -18,7 +18,7 @@
         android:layout_centerHorizontal="true"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
-        android:layout_marginTop="50dp">
+        android:layout_marginTop="40dp">
 
         <EditText
             android:id="@+id/search"
@@ -32,14 +32,14 @@
     <android.support.v7.widget.RecyclerView
         android:paddingTop="4dp"
         android:id="@+id/resultsRecyclerView"
-        tools:listitem="@layout/item_result"
+        tools:listitem="@layout/result_layout"
         android:layout_below="@id/searchLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <include
         android:layout_below="@+id/searchLayout"
-        layout="@layout/empty_content"
+        layout="@layout/empty_view_search"
         android:id="@+id/empty_result"
         android:visibility="gone"
         android:layout_height="match_parent"

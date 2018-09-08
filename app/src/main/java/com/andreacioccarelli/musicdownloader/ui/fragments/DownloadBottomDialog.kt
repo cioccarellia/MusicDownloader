@@ -59,7 +59,7 @@ import org.jetbrains.anko.uiThread
  */
 
 @SuppressLint("ValidFragment")
-class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment() {
+class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment() {
 
     private val prefs by lazy { CryptoPrefs(App.instance.baseContext, FILE, KEY) }
     private var isInChecklist = false
@@ -70,7 +70,7 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = BottomSheetDialog(requireContext(), theme)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.bottom_sheet, container, false)
+        val view = inflater.inflate(R.layout.checklist, container, false)
         VibrationUtil.strong()
 
         title = view.find(R.id.thumb_title)
@@ -167,7 +167,7 @@ class BottomSheetChooser(val remoteResult: Result) : BottomSheetDialogFragment()
 
     private fun openVideoInDialog() {
         val dialog = MaterialDialog(requireContext())
-                .customView(R.layout.video_player, scrollable = false)
+                .customView(R.layout.video_player_dialog, scrollable = false)
 
         dialog.window!!.setBackgroundDrawable(GradientGenerator.make(26F, R.color.Grey_1000, R.color.Grey_1000))
         val youtubePlayer = dialog.getCustomView()!!.find<YouTubePlayerView>(R.id.player)
