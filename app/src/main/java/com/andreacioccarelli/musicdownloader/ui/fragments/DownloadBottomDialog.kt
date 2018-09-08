@@ -24,9 +24,7 @@ import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.andreacioccarelli.cryptoprefs.CryptoPrefs
-import com.andreacioccarelli.logkit.logd
 import com.andreacioccarelli.logkit.loge
-import com.andreacioccarelli.logkit.logw
 import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.constants.*
@@ -300,7 +298,6 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
         act.runOnUiThread {
             if (isInChecklist) ChecklistUtil.remove(act, remoteResult.snippet.title)
 
-            //TODO cleanup
             val SDCARD_PATH = Environment.getExternalStorageDirectory().absolutePath!!
             val DOWNLOAD_PATH = Environment.DIRECTORY_DOWNLOADS!!
 
@@ -310,9 +307,6 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
             val compleateFileName = "$fileName.${response.format}"
             val fileDownloadLink = response.download.sanitize()
             val filePath = prefs.getString(Keys.folder, defaultPath) + fileName
-
-            logw(response)
-            logd(filePath, compleateFileName, fileDownloadLink)
 
             Alerter.hide()
             Alerter.create(act)
@@ -349,7 +343,6 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
             val nextRequest = OkHttpClient().newCall(requestBuilder).execute()
 
             val json = nextRequest.body()!!.string()
-            logd(json)
 
             val nextResponse = Gson().fromJson(json, DirectLinkResponse::class.java)
 

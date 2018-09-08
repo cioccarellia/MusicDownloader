@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.andreacioccarelli.logkit.logd
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.ui.activities.MainActivity
 import com.andreacioccarelli.musicdownloader.util.ChecklistUtil
@@ -38,8 +37,6 @@ class ChecklistAdapter(private val data: MutableList<Pair<String, String>>, priv
                 .thumbnail(0.1F)
                 .into(holder.icon)
         
-        logd(data, holder.adapterPosition)
-
         holder.title.text = data[holder.adapterPosition].first
 
         with(holder.card) {
@@ -58,7 +55,6 @@ class ChecklistAdapter(private val data: MutableList<Pair<String, String>>, priv
 
             setOnLongClickListener {
                 if (data.size == 1) {
-                    logd(data, holder.adapterPosition, ChecklistUtil.get(activity))
                     val ref = (activity as MainActivity)
                     ref.checklistDialog.dismiss()
                 }

@@ -7,13 +7,11 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.support.v4.content.FileProvider
-import com.andreacioccarelli.logkit.logd
 import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.BuildConfig
 import com.andreacioccarelli.musicdownloader.constants.Keys
 import com.andreacioccarelli.musicdownloader.data.serializers.UpdateCheck
 import java.io.File
-
 
 
 /**
@@ -51,14 +49,12 @@ object UpdateUtil {
     fun hasPackageBeenDownloaded(newVersionName: String): Boolean {
         val file = File("${Environment.getExternalStorageDirectory().absolutePath}/" +
                 "${Environment.DIRECTORY_DOWNLOADS}/$SUBFOLDER/music-downloader-$newVersionName.apk")
-        logd(file)
 
         return file.exists()
     }
 
     fun openUpdateInPackageManager(context: Context) {
         val cachedUpdatePackage = UpdateUtil.getPackagePath()
-        logd(cachedUpdatePackage)
 
         val uriForFile = FileProvider.getUriForFile(context, "${context.packageName}.provider", cachedUpdatePackage)
 

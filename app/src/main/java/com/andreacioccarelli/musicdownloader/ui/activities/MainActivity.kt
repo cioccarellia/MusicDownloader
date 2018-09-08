@@ -26,7 +26,6 @@ import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.list.customListAdapter
 import com.andreacioccarelli.logkit.loge
-import com.andreacioccarelli.logkit.logw
 import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.BuildConfig
 import com.andreacioccarelli.musicdownloader.R
@@ -213,7 +212,6 @@ class MainActivity : AssentActivity() {
                     val request = OkHttpClient().newCall(requestBuilder).execute()
 
                     val jsonRequest = request.body()!!.string()
-                    logw(jsonRequest)
 
                     uiThread {
                         if (!isSearching || searches.contains(searchId)) return@uiThread
@@ -280,7 +278,7 @@ class MainActivity : AssentActivity() {
 
             try {
                 Alerter.clearCurrent(this@MainActivity)
-            } catch (invalid: IllegalArgumentException) { logw(invalid) }
+            } catch (invalid: IllegalArgumentException) { loge(invalid) }
         }
     }
 
