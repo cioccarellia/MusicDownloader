@@ -13,13 +13,13 @@ import android.os.Handler
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.ContextCompat.getSystemService
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import com.afollestad.assent.Assent
-import com.afollestad.assent.AssentActivity
-import com.afollestad.assent.Permission
+import com.afollestad.assent.*
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
@@ -38,6 +38,7 @@ import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchRespo
 import com.andreacioccarelli.musicdownloader.extensions.dismissKeyboard
 import com.andreacioccarelli.musicdownloader.extensions.onSubmit
 import com.andreacioccarelli.musicdownloader.extensions.onceOutOf3
+import com.andreacioccarelli.musicdownloader.extensions.onceOutOf4
 import com.andreacioccarelli.musicdownloader.ui.adapters.ChecklistAdapter
 import com.andreacioccarelli.musicdownloader.ui.adapters.ResultsAdapter
 import com.andreacioccarelli.musicdownloader.ui.drawables.GradientGenerator
@@ -52,7 +53,7 @@ import org.jetbrains.anko.uiThread
 import java.io.IOException
 
 
-class MainActivity : AssentActivity() {
+class MainActivity : AppCompatActivity() {
 
     private var wasOffline = false
     private var isOffline = false
@@ -126,8 +127,8 @@ class MainActivity : AssentActivity() {
     }
 
     private fun initPermissions() {
-        if (!Assent.isAllGranted(Permission.WRITE_EXTERNAL_STORAGE)) {
-            Assent.request(Permission.WRITE_EXTERNAL_STORAGE) {
+        if (!isAllGranted(Permission.WRITE_EXTERNAL_STORAGE)) {
+            askForPermissions(Permission.WRITE_EXTERNAL_STORAGE) {
                 arePermissionsGranted = if (!it.isAllGranted(Permission.WRITE_EXTERNAL_STORAGE)) {
                     Alerter.create(this@MainActivity)
                             .setTitle("Cannot read external storage")
@@ -158,7 +159,7 @@ class MainActivity : AssentActivity() {
     private fun initFab() = with(fab) {
         setOnClickListener { view ->
             if (!arePermissionsGranted) {
-                Assent.request(Permission.WRITE_EXTERNAL_STORAGE) {
+                askForPermissions(Permission.WRITE_EXTERNAL_STORAGE) {
                     if (it.isAllGranted(Permission.WRITE_EXTERNAL_STORAGE)) {
                         arePermissionsGranted = true
                         fab.performClick()
@@ -282,7 +283,7 @@ class MainActivity : AssentActivity() {
         }
     }
 
-    private fun initUpdateChecker() = onceOutOf3 {
+    private fun initUpdateChecker() = onceOutOf4 {
         doAsync {
             val requestBuilder = UpdateRequestBuilder.get()
             val request = OkHttpClient().newCall(requestBuilder).execute()

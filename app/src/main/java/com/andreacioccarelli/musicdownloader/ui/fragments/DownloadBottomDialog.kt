@@ -298,43 +298,35 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
         act.runOnUiThread {
             if (isInChecklist) ChecklistUtil.remove(act, remoteResult.snippet.title)
 
-            val SDCARD_PATH = Environment.getExternalStorageDirectory().absolutePath!!
-            val DOWNLOAD_PATH = Environment.DIRECTORY_DOWNLOADS!!
-
-            val defaultPath = "$SDCARD_PATH/$DOWNLOAD_PATH/"
-
             val fileName = if (title.text.isBlank() || title.text.isEmpty()) response.title else title.text
-            val compleateFileName = "$fileName.${response.format}"
+            val completeFileName = "$fileName.${response.format}"
             val fileDownloadLink = response.download.sanitize()
-            val filePath = prefs.getString(Keys.folder, defaultPath) + fileName
 
             Alerter.hide()
             Alerter.create(act)
                     .setTitle("Downloading file")
-                    .setText(compleateFileName)
+                    .setText(completeFileName)
                     .setDuration(7_000)
                     .setBackgroundDrawable(GradientGenerator.appThemeGradient)
                     .setIcon(R.drawable.download)
                     .show()
 
-            doAsync {
-                val uri = fileDownloadLink.toUri()
-                val downloadRequest = DownloadManager.Request(uri)
+            val uri = fileDownloadLink.toUri()
+            val downloadRequest = DownloadManager.Request(uri)
 
-                with(downloadRequest) {
-                    setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
-                    setAllowedOverRoaming(true)
-                    setVisibleInDownloadsUi(true)
-                    setTitle("Downloading ${remoteResult.snippet.title}")
-                    setDescription(fileName)
-                    allowScanningByMediaScanner()
-                    setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            with(downloadRequest) {
+                setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+                setAllowedOverRoaming(true)
+                setVisibleInDownloadsUi(true)
+                setTitle("Downloading ${remoteResult.snippet.title}")
+                setDescription(fileName)
+                allowScanningByMediaScanner()
+                setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
 
-                    setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "MusicDownloader/$compleateFileName")
-                }
-
-                downloadManager.enqueue(downloadRequest)
+                setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "MusicDownloader/$completeFileName")
             }
+
+            downloadManager.enqueue(downloadRequest)
         }
     }
 
