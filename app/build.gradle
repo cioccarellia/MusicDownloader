@@ -40,7 +40,7 @@ ext {
     okhttp = '3.11.0'
 
     support = '28.0.0-rc02'
-    prefs = '1.1.2.0'
+    prefs = '1.2.0.0'
     log = '1.1.1'
     dialog = '2.0.0-alpha09'
     alerter = '2.0.6'

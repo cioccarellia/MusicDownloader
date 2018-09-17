@@ -40,6 +40,7 @@ import com.andreacioccarelli.musicdownloader.util.ChecklistUtil
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
+import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayerView
 import com.pierfrancescosoffritti.androidyoutubeplayer.player.listeners.AbstractYouTubePlayerListener
 import com.tapadoo.alerter.Alerter
@@ -59,7 +60,6 @@ import org.jetbrains.anko.uiThread
 @SuppressLint("ValidFragment")
 class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment() {
 
-    private val prefs by lazy { CryptoPrefs(App.instance.baseContext, FILE, KEY) }
     private var isInChecklist = false
     lateinit var title: TextView
 
@@ -70,6 +70,12 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.checklist, container, false)
         VibrationUtil.strong()
+
+        remoteResult.snippet.title.apply {
+            replace("/", "")
+            removeSuffix(".mp4")
+            removeSuffix(".mp3")
+        }
 
         title = view.find(R.id.thumb_title)
         title.text = remoteResult.snippet.title
@@ -82,7 +88,7 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
         view.find<CardView>(R.id.thumbCard).setOnClickListener {
             val dialog = MaterialDialog(requireContext())
                     .title(text = "Change file name")
-                    .input(prefill = title.text, waitForPositiveButton = true) { dialog, text ->
+                    .input(prefill = title.text, waitForPositiveButton = true) { _, text ->
                         title.text = text
                     }
                     .positiveButton(text = "SUBMIT")
@@ -170,7 +176,7 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
         dialog.window!!.setBackgroundDrawable(GradientGenerator.make(26F, R.color.Grey_1000, R.color.Grey_1000))
         val youtubePlayer = dialog.getCustomView()!!.find<YouTubePlayerView>(R.id.player)
 
-        youtubePlayer.initialize({ initializedYouTubePlayer ->
+        youtubePlayer.initialize({ initializedYouTubePlayer: YouTubePlayer ->
             initializedYouTubePlayer.addListener(object : AbstractYouTubePlayerListener() {
                 override fun onReady() {
                     initializedYouTubePlayer.loadVideo(remoteResult.id.videoId, 0f)
@@ -193,7 +199,7 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
             val intent = Intent(Intent.ACTION_VIEW)
             intent.run {
                 intent.data = watchLink.toUri()
-                setPackage("com.google.android.youtube")
+                setPackage(PACKAGE_YOUTUBE)
             }
 
             startActivity(intent)
@@ -333,9 +339,7 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
     private fun processDownloadForWaitingFile(act: Activity, requestBuilder: Request, downloadManager: DownloadManager) {
         doAsync {
             val nextRequest = OkHttpClient().newCall(requestBuilder).execute()
-
             val json = nextRequest.body()!!.string()
-
             val nextResponse = Gson().fromJson(json, DirectLinkResponse::class.java)
 
             uiThread {
@@ -350,7 +354,7 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
                     }
                 } else {
                     Alerter.create(act)
-                            .setTitle("Cannot download file")
+                            .setTitle("Can't download this file")
                             .setText("Video length exceeds 3 hours")
                             .setDuration(7_000)
                             .setBackgroundDrawable(GradientGenerator.errorGradient)
