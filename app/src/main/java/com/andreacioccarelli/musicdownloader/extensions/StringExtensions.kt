@@ -18,3 +18,7 @@ fun String.toEditable() = Editable.Factory.getInstance().newEditable(this)!!
 fun String.sanitize() = replace("\"", "")
         .replace("\"", "")
         .replace("\\/", "/")
+
+fun String.renameIfEqual(pattern: String, renaming: String) {
+    if (this == pattern) replace(this, renaming)
+}

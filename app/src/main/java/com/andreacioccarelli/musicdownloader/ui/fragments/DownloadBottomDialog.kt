@@ -32,6 +32,7 @@ import com.andreacioccarelli.musicdownloader.data.formats.Format
 import com.andreacioccarelli.musicdownloader.data.requests.DownloadLinkRequestsBuilder
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
+import com.andreacioccarelli.musicdownloader.extensions.renameIfEqual
 import com.andreacioccarelli.musicdownloader.extensions.sanitize
 import com.andreacioccarelli.musicdownloader.extensions.toUri
 import com.andreacioccarelli.musicdownloader.extensions.updateState
@@ -75,6 +76,9 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
             replace("/", "")
             removeSuffix(".mp4")
             removeSuffix(".mp3")
+            renameIfEqual(".", "_.")
+            renameIfEqual("_.", "__.")
+            removePrefix(".")
         }
 
         title = view.find(R.id.thumb_title)
