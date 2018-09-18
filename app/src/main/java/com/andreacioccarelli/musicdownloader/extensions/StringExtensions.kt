@@ -19,6 +19,7 @@ fun String.sanitize() = replace("\"", "")
         .replace("\"", "")
         .replace("\\/", "/")
 
-fun String.renameIfEqual(pattern: String, renaming: String) {
+fun String.renameIfEqual(pattern: String, renaming: String): String {
     if (this == pattern) replace(this, renaming)
+    return this
 }

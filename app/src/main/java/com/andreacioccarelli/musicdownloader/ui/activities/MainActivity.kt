@@ -13,13 +13,14 @@ import android.os.Handler
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
-import android.support.v4.content.ContextCompat.getSystemService
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import com.afollestad.assent.*
+import com.afollestad.assent.Permission
+import com.afollestad.assent.askForPermissions
+import com.afollestad.assent.isAllGranted
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
@@ -37,7 +38,6 @@ import com.andreacioccarelli.musicdownloader.data.serializers.UpdateCheck
 import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchResponse
 import com.andreacioccarelli.musicdownloader.extensions.dismissKeyboard
 import com.andreacioccarelli.musicdownloader.extensions.onSubmit
-import com.andreacioccarelli.musicdownloader.extensions.onceOutOf3
 import com.andreacioccarelli.musicdownloader.extensions.onceOutOf4
 import com.andreacioccarelli.musicdownloader.ui.adapters.ChecklistAdapter
 import com.andreacioccarelli.musicdownloader.ui.adapters.ResultsAdapter

@@ -23,9 +23,8 @@ import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
-import com.andreacioccarelli.cryptoprefs.CryptoPrefs
+import com.andreacioccarelli.logkit.logd
 import com.andreacioccarelli.logkit.loge
-import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.constants.*
 import com.andreacioccarelli.musicdownloader.data.formats.Format
@@ -62,7 +61,8 @@ import org.jetbrains.anko.uiThread
 class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment() {
 
     private var isInChecklist = false
-    lateinit var title: TextView
+    lateinit var titleTextView: TextView
+    var title = ""
 
     override fun getTheme() = R.style.BottomSheetTheme
 
@@ -72,17 +72,19 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
         val view = inflater.inflate(R.layout.checklist, container, false)
         VibrationUtil.strong()
 
-        remoteResult.snippet.title.apply {
-            replace("/", "")
-            removeSuffix(".mp4")
-            removeSuffix(".mp3")
-            renameIfEqual(".", "_.")
-            renameIfEqual("_.", "__.")
-            removePrefix(".")
-        }
+        title = remoteResult.snippet.title
+            .replace("/", "")
+            .removeSuffix(".mp4")
+            .removeSuffix(".mp3")
+            .renameIfEqual(".", "_.")
+            .renameIfEqual("..", "__.")
+            .removePrefix(".")
 
-        title = view.find(R.id.thumb_title)
-        title.text = remoteResult.snippet.title
+
+        logd(title)
+
+        titleTextView = view.find(R.id.thumb_title)
+        titleTextView.text = title
 
         Glide.with(this)
                 .load(remoteResult.snippet.thumbnails.medium.url)
@@ -92,8 +94,9 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
         view.find<CardView>(R.id.thumbCard).setOnClickListener {
             val dialog = MaterialDialog(requireContext())
                     .title(text = "Change file name")
-                    .input(prefill = title.text, waitForPositiveButton = true) { _, text ->
-                        title.text = text
+                    .input(prefill = titleTextView.text, waitForPositiveButton = true) { _, text ->
+                        titleTextView.text = text
+                        title = text.toString()
                     }
                     .positiveButton(text = "SUBMIT")
 
@@ -308,7 +311,7 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
         act.runOnUiThread {
             if (isInChecklist) ChecklistUtil.remove(act, remoteResult.snippet.title)
 
-            val fileName = if (title.text.isBlank() || title.text.isEmpty()) response.title else title.text
+            val fileName = if (titleTextView.text.isBlank() || titleTextView.text.isEmpty()) response.title else title
             val completeFileName = "$fileName.${response.format}"
             val fileDownloadLink = response.download.sanitize()
 
@@ -328,7 +331,7 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
                 setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
                 setAllowedOverRoaming(true)
                 setVisibleInDownloadsUi(true)
-                setTitle("Downloading ${remoteResult.snippet.title}")
+                setTitle("Downloading $title")
                 setDescription(fileName)
                 allowScanningByMediaScanner()
                 setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
