@@ -17,11 +17,6 @@ fun EditText.dismissKeyboard() {
     imm.hideSoftInputFromWindow(this.windowToken, 0)
 }
 
-fun EditText.popUpKeyboard() {
-    val imm = App.instance.baseContext.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    imm.showSoftInput(this, 0)
-}
-
 fun EditText.onSubmit(code: () -> Unit) {
     setOnEditorActionListener { _, actionId, _ ->
         when (actionId) {

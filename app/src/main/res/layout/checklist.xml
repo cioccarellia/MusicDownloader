@@ -9,7 +9,7 @@
     android:paddingTop="8dp">
 
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:foreground="?android:attr/selectableItemBackground"
         android:drawSelectorOnTop="false"
         android:id="@+id/thumbCard"
@@ -49,9 +49,9 @@
 
         </RelativeLayout>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
     
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/play"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -86,9 +86,9 @@
 
         </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/open_video"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -123,9 +123,9 @@
 
         </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/open_channel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -160,9 +160,9 @@
 
         </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/add_to_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -197,10 +197,10 @@
 
         </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/remove_from_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -235,9 +235,9 @@
 
         </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/copy_link"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -272,9 +272,9 @@
 
         </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/share_link"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -309,9 +309,9 @@
 
         </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/mp3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -346,9 +346,9 @@
 
         </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/mp4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -383,7 +383,7 @@
 
         </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
 
 </LinearLayout>

@@ -7,14 +7,15 @@ import android.app.DownloadManager
 import android.content.*
 import android.os.Bundle
 import android.os.Environment
-import android.support.design.widget.BottomSheetDialog
-import android.support.design.widget.BottomSheetDialogFragment
-import android.support.v7.widget.CardView
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import androidx.cardview.widget.CardView
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
@@ -61,7 +62,7 @@ import org.jetbrains.anko.uiThread
 class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment() {
 
     private var isInChecklist = false
-    lateinit var titleTextView: TextView
+    private lateinit var titleTextView: TextView
     var title = ""
 
     override fun getTheme() = R.style.BottomSheetTheme
@@ -86,7 +87,7 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
         titleTextView = view.find(R.id.thumb_title)
         titleTextView.text = title
 
-        Glide.with(this)
+        Glide.with(this.requireActivity())
                 .load(remoteResult.snippet.thumbnails.medium.url)
                 .thumbnail(0.1F)
                 .into(view.find(R.id.thumb_icon))

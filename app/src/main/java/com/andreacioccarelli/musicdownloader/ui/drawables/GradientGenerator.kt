@@ -4,8 +4,8 @@ import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.R
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
-import android.support.annotation.ColorRes
-import android.support.v4.content.ContextCompat
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 
 /**
  * Created by andrea on 2018/Aug.
