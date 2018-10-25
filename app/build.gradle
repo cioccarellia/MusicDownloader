@@ -4,14 +4,14 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion "28.0.2"
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
         applicationId "com.andreacioccarelli.musicdownloader"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 4
-        versionName "1.1.0"
+        versionCode 5
+        versionName "1.1.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -40,12 +40,12 @@ ext {
     okhttp = '3.11.0'
 
     support = '28.0.0'
-    prefs = '1.2.0.0'
+    prefs = '1.3.0.0'
     log = '1.1.1'
-    dialog = '2.0.0-beta2'
-    alerter = '2.0.6'
+    dialog = '2.0.0-beta4'
+    alerter = '3.0.1'
     glide = '4.8.0'
-    assent = '2.0.0'
+    assent = '2.2.0'
     youtube = '8.0.1'
     toasty = '1.3.0'
 }
