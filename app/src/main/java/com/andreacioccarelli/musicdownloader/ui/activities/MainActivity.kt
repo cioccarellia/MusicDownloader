@@ -11,13 +11,12 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-import com.google.android.material.snackbar.Snackbar
-import androidx.core.content.ContextCompat
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.assent.Permission
 import com.afollestad.assent.askForPermissions
 import com.afollestad.assent.isAllGranted
@@ -43,6 +42,7 @@ import com.andreacioccarelli.musicdownloader.ui.adapters.ChecklistAdapter
 import com.andreacioccarelli.musicdownloader.ui.adapters.ResultsAdapter
 import com.andreacioccarelli.musicdownloader.ui.drawables.GradientGenerator
 import com.andreacioccarelli.musicdownloader.util.*
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.tapadoo.alerter.Alerter
 import kotlinx.android.synthetic.main.activity_content.*
@@ -321,7 +321,7 @@ class MainActivity : AppCompatActivity() {
                                         setDescription(UpdateUtil.getNotificationContent())
                                         setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
 
-                                        setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
+                                        setDestinationInExternalPublicDir("",
                                                 UpdateUtil.getDestinationSubpath(updateCheck))
                                     }
 

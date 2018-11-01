@@ -6,7 +6,6 @@ import android.app.Dialog
 import android.app.DownloadManager
 import android.content.*
 import android.os.Bundle
-import android.os.Environment
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -336,7 +335,7 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
                 allowScanningByMediaScanner()
                 setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
 
-                setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "MusicDownloader/$completeFileName")
+                setDestinationInExternalPublicDir("", "MusicDownloader/$completeFileName")
             }
 
             downloadManager.enqueue(downloadRequest)
