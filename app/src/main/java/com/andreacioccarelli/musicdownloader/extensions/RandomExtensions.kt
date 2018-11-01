@@ -9,7 +9,7 @@ import com.andreacioccarelli.musicdownloader.constants.Keys
  */
 
 fun onceOutOf4(code: () -> Unit) {
-    val value = App.prefs.getInt(Keys.oneOf4, 3)
+    val value = App.prefs.get(Keys.oneOf4, 3)
     if (value == 3) {
         App.prefs.put(Keys.oneOf4, 0)
         code()

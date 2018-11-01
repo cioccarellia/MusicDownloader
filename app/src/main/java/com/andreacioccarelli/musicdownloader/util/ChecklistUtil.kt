@@ -20,16 +20,16 @@ object ChecklistUtil {
 
     fun get(context: Context): List<Pair<String, String>> {
         val prefs = CryptoPrefs(context, FILE, KEY)
-        val raw = prefs.getString(Keys.list, "")
+        val raw = prefs.get(Keys.list, "")
 
         if (raw == "") return emptyList()
         val list = raw.removeSuffix(separator).split(separator)
-        return list.map { it to prefs.getString(it, "") }
+        return list.map { it to prefs.get(it, "") }
     }
     
     fun add(context: Context, item: String, link: String) {
         val prefs = CryptoPrefs(context, FILE, KEY)
-        prefs.put(Keys.list, prefs.getString(Keys.list, "")
+        prefs.put(Keys.list, prefs.get(Keys.list, "")
                 .plus("$item$separator")
         )
         prefs.put(item, link)
@@ -38,13 +38,13 @@ object ChecklistUtil {
     fun contains(context: Context, item: String): Boolean {
         val prefs = CryptoPrefs(context, FILE, KEY)
 
-        val raw = prefs.getString(Keys.list, "")
+        val raw = prefs.get(Keys.list, "")
         return raw.contains(item)
     }
 
     fun remove(context: Context, item: String) {
         val prefs = CryptoPrefs(context, FILE, KEY)
-        val raw = prefs.getString(Keys.list, "")
+        val raw = prefs.get(Keys.list, "")
 
         if (raw.contains(item)) {
             if (raw == "$item$separator" || raw == item) {

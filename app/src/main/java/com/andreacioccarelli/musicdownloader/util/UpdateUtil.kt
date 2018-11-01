@@ -38,13 +38,13 @@ object UpdateUtil {
 
     fun clearDuplicatedInstallationPackage() {
         File("${Environment.getExternalStorageDirectory().absolutePath}/" +
-                "${Environment.DIRECTORY_DOWNLOADS}/" + App.prefs.getString(Keys.updateSubpath, "")).delete()
+                "${Environment.DIRECTORY_DOWNLOADS}/" + App.prefs.get(Keys.updateSubpath, "")).delete()
     }
 
     private fun getPackagePath(): File = File(
             "${Environment.getExternalStorageDirectory().absolutePath}/" +
                     "${Environment.DIRECTORY_DOWNLOADS}/" +
-                    App.prefs.getString(Keys.updateSubpath, ""))
+                    App.prefs.get(Keys.updateSubpath, ""))
 
     fun hasPackageBeenDownloaded(newVersionName: String): Boolean {
         val file = File("${Environment.getExternalStorageDirectory().absolutePath}/" +

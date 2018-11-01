@@ -86,7 +86,8 @@ class MainActivity : AppCompatActivity() {
                         .setIcon(R.drawable.download_error)
                         .enableSwipeToDismiss()
                         .setBackgroundDrawable(GradientGenerator.errorGradient)
-                        .setOnClickListener { startActivityForResult(Intent(android.provider.Settings.ACTION_WIFI_SETTINGS), 0) }
+                        .setOnClickListener(
+                                View.OnClickListener { startActivityForResult(Intent(android.provider.Settings.ACTION_WIFI_SETTINGS), 0) })
                         .show()
 
                 wasOffline = true
@@ -136,7 +137,7 @@ class MainActivity : AppCompatActivity() {
                             .setDuration(5_000)
                             .setIcon(R.drawable.folder)
                             .setBackgroundDrawable(GradientGenerator.errorGradient)
-                            .setOnClickListener { _ -> initPermissions() }
+                            .setOnClickListener( View.OnClickListener { initPermissions() })
                             .show()
                     false
                 } else {
@@ -295,7 +296,7 @@ class MainActivity : AppCompatActivity() {
                     jsonRequest,
                     UpdateCheck::class.java)
 
-            if (updateCheck.versionCode > BuildConfig.VERSION_CODE && !App.prefs.getBoolean(Keys.ignoring + updateCheck.versionCode, false)) {
+            if (updateCheck.versionCode > BuildConfig.VERSION_CODE && !App.prefs.get(Keys.ignoring + updateCheck.versionCode, false)) {
                 uiThread {
                     MaterialDialog(this@MainActivity)
                             .title(text = "Version ${updateCheck.versionName} found!")
