@@ -1,7 +1,7 @@
 {
   "versionCode": 5,
   "versionName": "1.1.1",
-  "changelog": "Internal optimization and bug fixes",
+  "changelog": "Internal updates and performances improvements",
 
   "downloadInfo": {
     "useBundledUpdateLink": true,
