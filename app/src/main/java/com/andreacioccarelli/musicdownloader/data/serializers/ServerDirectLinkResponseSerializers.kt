@@ -3,8 +3,7 @@ package com.andreacioccarelli.musicdownloader.data.serializers
 import com.google.gson.annotations.SerializedName
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package andreacioccarelli.musicdownloader.data.serializers
+ *  Designed and developed by Andrea Cioccarelli
  */
 
 data class DirectLinkResponse(

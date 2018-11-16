@@ -18,9 +18,9 @@ import com.andreacioccarelli.musicdownloader.ui.fragments.DownloadBottomDialog
 import com.bumptech.glide.Glide
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package andreacioccarelli.musicdownloader.ui.adapters
+ *  Designed and developed by Andrea Cioccarelli
  */
+
 class ResultsAdapter(response: YoutubeSearchResponse, private val activity: Activity, private val fm: FragmentManager) : RecyclerView.Adapter<ResultsAdapter.ViewHolder>() {
 
     val data by lazy { ArrayList<Result>() }

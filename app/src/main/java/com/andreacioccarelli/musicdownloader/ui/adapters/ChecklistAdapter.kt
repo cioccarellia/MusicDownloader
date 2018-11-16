@@ -2,24 +2,23 @@ package com.andreacioccarelli.musicdownloader.ui.adapters
 
 import android.app.Activity
 import android.os.Handler
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import androidx.cardview.widget.CardView
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.RecyclerView
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.ui.activities.MainActivity
 import com.andreacioccarelli.musicdownloader.util.ChecklistUtil
 import com.bumptech.glide.Glide
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.jetbrains.anko.find
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package com.andreacioccarelli.musicdownloader.ui.adapters
+ *  Designed and developed by Andrea Cioccarelli
  */
 
 class ChecklistAdapter(private val data: MutableList<Pair<String, String>>, private val activity: Activity) : RecyclerView.Adapter<ChecklistAdapter.ViewHolder>() {

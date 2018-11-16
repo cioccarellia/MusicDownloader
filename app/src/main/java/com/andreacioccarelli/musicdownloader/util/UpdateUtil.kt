@@ -13,11 +13,10 @@ import com.andreacioccarelli.musicdownloader.constants.Keys
 import com.andreacioccarelli.musicdownloader.data.serializers.UpdateCheck
 import java.io.File
 
-
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package com.andreacioccarelli.musicdownloader.util
+ *  Designed and developed by Andrea Cioccarelli
  */
+
 object UpdateUtil {
 
     private const val SUBFOLDER = "MusicDownloader"
@@ -25,7 +24,6 @@ object UpdateUtil {
 
     fun getNotificationTitle(check: UpdateCheck) = "MusicDownloader (${BuildConfig.VERSION_NAME} -> ${check.versionName})"
     fun getNotificationContent() = "Downloading update package"
-
 
     fun getDestinationSubpath(check: UpdateCheck): String {
         val subPath = "$SUBFOLDER/music-downloader-${check.versionName}.apk"

@@ -1,8 +1,7 @@
 package com.andreacioccarelli.musicdownloader.data.serializers
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package com.andreacioccarelli.musicdownloader.data.serializers
+ *  Designed and developed by Andrea Cioccarelli
  */
 
 data class UpdateCheck(

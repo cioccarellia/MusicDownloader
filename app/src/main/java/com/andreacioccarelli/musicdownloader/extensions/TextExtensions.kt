@@ -6,10 +6,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import com.andreacioccarelli.musicdownloader.App
 
-
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package andreacioccarelli.musicdownloader.extensions
+ *  Designed and developed by Andrea Cioccarelli
  */
 
 fun EditText.dismissKeyboard() {

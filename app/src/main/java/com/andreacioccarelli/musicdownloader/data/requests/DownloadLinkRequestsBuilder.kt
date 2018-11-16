@@ -7,8 +7,7 @@ import com.andreacioccarelli.musicdownloader.data.parsers.ConverterUrlParser
 import okhttp3.Request
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package andreacioccarelli.musicdownloader.data.generator
+ *  Designed and developed by Andrea Cioccarelli
  */
 
 object DownloadLinkRequestsBuilder {

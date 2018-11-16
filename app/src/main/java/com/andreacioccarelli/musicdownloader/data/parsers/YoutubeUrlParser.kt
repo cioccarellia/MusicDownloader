@@ -6,9 +6,9 @@ import com.andreacioccarelli.musicdownloader.constants.YOUTUBE_API_SEARCH_URL
 import com.andreacioccarelli.musicdownloader.extensions.isUrl
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package andreacioccarelli.musicdownloader.data.parser
+ *  Designed and developed by Andrea Cioccarelli
  */
+
 object YoutubeUrlParser {
     fun parse(search: String): String = YOUTUBE_API_SEARCH_URL + "?"
             .plus("part=snippet")

@@ -20,7 +20,6 @@ import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
-import com.andreacioccarelli.logkit.logd
 import com.andreacioccarelli.logkit.loge
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.constants.*
@@ -50,7 +49,6 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.find
 import org.jetbrains.anko.uiThread
 
-
 /**
  * Created by La mejor on 2018/Aug.
  * Part of the package andreacioccarelli.musicdownloader.ui.fragment
@@ -78,9 +76,6 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
             .renameIfEqual(".", "_.")
             .renameIfEqual("..", "__.")
             .removePrefix(".")
-
-
-        logd(title)
 
         titleTextView = view.find(R.id.thumb_title)
         titleTextView.text = title
@@ -240,7 +235,7 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
         val clip = ClipData.newPlainText("", watchLink)
         clipboard.primaryClip = clip
 
-        Toasty.success(requireContext(), "Link copied!").show()
+        Toasty.success(requireContext(), "Link copied").show()
         VibrationUtil.medium()
         dismiss()
     }
@@ -252,7 +247,7 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
             sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, remoteResult.snippet.title)
             sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, watchLink)
         }
-        startActivity(Intent.createChooser(sharingIntent, "Share link to.."))
+        startActivity(Intent.createChooser(sharingIntent, "Share link to"))
         VibrationUtil.medium()
         dismiss()
     }

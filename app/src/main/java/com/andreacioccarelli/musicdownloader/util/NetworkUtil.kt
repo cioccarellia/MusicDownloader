@@ -6,8 +6,7 @@ import android.net.wifi.WifiManager
 import com.andreacioccarelli.musicdownloader.App
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package andreacioccarelli.musicdownloader.util
+ *  Designed and developed by Andrea Cioccarelli
  */
 
 enum class ConnectionStatus { ONLINE, OFFLINE }

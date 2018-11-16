@@ -7,11 +7,8 @@ import com.andreacioccarelli.musicdownloader.constants.KEY
 import com.andreacioccarelli.musicdownloader.constants.Keys
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package andreacioccarelli.musicdownloader.util
- *
+ *  Designed and developed by Andrea Cioccarelli
  */
-
 
 object ChecklistUtil {
     private const val separator = "\\?a#s!\\"

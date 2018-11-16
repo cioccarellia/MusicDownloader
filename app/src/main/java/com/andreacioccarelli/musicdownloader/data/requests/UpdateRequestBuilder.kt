@@ -4,8 +4,7 @@ import com.andreacioccarelli.musicdownloader.constants.UPDATE_URL
 import okhttp3.Request
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package com.andreacioccarelli.musicdownloader.data.requests
+ *  Designed and developed by Andrea Cioccarelli
  */
 
 object UpdateRequestBuilder {

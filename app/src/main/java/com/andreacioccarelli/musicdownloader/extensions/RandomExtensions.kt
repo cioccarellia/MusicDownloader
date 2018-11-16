@@ -4,8 +4,7 @@ import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.constants.Keys
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package com.andreacioccarelli.musicdownloader.extensions
+ *  Designed and developed by Andrea Cioccarelli
  */
 
 fun onceOutOf4(code: () -> Unit) {

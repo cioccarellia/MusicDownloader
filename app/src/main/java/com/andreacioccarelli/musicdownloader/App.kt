@@ -7,9 +7,9 @@ import com.andreacioccarelli.musicdownloader.constants.KEY
 import com.andreacioccarelli.musicdownloader.extensions.Delegates
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package andreacioccarelli.musicdownloader
+ *  Designed and developed by Andrea Cioccarelli
  */
+
 class App : Application() {
 
     companion object {

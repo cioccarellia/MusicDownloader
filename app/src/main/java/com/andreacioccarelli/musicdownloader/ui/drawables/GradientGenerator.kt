@@ -1,16 +1,16 @@
 package com.andreacioccarelli.musicdownloader.ui.drawables
 
-import com.andreacioccarelli.musicdownloader.App
-import com.andreacioccarelli.musicdownloader.R
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
+import com.andreacioccarelli.musicdownloader.App
+import com.andreacioccarelli.musicdownloader.R
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package andreacioccarelli.musicdownloader.ui.drawables
+ *  Designed and developed by Andrea Cioccarelli
  */
+
 object GradientGenerator {
     fun make(radius: Float, @ColorRes startColor: Int, @ColorRes endColor: Int): Drawable {
         val gd = GradientDrawable(GradientDrawable.Orientation.TL_BR,

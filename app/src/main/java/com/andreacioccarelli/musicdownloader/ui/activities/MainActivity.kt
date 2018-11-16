@@ -1,6 +1,7 @@
 package com.andreacioccarelli.musicdownloader.ui.activities
 
 import android.app.DownloadManager
+import android.app.DownloadManager.Request.VISIBILITY_VISIBLE
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -8,7 +9,6 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.view.Menu
@@ -52,6 +52,9 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.io.IOException
 
+/**
+ *  Designed and developed by Andrea Cioccarelli
+ */
 
 class MainActivity : AppCompatActivity() {
 
@@ -316,7 +319,7 @@ class MainActivity : AppCompatActivity() {
                                         setAllowedOverRoaming(true)
                                         setVisibleInDownloadsUi(true)
                                         setAllowedOverMetered(true)
-                                        setShowRunningNotification(true)
+                                        setNotificationVisibility(VISIBILITY_VISIBLE)
                                         setTitle(UpdateUtil.getNotificationTitle(updateCheck))
                                         setDescription(UpdateUtil.getNotificationContent())
                                         setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
@@ -346,7 +349,7 @@ class MainActivity : AppCompatActivity() {
                                 }
                                 dialog.dismiss()
                             }
-                            .checkBoxPrompt(text = "Ignore this version", isCheckedDefault = false) { state ->
+                            .checkBoxPrompt(text = "Ignore this update", isCheckedDefault = false) { state ->
                                 App.prefs.put(Keys.ignoring + updateCheck.versionCode, state)
                             }
                             .noAutoDismiss()

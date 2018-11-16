@@ -1,8 +1,7 @@
 package com.andreacioccarelli.musicdownloader.constants
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package andreacioccarelli.musicdownloader.constants
+ *  Designed and developed by Andrea Cioccarelli
  */
 
 const val FROM_AUTH_URL = "aHR0cHM6Ly9mcmVlZHNvdW5kLmlv"

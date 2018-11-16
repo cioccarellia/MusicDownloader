@@ -6,9 +6,9 @@ import com.andreacioccarelli.musicdownloader.App
 import org.jetbrains.anko.vibrator
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package andreacioccarelli.musicdownloader.util
+ *  Designed and developed by Andrea Cioccarelli
  */
+
 object VibrationUtil {
     private const val VIBRATION_WEAK = 25L
     private const val AMPLITUDE_WEAK = 100

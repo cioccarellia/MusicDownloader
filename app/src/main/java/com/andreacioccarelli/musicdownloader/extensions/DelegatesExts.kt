@@ -3,8 +3,7 @@ package com.andreacioccarelli.musicdownloader.extensions
 import kotlin.reflect.KProperty
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package andreacioccarelli.musicdownloader.extensions
+ *  Designed and developed by Andrea Cioccarelli
  */
 
 object Delegates {

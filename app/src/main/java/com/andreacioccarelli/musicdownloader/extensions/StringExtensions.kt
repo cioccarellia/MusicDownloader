@@ -1,11 +1,9 @@
 package com.andreacioccarelli.musicdownloader.extensions
 
 import android.net.Uri
-import android.text.Editable
 
 /**
- * Created by andrea on 2018/Aug.
- * Part of the package andreacioccarelli.musicdownloader.extensions
+ *  Designed and developed by Andrea Cioccarelli
  */
 
 fun String.toUri(): Uri = Uri.parse(this)
