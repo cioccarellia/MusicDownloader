@@ -9,7 +9,7 @@
     <dimen name="bottom_sheet_image_size_height">90dp</dimen>
     <dimen name="bottom_sheet_image_margin">16dp</dimen>
 
-    <dimen name="bottom_sheet_thumb_size">34dp</dimen>
+    <dimen name="bottom_sheet_thumb_size">32dp</dimen>
     <dimen name="bottom_sheet_thumb_text_size">16sp</dimen>
     <dimen name="bottom_sheet_thumb_margin">12dp</dimen>
 </resources>

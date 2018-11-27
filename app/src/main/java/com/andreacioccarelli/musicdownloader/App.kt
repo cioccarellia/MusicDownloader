@@ -14,7 +14,7 @@ class App : Application() {
 
     companion object {
         var instance by Delegates.singleValue<Application>()
-        val prefs by lazy { CryptoPrefs(instance.applicationContext, FILE, KEY) }
+        val prefs by lazy { CryptoPrefs(instance.applicationContext, FILE, KEY, false) }
     }
 
     override fun onCreate() {

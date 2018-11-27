@@ -192,7 +192,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:textColor="@color/Grey_200"
-                android:text="Add to checklist"
+                android:text="Add to Checklist"
                 android:textSize="@dimen/bottom_sheet_thumb_text_size" />
 
         </LinearLayout>
@@ -230,7 +230,46 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:textColor="@color/Grey_200"
-                android:text="Remove from checklist"
+                android:text="Remove from Checklist"
+                android:textSize="@dimen/bottom_sheet_thumb_text_size" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/add_to_queue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardBackgroundColor="@color/Grey_850"
+        android:drawSelectorOnTop="true">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginEnd="@dimen/bottom_sheet_thumb_margin"
+            android:layout_marginStart="@dimen/bottom_sheet_thumb_margin"
+            android:padding="8dp">
+
+            <ImageView
+                android:layout_width="@dimen/bottom_sheet_thumb_size"
+                android:layout_height="@dimen/bottom_sheet_thumb_size"
+                android:layout_marginEnd="16dp"
+                android:tint="@color/bottomSheetIconLight"
+                app:srcCompat="@drawable/download" />
+
+            <TextView
+                android:id="@+id/queueTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:textColor="@color/Grey_200"
+                tools:text="Add to Checklist"
                 android:textSize="@dimen/bottom_sheet_thumb_text_size" />
 
         </LinearLayout>

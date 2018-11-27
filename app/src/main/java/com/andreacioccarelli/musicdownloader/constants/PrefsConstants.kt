@@ -12,6 +12,7 @@ object Keys {
     const val ignoring = "@ignoring->"
     const val list = "@checklist"
     const val updateSubpath = "@sub"
+    const val queue = "@queue"
 
     const val oneOf4 = "@1of4"
 }

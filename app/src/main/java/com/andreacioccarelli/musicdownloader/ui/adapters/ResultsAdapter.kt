@@ -31,7 +31,7 @@ class ResultsAdapter(response: YoutubeSearchResponse, private val activity: Acti
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.result_layout, parent, false)
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.result_item, parent, false)
         return ViewHolder(v)
     }
 

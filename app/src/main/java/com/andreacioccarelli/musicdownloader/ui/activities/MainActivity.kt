@@ -39,6 +39,7 @@ import com.andreacioccarelli.musicdownloader.extensions.dismissKeyboard
 import com.andreacioccarelli.musicdownloader.extensions.onSubmit
 import com.andreacioccarelli.musicdownloader.extensions.onceOutOf4
 import com.andreacioccarelli.musicdownloader.ui.adapters.ChecklistAdapter
+import com.andreacioccarelli.musicdownloader.ui.adapters.QueueAdapter
 import com.andreacioccarelli.musicdownloader.ui.adapters.ResultsAdapter
 import com.andreacioccarelli.musicdownloader.ui.drawables.GradientGenerator
 import com.andreacioccarelli.musicdownloader.util.*
@@ -377,18 +378,41 @@ class MainActivity : AppCompatActivity() {
     }
 
     lateinit var checklistDialog: MaterialDialog
+    lateinit var queueDialog: MaterialDialog
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.action_list -> {
-            if (ChecklistUtil.isEmpty(this)) {
+            if (ChecklistStore.isEmpty(this)) {
                 checklistDialog = MaterialDialog(this)
                         .customView(R.layout.empty_view_checklist)
                 checklistDialog.show()
             } else {
                 checklistDialog = MaterialDialog(this)
                         .title(text = "Checklist")
-                        .customListAdapter(ChecklistAdapter(ChecklistUtil.get(this).toMutableList(), this))
+                        .customListAdapter(ChecklistAdapter(ChecklistStore.get(this).toMutableList(), this))
                 checklistDialog.show()
+            }
+            true
+        }
+
+        R.id.action_queue -> {
+            if (QueueStore.isEmpty(this)) {
+                queueDialog = MaterialDialog(this)
+                        .customView(R.layout.empty_view_checklist)
+                queueDialog.show()
+            } else {
+                val adapter = QueueAdapter(QueueStore.get(this).toMutableList(), this)
+
+                queueDialog = MaterialDialog(this)
+                        .title(text = "Download Queue")
+                        .customListAdapter(adapter)
+                        .positiveButton(text = "Download MP3")
+                        .positiveButton {
+                            val list = QueueStore.get(this)
+                                    .filter { it.third }
+                        }
+                        .negativeButton(text = "Dismiss")
+                queueDialog.show()
             }
             true
         }

@@ -20,6 +20,7 @@ import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
+import com.andreacioccarelli.logkit.logd
 import com.andreacioccarelli.logkit.loge
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.constants.*
@@ -27,12 +28,10 @@ import com.andreacioccarelli.musicdownloader.data.formats.Format
 import com.andreacioccarelli.musicdownloader.data.requests.DownloadLinkRequestsBuilder
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
-import com.andreacioccarelli.musicdownloader.extensions.renameIfEqual
-import com.andreacioccarelli.musicdownloader.extensions.sanitize
-import com.andreacioccarelli.musicdownloader.extensions.toUri
-import com.andreacioccarelli.musicdownloader.extensions.updateState
+import com.andreacioccarelli.musicdownloader.extensions.*
 import com.andreacioccarelli.musicdownloader.ui.drawables.GradientGenerator
-import com.andreacioccarelli.musicdownloader.util.ChecklistUtil
+import com.andreacioccarelli.musicdownloader.util.ChecklistStore
+import com.andreacioccarelli.musicdownloader.util.QueueStore
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -42,7 +41,6 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayerView
 import com.pierfrancescosoffritti.androidyoutubeplayer.player.listeners.AbstractYouTubePlayerListener
 import com.tapadoo.alerter.Alerter
-import es.dmoral.toasty.Toasty
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jetbrains.anko.doAsync
@@ -58,6 +56,7 @@ import org.jetbrains.anko.uiThread
 class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment() {
 
     private var isInChecklist = false
+    private var isInQueue = false
     private lateinit var titleTextView: TextView
     var title = ""
 
@@ -66,7 +65,7 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = BottomSheetDialog(requireContext(), theme)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.checklist, container, false)
+        val view = inflater.inflate(R.layout.bottom_dialog, container, false)
         VibrationUtil.strong()
 
         title = remoteResult.snippet.title
@@ -147,24 +146,49 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
         val addTo = view.find<CardView>(R.id.add_to_list)
         val removeFrom = view.find<CardView>(R.id.remove_from_list)
 
-        isInChecklist = ChecklistUtil.contains(requireContext(), remoteResult.snippet.title)
+        isInChecklist = ChecklistStore.contains(requireContext(), remoteResult.snippet.title)
+        isInQueue = QueueStore.contains(requireContext(), remoteResult.snippet.title)
 
         if (isInChecklist) {
             removeFrom.setOnClickListener {
-                ChecklistUtil.remove(requireContext(), remoteResult.snippet.title)
+                ChecklistStore.remove(requireContext(), remoteResult.snippet.title)
                 dismiss()
                 VibrationUtil.medium()
+                success("Added to Checklist")
             }
 
             addTo.visibility = View.GONE
         } else {
             addTo.setOnClickListener {
-                ChecklistUtil.add(requireContext(), remoteResult.snippet.title, remoteResult.snippet.thumbnails.medium.url)
+                ChecklistStore.add(requireContext(), remoteResult.snippet.title, remoteResult.snippet.thumbnails.medium.url)
                 dismiss()
                 VibrationUtil.medium()
+                success("Removed from Checklist")
             }
 
             removeFrom.visibility = View.GONE
+        }
+
+        if (isInQueue) {
+            view.find<CardView>(R.id.add_to_queue).also {
+                it.setOnClickListener {
+                    QueueStore.remove(requireContext(), remoteResult.snippet.title)
+                    dismiss()
+                    VibrationUtil.medium()
+                    success("Removed from download queue")
+                }
+                view.find<TextView>(R.id.queueTitle).text = "Remove from Queue"
+            }
+        } else {
+            view.find<CardView>(R.id.add_to_queue).also {
+                it.setOnClickListener {
+                    QueueStore.add(requireContext(), remoteResult.snippet.title, watchLink, false)
+                    dismiss()
+                    VibrationUtil.medium()
+                    success("Added to download queue")
+                }
+                view.find<TextView>(R.id.queueTitle).text = "Add to Queue"
+            }
         }
 
         return view
@@ -235,7 +259,7 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
         val clip = ClipData.newPlainText("", watchLink)
         clipboard.primaryClip = clip
 
-        Toasty.success(requireContext(), "Link copied").show()
+        success("Link copied", R.drawable.copy)
         VibrationUtil.medium()
         dismiss()
     }
@@ -303,7 +327,7 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
 
     private fun processDownloadForReadyFile(act: Activity, response: DirectLinkResponse, downloadManager: DownloadManager) {
         act.runOnUiThread {
-            if (isInChecklist) ChecklistUtil.remove(act, remoteResult.snippet.title)
+            if (isInChecklist) ChecklistStore.remove(act, remoteResult.snippet.title)
 
             val fileName = if (titleTextView.text.isBlank() || titleTextView.text.isEmpty()) response.title else title
             val completeFileName = "$fileName.${response.format}"
@@ -319,6 +343,8 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
                     .show()
 
             val uri = fileDownloadLink.toUri()
+            logd(fileDownloadLink, completeFileName)
+
             val downloadRequest = DownloadManager.Request(uri)
 
             with(downloadRequest) {

@@ -3,9 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.activities.MainActivity">
 
+
+    <item
+        android:id="@+id/action_queue"
+        android:orderInCategory="107"
+        android:title="Queue"
+        android:icon="@drawable/queue"
+        app:showAsAction="always" />
+
     <item
         android:id="@+id/action_list"
-        android:orderInCategory="107"
+        android:orderInCategory="207"
         android:title="Checklist"
         android:icon="@drawable/list"
         app:showAsAction="always" />
