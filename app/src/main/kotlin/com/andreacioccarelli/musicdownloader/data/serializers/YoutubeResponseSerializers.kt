@@ -1,7 +1,5 @@
 package com.andreacioccarelli.musicdownloader.data.serializers
 
-import com.google.gson.annotations.SerializedName
-
 /**
  *  Designed and developed by Andrea Cioccarelli
  */
@@ -16,8 +14,8 @@ data class YoutubeSearchResponse(
 )
 
 data class VideoId (
-        @SerializedName("kind") val kind: String,
-        @SerializedName("videoId") val videoId: String
+        val kind: String,
+        val videoId: String
 )
 
 data class PageInfo (
