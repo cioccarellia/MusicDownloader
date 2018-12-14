@@ -19,3 +19,5 @@ An EditText view is available for the user to type text, and a request is perfor
 Since the input is directly passed to Google YouTube APIs, you can also use search operators to filter the results.
 This app is optimized for speed and lightness. The final apk size is less than 4MB and it's packed with many goodies and tweaks to make it clean and blazing-fast (e.g. image caching, checklist preferences, tablet support).
 The whole project fits Google material design guidelines and uses some awesome 3rd-party libraries like [Alerter](https://github.com/Tapadoo/Alerter), [Toasty](https://github.com/GrenderG/Toasty) and [material-dialogs](https://github.com/afollestad/material-dialogs) to make everything flawless and smooth.
+
+#### Redistributing this app as your own is NOT permitted.
