@@ -1,7 +1,7 @@
 {
-  "versionCode": 6,
-  "versionName": "1.1.2",
-  "changelog": "Internal updates and stability enhancements",
+  "versionCode": 7,
+  "versionName": "1.2.0",
+  "changelog": "Performances improvements, bug fixes for files download, enhanced experience",
 
   "downloadInfo": {
     "useBundledUpdateLink": true,

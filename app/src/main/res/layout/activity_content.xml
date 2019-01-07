@@ -18,7 +18,7 @@
         android:layout_centerHorizontal="true"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
-        android:layout_marginTop="40dp">
+        android:layout_marginTop="48dp">
 
         <EditText
             android:id="@+id/search"

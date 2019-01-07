@@ -21,7 +21,7 @@ import org.jetbrains.anko.find
  *  Designed and developed by Andrea Cioccarelli
  */
 
-class ChecklistAdapter(private val data: MutableList<Pair<String, String>>, private val activity: Activity) : RecyclerView.Adapter<ChecklistAdapter.ViewHolder>() {
+class ChecklistAdapter(private val data: MutableList<Triple<String, String, String>>, private val activity: Activity) : RecyclerView.Adapter<ChecklistAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.result_item, parent, false)
@@ -32,7 +32,7 @@ class ChecklistAdapter(private val data: MutableList<Pair<String, String>>, priv
 
     override fun onBindViewHolder(holder: ViewHolder, i: Int) {
         Glide.with(activity)
-                .load(data[holder.adapterPosition].second)
+                .load(data[holder.adapterPosition].third)
                 .thumbnail(0.1F)
                 .into(holder.icon)
         
@@ -58,7 +58,7 @@ class ChecklistAdapter(private val data: MutableList<Pair<String, String>>, priv
                     ref.checklistDialog.dismiss()
                 }
 
-                ChecklistStore.remove(activity, data[holder.adapterPosition].first)
+                ChecklistStore.remove(data[holder.adapterPosition].first)
                 data.removeAt(holder.adapterPosition)
                 notifyItemRemoved(holder.adapterPosition)
                 true

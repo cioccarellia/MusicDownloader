@@ -20,6 +20,23 @@ object GradientGenerator {
         return gd
     }
 
+    fun random(): Drawable {
+        val colorList = listOf(
+                R.color.Amber_600, R.color.Amber_700, R.color.Amber_800,
+                R.color.Amber_900, R.color.Amber_A400, R.color.Amber_A700,
+
+                R.color.Orange_600, R.color.Orange_700, R.color.Orange_800,
+                R.color.Orange_900, R.color.Orange_A400, R.color.Orange_A700,
+
+                R.color.DeepOrange_700, R.color.DeepOrange_800, R.color.DeepOrange_900)
+
+        val gd = GradientDrawable(GradientDrawable.Orientation.TL_BR,
+                intArrayOf(ContextCompat.getColor(App.instance.applicationContext, colorList.random()),
+                        ContextCompat.getColor(App.instance.baseContext, colorList.random())))
+        gd.cornerRadius = 0F
+        return gd
+    }
+
     val errorGradient: Drawable
         get() {
             val gd = GradientDrawable(GradientDrawable.Orientation.TL_BR,

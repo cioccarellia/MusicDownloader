@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.text.ClipboardManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -31,16 +32,15 @@ import com.andreacioccarelli.musicdownloader.BuildConfig
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.constants.APK_URL
 import com.andreacioccarelli.musicdownloader.constants.Keys
+import com.andreacioccarelli.musicdownloader.data.formats.Format
 import com.andreacioccarelli.musicdownloader.data.requests.UpdateRequestBuilder
 import com.andreacioccarelli.musicdownloader.data.requests.YoutubeRequestBuilder
 import com.andreacioccarelli.musicdownloader.data.serializers.UpdateCheck
 import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchResponse
-import com.andreacioccarelli.musicdownloader.extensions.dismissKeyboard
-import com.andreacioccarelli.musicdownloader.extensions.onSubmit
-import com.andreacioccarelli.musicdownloader.extensions.onceOutOf4
+import com.andreacioccarelli.musicdownloader.extensions.*
 import com.andreacioccarelli.musicdownloader.ui.adapters.ChecklistAdapter
-import com.andreacioccarelli.musicdownloader.ui.adapters.QueueAdapter
 import com.andreacioccarelli.musicdownloader.ui.adapters.ResultsAdapter
+import com.andreacioccarelli.musicdownloader.ui.downloader.MusicDownloader
 import com.andreacioccarelli.musicdownloader.ui.drawables.GradientGenerator
 import com.andreacioccarelli.musicdownloader.util.*
 import com.google.android.material.snackbar.Snackbar
@@ -48,13 +48,12 @@ import com.google.gson.Gson
 import com.tapadoo.alerter.Alerter
 import kotlinx.android.synthetic.main.activity_content.*
 import kotlinx.android.synthetic.main.activity_layout.*
+import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 import java.io.IOException
 
 /**
- *  Designed and developed by Andrea Cioccarelli
+ *  Designed and Developed by Andrea Cioccarelli
  */
 
 class MainActivity : AppCompatActivity() {
@@ -110,6 +109,25 @@ class MainActivity : AppCompatActivity() {
         initFab()
         initNetwork()
         initUpdateChecker()
+        initClipboard()
+
+        when {
+            intent?.action == Intent.ACTION_SEND -> {
+                if ("text/plain" == intent.type) {
+                    search.text = intent.getStringExtra(Intent.EXTRA_TEXT).toEditable()
+                    fab.performClick()
+                }
+            }
+        }
+    }
+
+    private fun initClipboard() {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+        if (clipboard.text.isUrl && intent?.getStringExtra(Intent.EXTRA_TEXT) == null) {
+            search.text = clipboard.text.toEditable()
+            fab.performClick()
+        }
     }
 
     private fun initInput() = with(search) {
@@ -129,6 +147,8 @@ class MainActivity : AppCompatActivity() {
                 fab.show()
             }
         }
+
+        search.popUpKeyboard()
     }
 
     private fun initPermissions() {
@@ -137,7 +157,7 @@ class MainActivity : AppCompatActivity() {
                 arePermissionsGranted = if (!it.isAllGranted(Permission.WRITE_EXTERNAL_STORAGE)) {
                     Alerter.create(this@MainActivity)
                             .setTitle("Cannot read external storage")
-                            .setText("You have to grant the requested permission to correctly use this up")
+                            .setText("You have to grant the requested permission to correctly use this")
                             .setDuration(5_000)
                             .setIcon(R.drawable.folder)
                             .setBackgroundDrawable(GradientGenerator.errorGradient)
@@ -212,20 +232,19 @@ class MainActivity : AppCompatActivity() {
             fab.hide()
             snack!!.show()
 
-            doAsync {
+            GlobalScope.launch(Dispatchers.IO) {
                 try {
                     val requestBuilder = YoutubeRequestBuilder.get(search.text)
                     val request = OkHttpClient().newCall(requestBuilder).execute()
 
                     val jsonRequest = request.body()!!.string()
+                    val response = Gson().fromJson(
+                            jsonRequest,
+                            YoutubeSearchResponse::class.java)
 
-                    uiThread {
-                        if (!isSearching || searches.contains(searchId)) return@uiThread
-
-                        val gson = Gson()
-                        val response = gson.fromJson(
-                                jsonRequest,
-                                YoutubeSearchResponse::class.java)
+                    withContext(Dispatchers.Main) {
+                        if (!isSearching || searches.contains(searchId)) return@withContext
+                        isSearching = false
 
                         if (response.pageInfo.totalResults == 0) {
                             empty_result.visibility = View.VISIBLE
@@ -240,11 +259,17 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
 
+                        if (response.pageInfo.totalResults == 1) {
+                            delay(300)
+                            if (!isSearching)
+                                resultsRecyclerView.getChildAt(0).performClick()
+                        }
+
                         fab.show()
                         snack!!.dismiss()
                     }
                 } catch (timeout: IOException) {
-                    uiThread {
+                    withContext(Dispatchers.Main) {
                         fab.show()
                         snack!!.dismiss()
                         VibrationUtil.medium()
@@ -262,7 +287,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var isInError = false
-
     private fun displayFormError() {
         isInError = true
         fab.hide()
@@ -289,7 +313,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initUpdateChecker() = onceOutOf4 {
-        doAsync {
+        GlobalScope.launch(Dispatchers.IO) {
             val requestBuilder = UpdateRequestBuilder.get()
             val request = OkHttpClient().newCall(requestBuilder).execute()
 
@@ -301,7 +325,7 @@ class MainActivity : AppCompatActivity() {
                     UpdateCheck::class.java)
 
             if (updateCheck.versionCode > BuildConfig.VERSION_CODE && !App.prefs.get(Keys.ignoring + updateCheck.versionCode, false)) {
-                uiThread {
+                withContext(Dispatchers.Main) {
                     MaterialDialog(this@MainActivity)
                             .title(text = "Version ${updateCheck.versionName} found!")
                             .message(text = updateCheck.changelog)
@@ -334,7 +358,7 @@ class MainActivity : AppCompatActivity() {
 
                                     registerReceiver(onPackageDownloadCompleated, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
                                     dialog.dismiss()
-                                    
+
                                     Alerter.create(this@MainActivity)
                                             .setTitle(UpdateUtil.getNotificationContent())
                                             .setText(UpdateUtil.getNotificationTitle(updateCheck))
@@ -378,42 +402,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     lateinit var checklistDialog: MaterialDialog
-    lateinit var queueDialog: MaterialDialog
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.action_list -> {
-            if (ChecklistStore.isEmpty(this)) {
-                checklistDialog = MaterialDialog(this)
+            checklistDialog = MaterialDialog(this)
+
+            if (ChecklistStore.isEmpty()) {
+                checklistDialog
                         .customView(R.layout.empty_view_checklist)
-                checklistDialog.show()
+
             } else {
-                checklistDialog = MaterialDialog(this)
+                checklistDialog
                         .title(text = "Checklist")
-                        .customListAdapter(ChecklistAdapter(ChecklistStore.get(this).toMutableList(), this))
-                checklistDialog.show()
-            }
-            true
-        }
-
-        R.id.action_queue -> {
-            if (QueueStore.isEmpty(this)) {
-                queueDialog = MaterialDialog(this)
-                        .customView(R.layout.empty_view_checklist)
-                queueDialog.show()
-            } else {
-                val adapter = QueueAdapter(QueueStore.get(this).toMutableList(), this)
-
-                queueDialog = MaterialDialog(this)
-                        .title(text = "Download Queue")
-                        .customListAdapter(adapter)
-                        .positiveButton(text = "Download MP3")
-                        .positiveButton {
-                            val list = QueueStore.get(this)
-                                    .filter { it.third }
+                        .customListAdapter(ChecklistAdapter(ChecklistStore.get().toMutableList(), this))
+                        .positiveButton(text = "DOWNLOAD ALL") {
+                            MusicDownloader(this@MainActivity, ChecklistStore.get().map { it.second })
+                                    .exec(Format.MP3)
+                            ChecklistStore.clear()
                         }
-                        .negativeButton(text = "Dismiss")
-                queueDialog.show()
             }
+
+            checklistDialog.show()
             true
         }
 

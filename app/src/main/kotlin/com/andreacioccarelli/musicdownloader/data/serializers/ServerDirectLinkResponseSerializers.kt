@@ -7,10 +7,10 @@ import com.google.gson.annotations.SerializedName
  */
 
 data class DirectLinkResponse(
-        val state: String,
-        @SerializedName("video_id") val videoId: String,
-        val title: String,
-        val format: String,
-        val download: String,
-        val percentage: String,
-        val reason: String)
+        @SerializedName("state")        val state: String,
+        @SerializedName("video_id")     val videoId: String,
+        @SerializedName("title")        val title: String,
+        @SerializedName("format")       val format: String,
+        @SerializedName("download")     val download: String,
+        @SerializedName("percentage")   val percentage: String,
+        @SerializedName("reason")       val reason: String)

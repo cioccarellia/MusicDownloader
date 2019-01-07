@@ -3,6 +3,7 @@ package com.andreacioccarelli.musicdownloader.extensions
 import android.content.Context
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
 import android.widget.EditText
 import com.andreacioccarelli.musicdownloader.App
 
@@ -11,8 +12,14 @@ import com.andreacioccarelli.musicdownloader.App
  */
 
 fun EditText.dismissKeyboard() {
-    val imm = App.instance.baseContext.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    val imm = App.instance.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.hideSoftInputFromWindow(this.windowToken, 0)
+}
+
+
+fun EditText.popUpKeyboard() {
+    val imm = App.instance.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.showSoftInput(this, SHOW_IMPLICIT)
 }
 
 fun EditText.onSubmit(code: () -> Unit) {

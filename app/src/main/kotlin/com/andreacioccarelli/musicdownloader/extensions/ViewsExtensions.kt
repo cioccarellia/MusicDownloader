@@ -17,6 +17,11 @@ fun CheckBox.switch() {
 }
 
 fun success(text: String, @DrawableRes icon: Int = R.drawable.ic_check_white_48dp) {
-    Toasty.custom(App.instance, text, App.instance.getDrawable(icon), ContextCompat.getColor(App.instance, R.color.Green_A400), Toast.LENGTH_SHORT, true, true)
+    Toasty.custom(App.instance, text, App.instance.getDrawable(icon), ContextCompat.getColor(App.instance, R.color.Orange_600), Toast.LENGTH_SHORT, true, true)
+            .show()
+}
+
+fun error(text: String, @DrawableRes icon: Int = R.drawable.ic_error_outline_white_48dp) {
+    Toasty.custom(App.instance, text, App.instance.getDrawable(icon), ContextCompat.getColor(App.instance, R.color.Red_600), Toast.LENGTH_SHORT, true, true)
             .show()
 }

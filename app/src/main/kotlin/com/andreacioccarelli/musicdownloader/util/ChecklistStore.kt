@@ -1,40 +1,43 @@
 package com.andreacioccarelli.musicdownloader.util
 
-import android.content.Context
 import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.constants.Keys
 
 /**
  *  Designed and developed by Andrea Cioccarelli
+ *
+ *  VideoTitle $ VideoLink $ ThumbnailLink
  */
 
 object ChecklistStore {
     private const val separator = "\\?a#s!\\"
 
-    fun isEmpty(context: Context): Boolean = get(context).isEmpty()
+    fun isEmpty(): Boolean = get().isEmpty()
+    fun clear() = App.prefs.put(Keys.list, "")
 
-    fun get(context: Context): List<Pair<String, String>> {
+    fun get(): List<Triple<String, String, String>> {
         val raw = App.prefs.get(Keys.list, "")
 
         if (raw == "") return emptyList()
         val list = raw.removeSuffix(separator).split(separator)
-        return list.map { it to App.prefs.get(it, "") }
+        return list.map { Triple(it, App.prefs.get("link->$it", ""), App.prefs.get("thumb->$it", "")) }
     }
     
-    fun add(context: Context, item: String, link: String) {
+    fun add(item: String, link: String, thumb: String) {
         App.prefs.put(Keys.list, App.prefs.get(Keys.list, "")
                 .plus("$item$separator")
         )
-        App.prefs.put(item, link)
+
+        App.prefs.put("thumb->$item", thumb)
+        App.prefs.put("link->$item", link)
     }
 
-    fun contains(context: Context, item: String): Boolean {
-
+    fun contains(link: String): Boolean {
         val raw = App.prefs.get(Keys.list, "")
-        return raw.contains(item)
+        return raw.contains(link)
     }
 
-    fun remove(context: Context, item: String) {
+    fun remove(item: String) {
         val raw = App.prefs.get(Keys.list, "")
 
         if (raw.contains(item)) {

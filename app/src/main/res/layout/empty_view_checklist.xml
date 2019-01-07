@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:layout_below="@id/empty_checklist"
-        android:text="Looks empty here"
+        android:text="Empty Checklist"
         android:gravity="center"/>
 
 </RelativeLayout>

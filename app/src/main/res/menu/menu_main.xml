@@ -5,13 +5,6 @@
 
 
     <item
-        android:id="@+id/action_queue"
-        android:orderInCategory="107"
-        android:title="Queue"
-        android:icon="@drawable/queue"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/action_list"
         android:orderInCategory="207"
         android:title="Checklist"
