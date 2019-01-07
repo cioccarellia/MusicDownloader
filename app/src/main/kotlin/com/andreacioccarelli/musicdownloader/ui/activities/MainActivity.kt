@@ -157,7 +157,7 @@ class MainActivity : AppCompatActivity() {
                 arePermissionsGranted = if (!it.isAllGranted(Permission.WRITE_EXTERNAL_STORAGE)) {
                     Alerter.create(this@MainActivity)
                             .setTitle("Cannot read external storage")
-                            .setText("You have to grant the requested permission to correctly use this")
+                            .setText("You have to grant the requested permission to correctly use this app")
                             .setDuration(5_000)
                             .setIcon(R.drawable.folder)
                             .setBackgroundDrawable(GradientGenerator.errorGradient)
