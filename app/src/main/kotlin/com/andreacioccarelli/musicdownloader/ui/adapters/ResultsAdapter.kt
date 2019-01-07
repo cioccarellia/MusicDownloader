@@ -14,7 +14,7 @@ import android.widget.TextView
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchResponse
-import com.andreacioccarelli.musicdownloader.ui.fragments.DownloadBottomDialog
+import com.andreacioccarelli.musicdownloader.ui.fragments.BottomDialogFragment
 import com.bumptech.glide.Glide
 
 /**
@@ -46,7 +46,7 @@ class ResultsAdapter(response: YoutubeSearchResponse, private val activity: Acti
         holder.title.text = data[i].snippet.title
 
         holder.card.setOnClickListener {
-            val bottomSheetFragment = DownloadBottomDialog(data[i])
+            val bottomSheetFragment = BottomDialogFragment(data[i])
             bottomSheetFragment.show(fm, bottomSheetFragment.tag)
         }
 

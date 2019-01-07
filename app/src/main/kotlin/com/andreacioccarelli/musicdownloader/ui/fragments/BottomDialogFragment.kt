@@ -46,7 +46,7 @@ import org.jetbrains.anko.find
  */
 
 @SuppressLint("ValidFragment")
-class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment() {
+class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment() {
 
     private var isInChecklist = false
     private lateinit var titleTextView: TextView
@@ -70,68 +70,19 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
                 .thumbnail(0.1F)
                 .into(view.find(R.id.thumb_icon))
 
-        view.find<CardView>(R.id.thumbCard).setOnClickListener {
-            val dialog = MaterialDialog(requireContext())
-                    .title(text = "Change file name")
-                    .input(prefill = titleTextView.text, waitForPositiveButton = true) { _, text ->
-                        titleTextView.text = text
-                        title = text.toString()
-                    }
-                    .positiveButton(text = "SUBMIT")
-
-            with(dialog) {
-                show()
-                getInputField()?.let { input ->
-                    input.selectAll()
-                    input.addTextChangedListener(object : TextWatcher {
-                        override fun afterTextChanged(p0: Editable?) {
-                            if (p0.isNullOrBlank()) {
-                                dialog.setActionButtonEnabled(WhichButton.POSITIVE, false)
-                                return
-                            }
-
-                            val text = p0.toString()
-                            val inputField = dialog.getInputField()!!
-
-                            if (text.contains("/")) {
-                                inputField.error = "File name cannot contain /"
-                                dialog.setActionButtonEnabled(WhichButton.POSITIVE, false)
-                                return
-                            }
-
-                            if (text.endsWith(".mp3") || text.endsWith(".mp4")) {
-                                inputField.error = "We will think about putting an extension, just enter the file name"
-                                dialog.setActionButtonEnabled(WhichButton.POSITIVE, false)
-                                return
-                            }
-
-                            dialog.setActionButtonEnabled(WhichButton.POSITIVE, true)
-                        }
-
-                        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-                        }
-
-                        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-                        }
-
-                    })
-                }
+        with(view) {
+            find<CardView>(R.id.thumbCard).setOnClickListener {
+                showChangeFileNameDialog()
             }
+            find<CardView>(R.id.play).setOnClickListener { openVideoInDialog() }
+            find<CardView>(R.id.open_video).setOnClickListener { openVideo() }
+            find<CardView>(R.id.open_channel).setOnClickListener { openChannel() }
+            find<CardView>(R.id.copy_link).setOnClickListener { copyLink() }
+            find<CardView>(R.id.share_link).setOnClickListener { shareLink() }
         }
-
-        view.find<CardView>(R.id.play).setOnClickListener { openVideoInDialog() }
-        view.find<CardView>(R.id.open_video).setOnClickListener { openVideo() }
-        view.find<CardView>(R.id.open_channel).setOnClickListener { openChannel() }
-        view.find<CardView>(R.id.copy_link).setOnClickListener { copyLink() }
-        view.find<CardView>(R.id.share_link).setOnClickListener { shareLink() }
-        view.find<CardView>(R.id.mp3).setOnClickListener { handleClick(Format.MP3) }
-        view.find<CardView>(R.id.mp4).setOnClickListener { handleClick(Format.MP4) }
 
         val addTo = view.find<CardView>(R.id.add_to_list)
         val removeFrom = view.find<CardView>(R.id.remove_from_list)
-
         isInChecklist = ChecklistStore.contains(remoteResult.snippet.title)
 
         if (isInChecklist) {
@@ -152,6 +103,24 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
             }
 
             removeFrom.visibility = View.GONE
+        }
+
+        val mp3 = view.find<CardView>(R.id.mp3)
+        mp3.apply {
+            setOnClickListener { handleClick(Format.MP3) }
+            setOnLongClickListener {
+                showChangeFileNameDialog()
+                true
+            }
+        }
+
+        val mp4 = view.find<CardView>(R.id.mp4)
+        mp4.apply {
+            setOnClickListener { handleClick(Format.MP4) }
+            setOnLongClickListener {
+                showChangeFileNameDialog()
+                true
+            }
         }
 
         return view
@@ -181,6 +150,57 @@ class DownloadBottomDialog(val remoteResult: Result) : BottomSheetDialogFragment
     }
 
     private val watchLink = "$YOUTUBE_WATCH_URL${remoteResult.id.videoId}"
+
+    private fun showChangeFileNameDialog() {
+        val dialog = MaterialDialog(requireContext())
+                .title(text = "Change file name")
+                .input(prefill = titleTextView.text, waitForPositiveButton = true) { _, text ->
+                    titleTextView.text = text
+                    title = text.toString()
+                }
+                .positiveButton(text = "SUBMIT")
+
+        with(dialog) {
+            show()
+            getInputField()?.let { input ->
+                input.selectAll()
+                input.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(p0: Editable?) {
+                        if (p0.isNullOrBlank()) {
+                            dialog.setActionButtonEnabled(WhichButton.POSITIVE, false)
+                            return
+                        }
+
+                        val text = p0.toString()
+                        val inputField = dialog.getInputField()!!
+
+                        if (text.contains("/")) {
+                            inputField.error = "File name cannot contain /"
+                            dialog.setActionButtonEnabled(WhichButton.POSITIVE, false)
+                            return
+                        }
+
+                        if (text.endsWith(".mp3") || text.endsWith(".mp4")) {
+                            inputField.error = "We will think about putting an extension, just enter the file name"
+                            dialog.setActionButtonEnabled(WhichButton.POSITIVE, false)
+                            return
+                        }
+
+                        dialog.setActionButtonEnabled(WhichButton.POSITIVE, true)
+                    }
+
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                    }
+
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                    }
+
+                })
+            }
+        }
+    }
 
     private fun openVideo() {
         try {

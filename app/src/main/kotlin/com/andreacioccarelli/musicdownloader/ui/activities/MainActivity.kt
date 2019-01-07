@@ -1,5 +1,6 @@
 package com.andreacioccarelli.musicdownloader.ui.activities
 
+import android.annotation.SuppressLint
 import android.app.DownloadManager
 import android.app.DownloadManager.Request.VISIBILITY_VISIBLE
 import android.content.BroadcastReceiver
@@ -26,6 +27,7 @@ import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.list.customListAdapter
+import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.andreacioccarelli.logkit.loge
 import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.BuildConfig
@@ -56,6 +58,7 @@ import java.io.IOException
  *  Designed and Developed by Andrea Cioccarelli
  */
 
+@SuppressLint("GoogleAppIndexingApiWarning")
 class MainActivity : AppCompatActivity() {
 
     private var wasOffline = false
@@ -123,10 +126,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun initClipboard() {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val text = clipboard.text
 
-        if (clipboard.text.isUrl && intent?.getStringExtra(Intent.EXTRA_TEXT) == null) {
-            search.text = clipboard.text.toEditable()
-            fab.performClick()
+        text?.let {
+            if (it.isUrl && intent?.getStringExtra(Intent.EXTRA_TEXT) == null) {
+                search.text = clipboard.text.toEditable()
+                fab.performClick()
+            }
         }
     }
 
@@ -304,11 +310,13 @@ class MainActivity : AppCompatActivity() {
             val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
             if (id == -1L) return
 
+            Thread.sleep(1000)
+
             UpdateUtil.openUpdateInPackageManager(context)
 
             try {
                 Alerter.clearCurrent(this@MainActivity)
-            } catch (invalid: IllegalArgumentException) { loge(invalid) }
+            } catch (invalid: Exception) { loge(invalid) }
         }
     }
 
@@ -389,7 +397,7 @@ class MainActivity : AppCompatActivity() {
     private fun unregisterReceivers() = try {
         unregisterReceiver(networkConnectionListener)
         unregisterReceiver(onPackageDownloadCompleated)
-    } catch (notRegistered: IllegalArgumentException) { loge(notRegistered) }
+    } catch (notRegistered: RuntimeException) { loge(notRegistered) }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -415,9 +423,16 @@ class MainActivity : AppCompatActivity() {
                         .title(text = "Checklist")
                         .customListAdapter(ChecklistAdapter(ChecklistStore.get().toMutableList(), this))
                         .positiveButton(text = "DOWNLOAD ALL") {
-                            MusicDownloader(this@MainActivity, ChecklistStore.get().map { it.second })
-                                    .exec(Format.MP3)
-                            ChecklistStore.clear()
+                            MaterialDialog(this).show {
+                                title(text = "Select Format")
+                                listItemsSingleChoice(items = listOf("MP3", "MP4"), initialSelection = 0) { _, index, _ ->
+                                    val format = Format.values()[index]
+
+                                    MusicDownloader(this@MainActivity, ChecklistStore.get().map { it.second })
+                                            .exec(format)
+                                }
+                                positiveButton(text = "SELECT")
+                            }
                         }
             }
 

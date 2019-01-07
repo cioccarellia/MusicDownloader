@@ -1,6 +1,6 @@
 {
-  "versionCode": 7,
-  "versionName": "1.2.0",
+  "versionCode": 8,
+  "versionName": "1.2.1",
   "changelog": "Performances improvements, bug fixes for files download, enhanced experience",
 
   "downloadInfo": {

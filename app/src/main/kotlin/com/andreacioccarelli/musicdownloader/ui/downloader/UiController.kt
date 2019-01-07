@@ -1,6 +1,7 @@
 package com.andreacioccarelli.musicdownloader.ui.downloader
 
 import android.app.Activity
+import androidx.annotation.UiThread
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
 import com.andreacioccarelli.musicdownloader.ui.drawables.GradientGenerator
@@ -12,26 +13,34 @@ import com.tapadoo.alerter.Alerter
 
 object UiController {
 
-    fun displayProgressMetaRetrievingSingle(activity: Activity?, downloads: String) {
+    @UiThread
+    fun displayProgressMetaRetrievingSingle(activity: Activity?, download: String)
+            = displayProgressMetaRetrievingSingle(activity, listOf(download))
+
+    @UiThread
+    fun displayProgressMetaRetrievingSingle(activity: Activity?, downloads: List<String>) {
         if (activity == null) return
         if (activity.isDestroyed || activity.isFinishing) return
 
         Alerter.create(activity)
                 .enableProgress(true)
+                .setDismissable(false)
                 .setIcon(R.drawable.download)
                 .setTitle("Initializing conversion")
-                .setText("Retrieving download information for video $downloads")
+                .setText("Retrieving download information for video ${downloads[0]}")
                 .setBackgroundDrawable(GradientGenerator.random())
                 .enableInfiniteDuration(true)
                 .show()
     }
 
+    @UiThread
     fun displayProgressMetaRetrievingList(activity: Activity?, downloads: List<String>) {
         if (activity == null) return
         if (activity.isDestroyed || activity.isFinishing) return
 
         Alerter.create(activity)
                 .enableProgress(true)
+                .setDismissable(false)
                 .setIcon(R.drawable.download)
                 .setTitle("Initializing conversions")
                 .setText("Retrieving download information for ${downloads.size} videos")
@@ -40,6 +49,9 @@ object UiController {
                 .show()
     }
 
+    @UiThread
+    fun displayDownloadStarted(activity: Activity?, downloads: DirectLinkResponse) = displayDownloadStarted(activity, listOf(downloads))
+    @UiThread
     fun displayDownloadStarted(activity: Activity?, downloads: List<DirectLinkResponse>) {
         if (activity == null) return
         if (activity.isDestroyed || activity.isFinishing) return
@@ -67,7 +79,10 @@ object UiController {
         }
     }
 
-    fun displayError(activity: Activity?, error: KnownError, response: DirectLinkResponse, link: String) {
+    @UiThread
+    fun displayError(activity: Activity?, error: KnownError, link: String) = displayError(activity, error, listOf(link))
+    @UiThread
+    fun displayError(activity: Activity?, error: KnownError, links: List<String>) {
         if (activity == null) return
         if (activity.isDestroyed || activity.isFinishing) return
 
@@ -76,7 +91,7 @@ object UiController {
                 Alerter.create(activity)
                         .setIcon(R.drawable.ic_error_outline_white_48dp)
                         .setTitle("Malformed URL")
-                        .setText("Cannot process the given URL because it is in an unknown format ($link)")
+                        .setText("Cannot process the given URL because it is in an unknown format (${links[0]})")
                         .setBackgroundDrawable(GradientGenerator.make(0F, R.color.Red_800, R.color.Red_A700))
                         .setDuration(7_000)
                         .show()
@@ -95,6 +110,26 @@ object UiController {
                         .setIcon(R.drawable.ic_error_outline_white_48dp)
                         .setTitle("Video Length Error")
                         .setText("Cannot process the given video because its length exceeds 3 hours")
+                        .setBackgroundDrawable(GradientGenerator.make(0F, R.color.Red_500, R.color.Red_A400))
+                        .setDuration(7_000)
+                        .show()
+            }
+
+            KnownError.UNKNOWN_ERROR -> {
+                Alerter.create(activity)
+                        .setIcon(R.drawable.ic_error_outline_white_48dp)
+                        .setTitle("Unknown error")
+                        .setText("An exception was raised by the server while converting the selected video")
+                        .setBackgroundDrawable(GradientGenerator.make(0F, R.color.Red_500, R.color.Red_A400))
+                        .setDuration(7_000)
+                        .show()
+            }
+
+            KnownError.BATCH_FAILED -> {
+                Alerter.create(activity)
+                        .setIcon(R.drawable.ic_error_outline_white_48dp)
+                        .setTitle("Downloading error")
+                        .setText("A video in the list can not be converted for length or server issues")
                         .setBackgroundDrawable(GradientGenerator.make(0F, R.color.Red_500, R.color.Red_A400))
                         .setDuration(7_000)
                         .show()

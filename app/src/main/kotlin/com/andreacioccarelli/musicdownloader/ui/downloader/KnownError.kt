@@ -20,5 +20,17 @@ enum class KnownError {
     /**
      * The video length exceeds 3 hours
      * */
-    VIDEO_LENGTH
+    VIDEO_LENGTH,
+
+
+    /**
+     * An exception was raised while downloading a video list
+     * */
+    BATCH_FAILED,
+
+
+    /**
+     * An unknown error was thrown (for instance, an unknown repose was provided by the server)
+     * */
+    UNKNOWN_ERROR
 }

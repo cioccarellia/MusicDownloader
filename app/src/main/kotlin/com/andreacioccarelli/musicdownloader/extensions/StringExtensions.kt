@@ -44,3 +44,5 @@ fun String.correctSpecialChars(): String = this
         .renameIfEqual(".", "_.")
         .renameIfEqual("..", "__.")
         .removePrefix(".")
+
+fun String.toFileName() = replace("39", "'")
