@@ -28,7 +28,7 @@ object GradientGenerator {
                 R.color.Orange_600, R.color.Orange_700, R.color.Orange_800,
                 R.color.Orange_900, R.color.Orange_A400, R.color.Orange_A700,
 
-                R.color.DeepOrange_700, R.color.DeepOrange_800, R.color.DeepOrange_900)
+                R.color.DeepOrange_700)
 
         val gd = GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 intArrayOf(ContextCompat.getColor(App.instance.applicationContext, colorList.random()),
