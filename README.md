@@ -8,7 +8,7 @@
 [![Language](https://img.shields.io/badge/language-kotlin-orange.svg)](https://github.com/AndreaCioccarelli/MusicDownloader/blob/master/app/build.gradle)
 [![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/AndreaCioccarelli/MusicDownloader/blob/master/LICENSE)
 
-Beautiful Kotlin material design mp3/mp4 files downloader, via the official YouTube APIs
+Beautiful Kotlin material design mp3/mp4 video downloader, via the official YouTube APIs
 
 # Screenshots
 <img src="https://raw.githubusercontent.com/AndreaCioccarelli/MusicDownloader/master/media/carousel.jpg">
