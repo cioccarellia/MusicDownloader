@@ -10,10 +10,9 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.R
-import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistEntry
 import com.andreacioccarelli.musicdownloader.ui.activities.MainActivity
-import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistStore
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.jetbrains.anko.find
@@ -22,7 +21,12 @@ import org.jetbrains.anko.find
  *  Designed and developed by Andrea Cioccarelli
  */
 
-class ChecklistAdapter(private val data: MutableList<ChecklistEntry>, private val activity: Activity) : RecyclerView.Adapter<ChecklistAdapter.ViewHolder>() {
+class ChecklistAdapter(private val activity: Activity) : RecyclerView.Adapter<ChecklistAdapter.ViewHolder>() {
+
+    val data = checklist
+            .getAll()
+            .toMutableList()
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.result_item, parent, false)
@@ -54,7 +58,7 @@ class ChecklistAdapter(private val data: MutableList<ChecklistEntry>, private va
             }
 
             setOnLongClickListener {
-                ChecklistStore.remove(data[holder.adapterPosition])
+                checklist.remove(data[holder.adapterPosition])
                 data.removeAt(holder.adapterPosition)
                 notifyItemRemoved(holder.adapterPosition)
 

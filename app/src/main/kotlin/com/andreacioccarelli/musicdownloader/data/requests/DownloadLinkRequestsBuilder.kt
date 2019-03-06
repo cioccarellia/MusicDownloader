@@ -2,8 +2,8 @@ package com.andreacioccarelli.musicdownloader.data.requests
 
 import android.util.Base64
 import com.andreacioccarelli.musicdownloader.constants.*
-import com.andreacioccarelli.musicdownloader.data.model.Format
-import com.andreacioccarelli.musicdownloader.data.parsers.ConverterUrlParser
+import com.andreacioccarelli.musicdownloader.data.enums.Format
+import com.andreacioccarelli.musicdownloader.data.parsers.ConversionUrlParser
 import okhttp3.Request
 
 /**
@@ -12,7 +12,7 @@ import okhttp3.Request
 
 object DownloadLinkRequestsBuilder {
     fun get(id: String, format: Format): Request = Request.Builder()
-            .url(ConverterUrlParser.parse(id, format))
+            .url(ConversionUrlParser.parse(id, format))
             .header(HEADER_ACCEPT, "*/*")
             .header(HEADER_DNT, "1")
             .header(HEADER_ORIGIN, Base64.decode(FROM_AUTH_URL, Base64.DEFAULT).toString(Charsets.UTF_8))

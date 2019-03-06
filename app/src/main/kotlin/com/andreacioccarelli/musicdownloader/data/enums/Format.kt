@@ -1,4 +1,4 @@
-package com.andreacioccarelli.musicdownloader.data.model
+package com.andreacioccarelli.musicdownloader.data.enums
 
 /**
  *  Designed and developed by Andrea Cioccarelli

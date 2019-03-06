@@ -18,18 +18,19 @@ import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
+import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.constants.MIME_TEXT_PLAIN
 import com.andreacioccarelli.musicdownloader.constants.PACKAGE_YOUTUBE
 import com.andreacioccarelli.musicdownloader.constants.YOUTUBE_CHANNEL_URL
 import com.andreacioccarelli.musicdownloader.constants.YOUTUBE_WATCH_URL
-import com.andreacioccarelli.musicdownloader.data.model.Format
+import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistEntry
+import com.andreacioccarelli.musicdownloader.data.enums.Format
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
-import com.andreacioccarelli.musicdownloader.extensions.correctSpecialChars
+import com.andreacioccarelli.musicdownloader.extensions.escapeHtml
 import com.andreacioccarelli.musicdownloader.extensions.toUri
 import com.andreacioccarelli.musicdownloader.ui.downloader.MusicDownloader
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
-import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistStore
 import com.andreacioccarelli.musicdownloader.util.ToastUtil
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.bumptech.glide.Glide
@@ -61,7 +62,9 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
         val view = inflater.inflate(R.layout.bottom_dialog, container, false)
         VibrationUtil.medium()
 
-        title = remoteResult.snippet.title.correctSpecialChars()
+        val x = remoteResult.snippet.title
+
+        title = x.escapeHtml()
 
         titleTextView = view.find(R.id.thumb_title)
         titleTextView.text = title
@@ -84,11 +87,11 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
 
         val addTo = view.find<CardView>(R.id.add_to_list)
         val removeFrom = view.find<CardView>(R.id.remove_from_list)
-        isInChecklist = ChecklistStore.contains(remoteResult.id.videoId)
+        isInChecklist = checklist.findByLink(remoteResult.id.videoId).isEmpty()
 
         if (isInChecklist) {
             removeFrom.setOnClickListener {
-                ChecklistStore.remove(remoteResult.snippet.title)
+                checklist.remove(remoteResult.id.videoId)
                 dismiss()
                 VibrationUtil.medium()
                 ToastUtil.success("Removed from Checklist")
@@ -97,7 +100,13 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
             addTo.visibility = View.GONE
         } else {
             addTo.setOnClickListener {
-                ChecklistStore.add(remoteResult.snippet.title, watchLink, remoteResult.snippet.thumbnails.medium.url)
+                checklist.add(
+                        ChecklistEntry(
+                                title,
+                                watchLink,
+                                remoteResult.snippet.thumbnails.medium.url)
+                )
+
                 dismiss()
                 VibrationUtil.medium()
                 ToastUtil.success("Added to Checklist")
@@ -107,6 +116,8 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
         }
 
         val mp3 = view.find<CardView>(R.id.mp3)
+        val mp4 = view.find<CardView>(R.id.mp4)
+
         mp3.apply {
             setOnClickListener { handleClick(Format.MP3) }
             setOnLongClickListener {
@@ -115,7 +126,6 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
             }
         }
 
-        val mp4 = view.find<CardView>(R.id.mp4)
         mp4.apply {
             setOnClickListener { handleClick(Format.MP4) }
             setOnLongClickListener {
@@ -135,6 +145,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
 
         val youtubePlayer = dialog.getCustomView().find<YouTubePlayerView>(R.id.player)
 
+        youtubePlayer.enableAutomaticInitialization = false
         youtubePlayer.initialize(object: YouTubePlayerListener {
             override fun onReady(youTubePlayer: YouTubePlayer) {
                 youTubePlayer.loadVideo(remoteResult.id.videoId, 0f)
@@ -270,7 +281,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
         val sharingIntent = Intent(android.content.Intent.ACTION_SEND)
         sharingIntent.run {
             type = MIME_TEXT_PLAIN
-            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, remoteResult.snippet.title)
+            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, title)
             sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, watchLink)
         }
         startActivity(Intent.createChooser(sharingIntent, "Share link to"))

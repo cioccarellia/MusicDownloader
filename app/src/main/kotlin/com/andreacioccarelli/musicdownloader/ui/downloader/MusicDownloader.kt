@@ -3,17 +3,18 @@ package com.andreacioccarelli.musicdownloader.ui.downloader
 import android.app.Activity
 import android.app.DownloadManager
 import android.content.Context
+import android.os.Environment
 import androidx.annotation.UiThread
 import com.andreacioccarelli.logkit.logd
 import com.andreacioccarelli.logkit.loge
 import com.andreacioccarelli.musicdownloader.App
+import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.constants.*
-import com.andreacioccarelli.musicdownloader.data.model.Format
+import com.andreacioccarelli.musicdownloader.data.enums.Format
+import com.andreacioccarelli.musicdownloader.data.enums.KnownError
 import com.andreacioccarelli.musicdownloader.data.requests.DownloadLinkRequestsBuilder
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
 import com.andreacioccarelli.musicdownloader.extensions.*
-import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistStore
-import com.andreacioccarelli.musicdownloader.data.model.KnownError
 import com.andreacioccarelli.musicdownloader.util.ToastUtil
 import com.google.gson.Gson
 import kotlinx.coroutines.*
@@ -47,6 +48,12 @@ class MusicDownloader {
             data.size == 1 -> startFileDownload(_format)
             else -> throw IllegalStateException()
         }
+    }
+
+    private fun getFileDownloadPath(fileName: String, trimToSdcard: Boolean = false): String {
+        val path = "MusicDownloader/$format/$fileName"
+
+        return if (trimToSdcard) path else Environment.getExternalStorageDirectory().absolutePath + "/" + path
     }
 
     private suspend fun fetchVideoDownloadInformation(url: String, format: Format): DirectLinkResponse {
@@ -144,7 +151,7 @@ class MusicDownloader {
                              response: DirectLinkResponse,
                              isSingle: Boolean = true) {
 
-        ChecklistStore.remove(response.videoId)
+        checklist.remove(response.videoId)
 
         if (response.isUnsuccessful()) {
             // If the conversion has failed and the download target was 1, we can print to the user the reason.
@@ -163,11 +170,12 @@ class MusicDownloader {
             UiController.displayDownloadStarted(activity, response)
         }
 
-        GlobalScope.launch(Dispatchers.IO) {
-            val fileName = "${response.title.toFileName()}.${response.format}"
-            val fileDownloadLink = response.download.sanitize()
 
-            File(fileName).delete()
+        GlobalScope.launch(Dispatchers.IO) {
+            val fileName = "${response.title}.${response.format}"
+            val fileDownloadLink = response.download.sanitizeUrl()
+
+            File(getFileDownloadPath(fileName)).delete()
 
             val uri = fileDownloadLink.toUri()
             logd(fileDownloadLink, fileName)
@@ -183,11 +191,11 @@ class MusicDownloader {
                 allowScanningByMediaScanner()
                 setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
 
-                setDestinationInExternalPublicDir("", "MusicDownloader/$format/$fileName")
+                setDestinationInExternalPublicDir("", getFileDownloadPath(fileName, trimToSdcard = true))
             }
 
             downloadManager.enqueue(downloadRequest)
-            ChecklistStore.remove(response.videoId)
+            checklist.remove(response.videoId)
         }
     }
 }

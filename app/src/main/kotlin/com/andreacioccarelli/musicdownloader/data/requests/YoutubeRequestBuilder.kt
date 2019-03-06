@@ -10,5 +10,6 @@ import okhttp3.Request
 object YoutubeRequestBuilder {
     fun get(search: CharSequence): Request = Request.Builder()
             .url(YoutubeUrlParser.parse(search.toString()))
+            .addHeader("Content-Type", "UTF-8")
             .build()
 }

@@ -30,12 +30,12 @@ import com.afollestad.materialdialogs.list.customListAdapter
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.andreacioccarelli.logkit.loge
 import com.andreacioccarelli.musicdownloader.App
+import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.BuildConfig
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.constants.APK_URL
 import com.andreacioccarelli.musicdownloader.constants.Keys
-import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistStore
-import com.andreacioccarelli.musicdownloader.data.model.Format
+import com.andreacioccarelli.musicdownloader.data.enums.Format
 import com.andreacioccarelli.musicdownloader.data.requests.UpdateRequestBuilder
 import com.andreacioccarelli.musicdownloader.data.requests.YoutubeRequestBuilder
 import com.andreacioccarelli.musicdownloader.data.serializers.UpdateCheck
@@ -45,7 +45,10 @@ import com.andreacioccarelli.musicdownloader.ui.adapters.ChecklistAdapter
 import com.andreacioccarelli.musicdownloader.ui.adapters.ResultsAdapter
 import com.andreacioccarelli.musicdownloader.ui.downloader.MusicDownloader
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
-import com.andreacioccarelli.musicdownloader.util.*
+import com.andreacioccarelli.musicdownloader.util.ConnectionStatus
+import com.andreacioccarelli.musicdownloader.util.NetworkUtil
+import com.andreacioccarelli.musicdownloader.util.UpdateUtil
+import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.tapadoo.alerter.Alerter
@@ -415,29 +418,35 @@ class MainActivity : AppCompatActivity() {
         R.id.action_list -> {
             checklistDialog = MaterialDialog(this)
 
-            if (ChecklistStore.isEmpty()) {
-                checklistDialog
-                        .customView(R.layout.empty_view_checklist)
+            GlobalScope.launch(Dispatchers.IO) {
 
-            } else {
-                checklistDialog
-                        .title(text = "Checklist")
-                        .customListAdapter(ChecklistAdapter(ChecklistStore.get().toMutableList(), this))
-                        .positiveButton(text = "DOWNLOAD ALL") {
-                            MaterialDialog(this).show {
-                                title(text = "Select Format")
-                                listItemsSingleChoice(items = listOf("MP3", "MP4"), initialSelection = 0) { _, index, _ ->
-                                    val format = Format.values()[index]
+                if (checklist.isEmpty()) {
+                    checklistDialog
+                            .customView(R.layout.empty_view_checklist)
 
-                                    MusicDownloader(this@MainActivity, ChecklistStore.get().map { it.link })
-                                            .exec(format)
+                } else {
+                    checklistDialog
+                            .title(text = "Checklist")
+                            .customListAdapter(ChecklistAdapter(this@MainActivity))
+                            .positiveButton(text = "DOWNLOAD ALL") {
+                                MaterialDialog(this@MainActivity).show {
+                                    title(text = "Select Format")
+                                    listItemsSingleChoice(items = listOf("MP3", "MP4"), initialSelection = 0) { _, index, _ ->
+                                        val format = Format.values()[index]
+
+                                        MusicDownloader(this@MainActivity,
+                                                checklist.getAll().map { it.link })
+                                                .exec(format)
+                                    }
+                                    positiveButton(text = "SELECT")
                                 }
-                                positiveButton(text = "SELECT")
                             }
-                        }
-            }
+                }
 
-            checklistDialog.show()
+                withContext(Dispatchers.Main) {
+                    checklistDialog.show()
+                }
+            }
             true
         }
 

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayerView
+    <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
         android:id="@+id/player"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
