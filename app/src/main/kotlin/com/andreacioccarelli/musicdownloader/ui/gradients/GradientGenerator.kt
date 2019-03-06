@@ -1,4 +1,4 @@
-package com.andreacioccarelli.musicdownloader.ui.drawables
+package com.andreacioccarelli.musicdownloader.ui.gradients
 
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable

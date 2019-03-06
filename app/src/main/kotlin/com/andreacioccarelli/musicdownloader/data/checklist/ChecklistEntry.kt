@@ -1,4 +1,4 @@
-package com.andreacioccarelli.musicdownloader.data.model
+package com.andreacioccarelli.musicdownloader.data.checklist
 
 /**
  * Designed and Developed by Andrea Cioccarelli

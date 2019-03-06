@@ -2,7 +2,7 @@ package com.andreacioccarelli.musicdownloader.data.requests
 
 import android.util.Base64
 import com.andreacioccarelli.musicdownloader.constants.*
-import com.andreacioccarelli.musicdownloader.data.formats.Format
+import com.andreacioccarelli.musicdownloader.data.model.Format
 import com.andreacioccarelli.musicdownloader.data.parsers.ConverterUrlParser
 import okhttp3.Request
 

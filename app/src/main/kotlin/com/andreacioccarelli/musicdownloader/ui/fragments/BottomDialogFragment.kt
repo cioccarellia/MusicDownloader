@@ -23,13 +23,13 @@ import com.andreacioccarelli.musicdownloader.constants.MIME_TEXT_PLAIN
 import com.andreacioccarelli.musicdownloader.constants.PACKAGE_YOUTUBE
 import com.andreacioccarelli.musicdownloader.constants.YOUTUBE_CHANNEL_URL
 import com.andreacioccarelli.musicdownloader.constants.YOUTUBE_WATCH_URL
-import com.andreacioccarelli.musicdownloader.data.formats.Format
+import com.andreacioccarelli.musicdownloader.data.model.Format
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.extensions.correctSpecialChars
 import com.andreacioccarelli.musicdownloader.extensions.toUri
 import com.andreacioccarelli.musicdownloader.ui.downloader.MusicDownloader
-import com.andreacioccarelli.musicdownloader.ui.drawables.GradientGenerator
-import com.andreacioccarelli.musicdownloader.util.ChecklistStore
+import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
+import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistStore
 import com.andreacioccarelli.musicdownloader.util.ToastUtil
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.bumptech.glide.Glide

@@ -3,8 +3,9 @@ package com.andreacioccarelli.musicdownloader.ui.downloader
 import android.app.Activity
 import androidx.annotation.UiThread
 import com.andreacioccarelli.musicdownloader.R
+import com.andreacioccarelli.musicdownloader.data.model.KnownError
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
-import com.andreacioccarelli.musicdownloader.ui.drawables.GradientGenerator
+import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
 import com.tapadoo.alerter.Alerter
 
 /**

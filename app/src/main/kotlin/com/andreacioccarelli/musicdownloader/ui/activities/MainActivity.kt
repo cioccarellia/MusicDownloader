@@ -34,7 +34,8 @@ import com.andreacioccarelli.musicdownloader.BuildConfig
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.constants.APK_URL
 import com.andreacioccarelli.musicdownloader.constants.Keys
-import com.andreacioccarelli.musicdownloader.data.formats.Format
+import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistStore
+import com.andreacioccarelli.musicdownloader.data.model.Format
 import com.andreacioccarelli.musicdownloader.data.requests.UpdateRequestBuilder
 import com.andreacioccarelli.musicdownloader.data.requests.YoutubeRequestBuilder
 import com.andreacioccarelli.musicdownloader.data.serializers.UpdateCheck
@@ -43,7 +44,7 @@ import com.andreacioccarelli.musicdownloader.extensions.*
 import com.andreacioccarelli.musicdownloader.ui.adapters.ChecklistAdapter
 import com.andreacioccarelli.musicdownloader.ui.adapters.ResultsAdapter
 import com.andreacioccarelli.musicdownloader.ui.downloader.MusicDownloader
-import com.andreacioccarelli.musicdownloader.ui.drawables.GradientGenerator
+import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
 import com.andreacioccarelli.musicdownloader.util.*
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson

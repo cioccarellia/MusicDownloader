@@ -1,13 +1,10 @@
-package com.andreacioccarelli.musicdownloader.util
+package com.andreacioccarelli.musicdownloader.data.checklist
 
 import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.constants.Keys
-import com.andreacioccarelli.musicdownloader.data.model.ChecklistEntry
 
 /**
  *  Designed and developed by Andrea Cioccarelli
- *
- *  VideoTitle $ VideoLink $ ThumbnailLink
  */
 
 object ChecklistStore {

@@ -11,9 +11,9 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.andreacioccarelli.musicdownloader.R
-import com.andreacioccarelli.musicdownloader.data.model.ChecklistEntry
+import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistEntry
 import com.andreacioccarelli.musicdownloader.ui.activities.MainActivity
-import com.andreacioccarelli.musicdownloader.util.ChecklistStore
+import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistStore
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.jetbrains.anko.find

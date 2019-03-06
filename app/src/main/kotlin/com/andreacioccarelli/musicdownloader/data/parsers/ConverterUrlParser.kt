@@ -2,9 +2,9 @@ package com.andreacioccarelli.musicdownloader.data.parsers
 
 import android.util.Base64
 import com.andreacioccarelli.musicdownloader.constants.DIRECT_LINK_GENERATOR_URL
-import com.andreacioccarelli.musicdownloader.data.formats.Format
-import com.andreacioccarelli.musicdownloader.data.formats.Format.MP3
-import com.andreacioccarelli.musicdownloader.data.formats.Format.MP4
+import com.andreacioccarelli.musicdownloader.data.model.Format
+import com.andreacioccarelli.musicdownloader.data.model.Format.MP3
+import com.andreacioccarelli.musicdownloader.data.model.Format.MP4
 
 /**
  *  Designed and developed by Andrea Cioccarelli

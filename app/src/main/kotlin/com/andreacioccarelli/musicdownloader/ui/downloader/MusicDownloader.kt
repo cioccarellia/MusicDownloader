@@ -8,11 +8,12 @@ import com.andreacioccarelli.logkit.logd
 import com.andreacioccarelli.logkit.loge
 import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.constants.*
-import com.andreacioccarelli.musicdownloader.data.formats.Format
+import com.andreacioccarelli.musicdownloader.data.model.Format
 import com.andreacioccarelli.musicdownloader.data.requests.DownloadLinkRequestsBuilder
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
 import com.andreacioccarelli.musicdownloader.extensions.*
-import com.andreacioccarelli.musicdownloader.util.ChecklistStore
+import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistStore
+import com.andreacioccarelli.musicdownloader.data.model.KnownError
 import com.andreacioccarelli.musicdownloader.util.ToastUtil
 import com.google.gson.Gson
 import kotlinx.coroutines.*

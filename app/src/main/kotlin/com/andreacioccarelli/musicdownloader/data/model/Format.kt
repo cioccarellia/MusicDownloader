@@ -1,4 +1,4 @@
-package com.andreacioccarelli.musicdownloader.data.formats
+package com.andreacioccarelli.musicdownloader.data.model
 
 /**
  *  Designed and developed by Andrea Cioccarelli
