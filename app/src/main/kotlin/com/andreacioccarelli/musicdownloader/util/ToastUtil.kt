@@ -11,6 +11,7 @@ import es.dmoral.toasty.Toasty
  */
 
 
+@Suppress("unused")
 object ToastUtil {
     fun success(text: String,
                 @DrawableRes icon: Int = R.drawable.toast_check,

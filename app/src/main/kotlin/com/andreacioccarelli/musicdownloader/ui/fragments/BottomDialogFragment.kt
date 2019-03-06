@@ -29,6 +29,7 @@ import com.andreacioccarelli.musicdownloader.data.enums.Format
 import com.andreacioccarelli.musicdownloader.data.model.DownloadInfo
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.extensions.escapeHtml
+
 import com.andreacioccarelli.musicdownloader.extensions.toUri
 import com.andreacioccarelli.musicdownloader.ui.downloader.MusicDownloader
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
@@ -63,9 +64,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
         val view = inflater.inflate(R.layout.bottom_dialog, container, false)
         VibrationUtil.medium()
 
-        val x = remoteResult.snippet.title
-
-        title = x.escapeHtml()
+        title = remoteResult.snippet.title.escapeHtml()
 
         titleTextView = view.find(R.id.thumb_title)
         titleTextView.text = title
@@ -200,22 +199,22 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
             getInputField().let { input ->
                 input.selectAll()
                 input.addTextChangedListener(object : TextWatcher {
-                    override fun afterTextChanged(p0: Editable?) {
-                        if (p0.isNullOrBlank()) {
+                    override fun afterTextChanged(text: Editable?) {
+                        if (text.isNullOrBlank()) {
                             dialog.setActionButtonEnabled(WhichButton.POSITIVE, false)
                             return
                         }
 
-                        val text = p0.toString()
+                        val newName = text.toString()
                         val inputField = dialog.getInputField()
 
-                        if (text.contains("/")) {
-                            inputField.error = "File name cannot contain /"
+                        if (newName.contains("/")) {
+                            inputField.error = "Filename cannot contain /"
                             dialog.setActionButtonEnabled(WhichButton.POSITIVE, false)
                             return
                         }
 
-                        if (text.endsWith(".mp3") || text.endsWith(".mp4")) {
+                        if (newName.endsWith(".mp3") || newName.endsWith(".mp4")) {
                             inputField.error = "We will think about putting an extension, just enter the file name"
                             dialog.setActionButtonEnabled(WhichButton.POSITIVE, false)
                             return
@@ -224,14 +223,8 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
                         dialog.setActionButtonEnabled(WhichButton.POSITIVE, true)
                     }
 
-                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-                    }
-
-                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-                    }
-
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
                 })
             }
         }

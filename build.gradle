@@ -5,12 +5,13 @@ buildscript {
     repositories {
         google()
         maven { url "https://jitpack.io" }
-        maven { url "https://dl.bintray.com/drummer-aidan/maven/" }
+        maven { url "https://plugins.gradle.org/m2/" }
         jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.3.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "gradle.plugin.com.github.konifar.gradle:plugin:0.3.3"
     }
 }
 
@@ -18,7 +19,7 @@ allprojects {
     repositories {
         google()
         maven { url "https://jitpack.io" }
-        maven { url "https://dl.bintray.com/drummer-aidan/maven/" }
+        maven { url "https://plugins.gradle.org/m2/" }
         jcenter()
     }
 }

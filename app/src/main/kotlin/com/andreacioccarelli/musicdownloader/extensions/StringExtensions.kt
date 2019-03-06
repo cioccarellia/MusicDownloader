@@ -2,7 +2,6 @@ package com.andreacioccarelli.musicdownloader.extensions
 
 import android.net.Uri
 import android.text.SpannableStringBuilder
-import com.andreacioccarelli.logkit.logd
 
 /**
  *  Designed and developed by Andrea Cioccarelli
@@ -24,13 +23,6 @@ fun String.renameIfEqual(pattern: String, renaming: String): String {
 }
 
 fun CharSequence.toEditable() = SpannableStringBuilder(this)
-
-fun String.getVideoId(): String {
-    if (this.contains("?v=")) return split("?v=")[1].split("&")[0]
-
-    logd("Trying to parse string $this to linkId, but unsuccessful. Can't find ?v=")
-    return ""
-}
 
 fun String.getVideoIdOrThrow(): String {
     if (this.contains("?v="))

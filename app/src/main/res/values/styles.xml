@@ -3,10 +3,10 @@
 
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="colorPrimary">@color/Grey_915</item>
-        <item name="colorPrimaryDark">@color/Grey_915</item>
+        <item name="colorPrimaryDark">@color/Grey_925</item>
         <item name="colorAccent">@color/Orange_600</item>
 
-
+        <item name="isLightTheme">false</item>
         <item name="android:windowActionBarOverlay">true</item>
         <item name="android:windowBackground">@color/Grey_900</item>
         <item name="android:textColorPrimary">@color/Grey_100</item>
@@ -20,8 +20,6 @@
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
-
     <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/bottom_sheet</item>
     </style>
@@ -29,5 +27,4 @@
     <style name="BottomSheetTheme" parent="@style/Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/BottomSheet</item>
     </style>
-
 </resources>

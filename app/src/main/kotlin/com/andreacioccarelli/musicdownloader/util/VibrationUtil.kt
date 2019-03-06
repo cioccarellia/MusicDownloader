@@ -9,6 +9,7 @@ import org.jetbrains.anko.vibrator
  *  Designed and developed by Andrea Cioccarelli
  */
 
+@Suppress("unused")
 object VibrationUtil {
     private const val VIBRATION_WEAK = 25L
     private const val AMPLITUDE_WEAK = 100

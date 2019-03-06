@@ -1,7 +1,7 @@
 {
-  "versionCode": 8,
-  "versionName": "1.2.1",
-  "changelog": "Performances improvements, bug fixes for files download, enhanced experience",
+  "versionCode": 9,
+  "versionName": "1.3.0",
+  "changelog": "Performances improvements, bug fixes for files download, enhanced user experience",
 
   "downloadInfo": {
     "useBundledUpdateLink": true,

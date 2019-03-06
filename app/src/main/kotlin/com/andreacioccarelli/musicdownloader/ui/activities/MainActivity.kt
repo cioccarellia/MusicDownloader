@@ -16,6 +16,7 @@ import android.text.ClipboardManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -135,18 +136,17 @@ class MainActivity : AppCompatActivity() {
         text?.let {
             if (it.isUrl && intent?.getStringExtra(Intent.EXTRA_TEXT) == null) {
                 search.text = clipboard.text.toEditable()
-                fab.performClick()
             }
         }
     }
 
-    private fun initInput() = with(search) {
-        onSubmit {
+    private fun initInput() {
+        search.onSubmit {
             fab.performClick()
             search.dismissKeyboard()
         }
 
-        setOnClickListener {
+        search.setOnClickListener {
             if (isSearching) {
                 isSearching = false
                 snack?.dismiss()
@@ -158,7 +158,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        search.popUpKeyboard()
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        Handler().postDelayed({
+            search.popUpKeyboard()
+        }, 107)
     }
 
     private fun initPermissions() {
@@ -290,7 +293,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     if (resultsRecyclerView.adapter?.itemCount == 1) {
-                        delay(207)
+                        delay(107)
                         resultsRecyclerView.getChildAt(0)?.performClick()
                     }
 
@@ -342,7 +345,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initUpdateChecker() = onceOutOf4 {
+    private fun initUpdateChecker() = onceFor3 {
         GlobalScope.launch(Dispatchers.IO) {
             val requestBuilder = UpdateRequestBuilder.get()
             val request = OkHttpClient().newCall(requestBuilder).execute()
@@ -353,6 +356,8 @@ class MainActivity : AppCompatActivity() {
             val updateCheck = gson.fromJson(
                     jsonRequest,
                     UpdateCheck::class.java)
+
+
 
             if (updateCheck.versionCode > BuildConfig.VERSION_CODE && !App.prefs.get(Keys.ignoring + updateCheck.versionCode, false)) {
                 withContext(Dispatchers.Main) {

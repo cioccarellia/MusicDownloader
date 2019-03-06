@@ -26,8 +26,8 @@ import kotlin.random.Random
 /**
  * Designed and Developed by Andrea Cioccarelli
  */
-class MusicDownloader {
 
+class MusicDownloader {
     private var activity: Activity?
     private val data: MutableList<DownloadInfo>
     private lateinit var format: Format
@@ -177,6 +177,7 @@ class MusicDownloader {
             val fileName = "${response.fileName}.${response.format}"
             val fileDownloadLink = response.download.sanitizeUrl()
 
+            // Remove file if it already exists
             File(getFileDownloadPath(fileName)).delete()
 
             val uri = fileDownloadLink.toUri()
@@ -185,14 +186,12 @@ class MusicDownloader {
             val downloadRequest = DownloadManager.Request(uri)
 
             with(downloadRequest) {
-                setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
                 setAllowedOverRoaming(true)
                 setVisibleInDownloadsUi(true)
-                setTitle("Downloading ${response.title}")
+                setTitle(response.fileName)
                 setDescription(fileName)
                 allowScanningByMediaScanner()
                 setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-
                 setDestinationInExternalPublicDir("", getFileDownloadPath(fileName, trimToSdcard = true))
             }
 

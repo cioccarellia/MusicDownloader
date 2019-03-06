@@ -1,8 +1,10 @@
+@file:Suppress("unused")
+
 package com.andreacioccarelli.musicdownloader.extensions
 
 import com.andreacioccarelli.musicdownloader.constants.*
-import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
 import com.andreacioccarelli.musicdownloader.data.enums.KnownError
+import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
 
 /**
  * Designed and Developed by Andrea Cioccarelli

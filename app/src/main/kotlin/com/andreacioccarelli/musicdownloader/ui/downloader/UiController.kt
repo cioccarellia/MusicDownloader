@@ -16,10 +16,6 @@ import com.tapadoo.alerter.Alerter
 object UiController {
 
     @UiThread
-    fun displayProgressMetaRetrievingSingle(activity: Activity?, download: DownloadInfo)
-            = displayRetrievingVideoInformation(activity, listOf(download))
-
-    @UiThread
     fun displayRetrievingVideoInformation(activity: Activity?, downloads: List<DownloadInfo>) {
         if (activity == null) return
         if (activity.isDestroyed || activity.isFinishing) return
@@ -29,7 +25,7 @@ object UiController {
                 .setDismissable(false)
                 .setIcon(R.drawable.download)
                 .setTitle("Initializing conversion")
-                .setText("Retrieving download information for video ${downloads[0]}")
+                .setText("Retrieving download information for video ${downloads[0].fileName}")
                 .setBackgroundDrawable(GradientGenerator.random())
                 .enableInfiniteDuration(true)
                 .show()
@@ -61,7 +57,7 @@ object UiController {
                 Alerter.create(activity)
                         .setIcon(R.drawable.download)
                         .setTitle("Starting download")
-                        .setText("For video \"${downloads[0].title}\"")
+                        .setText(downloads[0].fileName)
                         .setBackgroundDrawable(GradientGenerator.random())
                         .setDuration(7_000)
                         .show()
