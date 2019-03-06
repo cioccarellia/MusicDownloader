@@ -32,13 +32,14 @@ fun String.getVideoId(): String {
 }
 
 fun String.getVideoIdOrThrow(): String {
-    if (this.contains("?v=")) return split("?v=")[1].split("&")[0]
-
-    throw IllegalStateException()
+    if (this.contains("?v="))
+        return split("?v=")[1].split("&")[0]
+    else throw IllegalStateException()
 }
 
 fun String.correctSpecialChars(): String = this
         .replace("/", "")
+        .replace("&#39;", "'")
         .removeSuffix(".mp4")
         .removeSuffix(".mp3")
         .renameIfEqual(".", "_.")

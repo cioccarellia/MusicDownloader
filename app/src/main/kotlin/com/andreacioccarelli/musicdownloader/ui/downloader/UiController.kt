@@ -15,10 +15,10 @@ object UiController {
 
     @UiThread
     fun displayProgressMetaRetrievingSingle(activity: Activity?, download: String)
-            = displayProgressMetaRetrievingSingle(activity, listOf(download))
+            = displayRetrievingVideoInformation(activity, listOf(download))
 
     @UiThread
-    fun displayProgressMetaRetrievingSingle(activity: Activity?, downloads: List<String>) {
+    fun displayRetrievingVideoInformation(activity: Activity?, downloads: List<String>) {
         if (activity == null) return
         if (activity.isDestroyed || activity.isFinishing) return
 
@@ -34,7 +34,7 @@ object UiController {
     }
 
     @UiThread
-    fun displayProgressMetaRetrievingList(activity: Activity?, downloads: List<String>) {
+    fun displayRetrievingListInformation(activity: Activity?, downloads: List<String>) {
         if (activity == null) return
         if (activity.isDestroyed || activity.isFinishing) return
 
@@ -89,7 +89,7 @@ object UiController {
         when(error) {
             KnownError.MALFORMED_URL -> {
                 Alerter.create(activity)
-                        .setIcon(R.drawable.ic_error_outline_white_48dp)
+                        .setIcon(R.drawable.toast_error)
                         .setTitle("Malformed URL")
                         .setText("Cannot process the given URL because it is in an unknown format (${links[0]})")
                         .setBackgroundDrawable(GradientGenerator.make(0F, R.color.Red_800, R.color.Red_A700))
@@ -98,7 +98,7 @@ object UiController {
             }
             KnownError.UNADDRESSABLE_VIDEO -> {
                 Alerter.create(activity)
-                        .setIcon(R.drawable.ic_error_outline_white_48dp)
+                        .setIcon(R.drawable.toast_error)
                         .setTitle("Cannot Download Video")
                         .setText("Cannot process the given video, youtube responded with an error")
                         .setBackgroundDrawable(GradientGenerator.make(0F, R.color.Red_800, R.color.Red_A700))
@@ -107,7 +107,7 @@ object UiController {
             }
             KnownError.VIDEO_LENGTH -> {
                 Alerter.create(activity)
-                        .setIcon(R.drawable.ic_error_outline_white_48dp)
+                        .setIcon(R.drawable.toast_error)
                         .setTitle("Video Length Error")
                         .setText("Cannot process the given video because its length exceeds 3 hours")
                         .setBackgroundDrawable(GradientGenerator.make(0F, R.color.Red_500, R.color.Red_A400))
@@ -117,7 +117,7 @@ object UiController {
 
             KnownError.UNKNOWN_ERROR -> {
                 Alerter.create(activity)
-                        .setIcon(R.drawable.ic_error_outline_white_48dp)
+                        .setIcon(R.drawable.toast_error)
                         .setTitle("Unknown error")
                         .setText("An exception was raised by the server while converting the selected video")
                         .setBackgroundDrawable(GradientGenerator.make(0F, R.color.Red_500, R.color.Red_A400))
@@ -127,7 +127,7 @@ object UiController {
 
             KnownError.BATCH_FAILED -> {
                 Alerter.create(activity)
-                        .setIcon(R.drawable.ic_error_outline_white_48dp)
+                        .setIcon(R.drawable.toast_error)
                         .setTitle("Downloading error")
                         .setText("A video in the list can not be converted for length or server issues")
                         .setBackgroundDrawable(GradientGenerator.make(0F, R.color.Red_500, R.color.Red_A400))

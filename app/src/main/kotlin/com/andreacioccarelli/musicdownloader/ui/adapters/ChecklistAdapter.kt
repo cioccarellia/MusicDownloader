@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.andreacioccarelli.musicdownloader.R
+import com.andreacioccarelli.musicdownloader.data.model.ChecklistEntry
 import com.andreacioccarelli.musicdownloader.ui.activities.MainActivity
 import com.andreacioccarelli.musicdownloader.util.ChecklistStore
 import com.bumptech.glide.Glide
@@ -21,7 +22,7 @@ import org.jetbrains.anko.find
  *  Designed and developed by Andrea Cioccarelli
  */
 
-class ChecklistAdapter(private val data: MutableList<Triple<String, String, String>>, private val activity: Activity) : RecyclerView.Adapter<ChecklistAdapter.ViewHolder>() {
+class ChecklistAdapter(private val data: MutableList<ChecklistEntry>, private val activity: Activity) : RecyclerView.Adapter<ChecklistAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.result_item, parent, false)
@@ -32,11 +33,11 @@ class ChecklistAdapter(private val data: MutableList<Triple<String, String, Stri
 
     override fun onBindViewHolder(holder: ViewHolder, i: Int) {
         Glide.with(activity)
-                .load(data[holder.adapterPosition].third)
+                .load(data[holder.adapterPosition].thumbnailLink)
                 .thumbnail(0.1F)
                 .into(holder.icon)
         
-        holder.title.text = data[holder.adapterPosition].first
+        holder.title.text = data[holder.adapterPosition].title
 
         with(holder.card) {
             setOnClickListener {
@@ -46,26 +47,29 @@ class ChecklistAdapter(private val data: MutableList<Triple<String, String, Stri
                 val fab = ref.find<FloatingActionButton>(R.id.fab)
                 val rv = ref.find<RecyclerView>(R.id.resultsRecyclerView)
 
-                search.text = data[holder.adapterPosition].first
+                search.text = data[holder.adapterPosition].title
                 fab.performClick()
                 rv.smoothScrollToPosition(0)
                 ref.checklistDialog.dismiss()
             }
 
             setOnLongClickListener {
-                if (data.size == 1) {
-                    val ref = (activity as MainActivity)
-                    ref.checklistDialog.dismiss()
-                }
-
-                ChecklistStore.remove(data[holder.adapterPosition].first)
+                ChecklistStore.remove(data[holder.adapterPosition])
                 data.removeAt(holder.adapterPosition)
                 notifyItemRemoved(holder.adapterPosition)
+
+                if (data.isEmpty()) {
+                    // If the last remaining item is removed, safely close the dialog
+                    val ref = (activity as? MainActivity)
+                    ref?.checklistDialog?.dismiss()
+                }
                 true
             }
         }
 
         Handler().post {
+            // Maybe a title has just 1 line of text, and so we should give it
+            // a normal dimension, if compared to longer ones
             if (holder.title.lineCount == 1) {
                 holder.title.height = activity.resources.getDimension(R.dimen.result_thumb_width).toInt()
             }

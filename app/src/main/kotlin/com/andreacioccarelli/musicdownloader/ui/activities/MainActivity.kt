@@ -428,7 +428,7 @@ class MainActivity : AppCompatActivity() {
                                 listItemsSingleChoice(items = listOf("MP3", "MP4"), initialSelection = 0) { _, index, _ ->
                                     val format = Format.values()[index]
 
-                                    MusicDownloader(this@MainActivity, ChecklistStore.get().map { it.second })
+                                    MusicDownloader(this@MainActivity, ChecklistStore.get().map { it.link })
                                             .exec(format)
                                 }
                                 positiveButton(text = "SELECT")

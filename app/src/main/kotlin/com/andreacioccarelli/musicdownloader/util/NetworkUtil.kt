@@ -12,20 +12,9 @@ import com.andreacioccarelli.musicdownloader.App
 enum class ConnectionStatus { ONLINE, OFFLINE }
 
 object NetworkUtil {
-    val n: ConnectionStatus
-        get() {
-            val connectionsManager = App.instance.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-            connectionsManager.allNetworks.map {
-                if (connectionsManager.getNetworkInfo(it).isConnected) return ConnectionStatus.ONLINE
-            }
-
-            return ConnectionStatus.OFFLINE
-        }
-
     val connectionStatus: ConnectionStatus
         get() {
-            val connectionManager = App.instance.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val connectionManager = App.context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
             val wifiState: Boolean = isWifiOn()
             val dataState: Boolean = isDataOn(connectionManager)
@@ -43,7 +32,7 @@ object NetworkUtil {
     }
 
     private fun isWifiOn(): Boolean {
-        val wifi = App.instance.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val wifi = App.context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         return wifi.isWifiEnabled
     }
 }

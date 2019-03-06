@@ -2,6 +2,7 @@ package com.andreacioccarelli.musicdownloader.util
 
 import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.constants.Keys
+import com.andreacioccarelli.musicdownloader.data.model.ChecklistEntry
 
 /**
  *  Designed and developed by Andrea Cioccarelli
@@ -15,14 +16,15 @@ object ChecklistStore {
     fun isEmpty(): Boolean = get().isEmpty()
     fun clear() = App.prefs.put(Keys.list, "")
 
-    fun get(): List<Triple<String, String, String>> {
+    fun get(): List<ChecklistEntry> {
         val raw = App.prefs.get(Keys.list, "")
 
         if (raw == "") return emptyList()
         val list = raw.removeSuffix(separator).split(separator)
-        return list.map { Triple(it, App.prefs.get("link->$it", ""), App.prefs.get("thumb->$it", "")) }
+        return list.map { ChecklistEntry(it, App.prefs.get("link->$it", ""), App.prefs.get("thumb->$it", "")) }
     }
-    
+
+    fun add(checklistEntry: ChecklistEntry) = add(checklistEntry.link, checklistEntry.link, checklistEntry.thumbnailLink)
     fun add(item: String, link: String, thumb: String) {
         App.prefs.put(Keys.list, App.prefs.get(Keys.list, "")
                 .plus("$item$separator")
@@ -33,10 +35,11 @@ object ChecklistStore {
     }
 
     fun contains(link: String): Boolean {
-        val raw = App.prefs.get(Keys.list, "")
-        return raw.contains(link)
+        val raw = App.prefs.allPrefsList
+        return raw.map { it.second }.contains(link)
     }
 
+    fun remove(checklistEntry: ChecklistEntry) = remove(checklistEntry.link)
     fun remove(item: String) {
         val raw = App.prefs.get(Keys.list, "")
 

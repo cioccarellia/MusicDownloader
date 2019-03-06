@@ -15,9 +15,9 @@ object VibrationUtil {
 
     fun weak() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            App.instance.baseContext.vibrator.vibrate(VibrationEffect.createOneShot(VIBRATION_WEAK, AMPLITUDE_WEAK))
+            App.context.baseContext.vibrator.vibrate(VibrationEffect.createOneShot(VIBRATION_WEAK, AMPLITUDE_WEAK))
         } else {
-            App.instance.baseContext.vibrator.vibrate(VIBRATION_WEAK)
+            App.context.baseContext.vibrator.vibrate(VIBRATION_WEAK)
         }
     }
 
@@ -26,9 +26,9 @@ object VibrationUtil {
 
     fun medium() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            App.instance.baseContext.vibrator.vibrate(VibrationEffect.createOneShot(VIBRATION_MEDIUM, AMPLITUDE_MEDIUM))
+            App.context.baseContext.vibrator.vibrate(VibrationEffect.createOneShot(VIBRATION_MEDIUM, AMPLITUDE_MEDIUM))
         } else {
-            App.instance.baseContext.vibrator.vibrate(VIBRATION_MEDIUM)
+            App.context.baseContext.vibrator.vibrate(VIBRATION_MEDIUM)
         }
     }
 
@@ -37,9 +37,9 @@ object VibrationUtil {
 
     fun strong() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            App.instance.baseContext.vibrator.vibrate(VibrationEffect.createOneShot(VIBRATION_STRONG, AMPLITUDE_STRONG))
+            App.context.baseContext.vibrator.vibrate(VibrationEffect.createOneShot(VIBRATION_STRONG, AMPLITUDE_STRONG))
         } else {
-            App.instance.baseContext.vibrator.vibrate(VIBRATION_STRONG)
+            App.context.baseContext.vibrator.vibrate(VIBRATION_STRONG)
         }
     }
 }

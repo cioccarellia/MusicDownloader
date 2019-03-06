@@ -30,7 +30,7 @@ enum class KnownError {
 
 
     /**
-     * An unknown error was thrown (for instance, an unknown repose was provided by the server)
+     * An unknown error was thrown (for context, an unknown repose was provided by the server)
      * */
     UNKNOWN_ERROR
 }

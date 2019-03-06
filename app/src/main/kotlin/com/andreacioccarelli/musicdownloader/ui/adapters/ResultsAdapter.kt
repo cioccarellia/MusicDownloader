@@ -2,15 +2,15 @@ package com.andreacioccarelli.musicdownloader.ui.adapters
 
 import android.app.Activity
 import android.os.Handler
-import androidx.fragment.app.FragmentManager
-import androidx.cardview.widget.CardView
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.cardview.widget.CardView
+import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.RecyclerView
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchResponse
@@ -21,7 +21,7 @@ import com.bumptech.glide.Glide
  *  Designed and developed by Andrea Cioccarelli
  */
 
-class ResultsAdapter(response: YoutubeSearchResponse, private val activity: Activity, private val fm: FragmentManager) : RecyclerView.Adapter<ResultsAdapter.ViewHolder>() {
+class ResultsAdapter(response: YoutubeSearchResponse, private val activity: Activity, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<ResultsAdapter.ViewHolder>() {
 
     val data by lazy { ArrayList<Result>() }
 
@@ -47,7 +47,7 @@ class ResultsAdapter(response: YoutubeSearchResponse, private val activity: Acti
 
         holder.card.setOnClickListener {
             val bottomSheetFragment = BottomDialogFragment(data[i])
-            bottomSheetFragment.show(fm, bottomSheetFragment.tag)
+            bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
         }
 
         Handler().post {

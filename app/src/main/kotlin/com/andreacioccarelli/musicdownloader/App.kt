@@ -13,12 +13,12 @@ import com.andreacioccarelli.musicdownloader.extensions.Delegates
 class App : Application() {
 
     companion object {
-        var instance by Delegates.singleValue<Application>()
-        val prefs by lazy { CryptoPrefs(instance.applicationContext, FILE, KEY, false) }
+        var context by Delegates.singleValue<Application>()
+        val prefs by lazy { CryptoPrefs(context.applicationContext, FILE, KEY, false) }
     }
 
     override fun onCreate() {
         super.onCreate()
-        instance = this
+        context = this
     }
 }

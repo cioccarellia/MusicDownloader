@@ -13,10 +13,12 @@ import com.andreacioccarelli.musicdownloader.data.requests.DownloadLinkRequestsB
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
 import com.andreacioccarelli.musicdownloader.extensions.*
 import com.andreacioccarelli.musicdownloader.util.ChecklistStore
+import com.andreacioccarelli.musicdownloader.util.ToastUtil
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import java.io.File
+import kotlin.random.Random
 
 /**
  * Designed and Developed by Andrea Cioccarelli
@@ -25,6 +27,7 @@ class MusicDownloader {
 
     private var activity: Activity?
     private val data: MutableList<String>
+    private lateinit var format: Format
 
     constructor(activity: Activity?, url: String) {
         data = mutableListOf(url)
@@ -36,15 +39,16 @@ class MusicDownloader {
         this.activity = activity
     }
 
-    fun exec(format: Format) {
+    fun exec(_format: Format) {
+        format = _format
         when {
-            data.size > 1 -> startFilesDownload(format)
-            data.size == 1 -> startFileDownload(format)
+            data.size > 1 -> startFilesDownload(_format)
+            data.size == 1 -> startFileDownload(_format)
             else -> throw IllegalStateException()
         }
     }
 
-    private fun fetchMeta(url: String, format: Format): DirectLinkResponse {
+    private suspend fun fetchVideoDownloadInformation(url: String, format: Format): DirectLinkResponse {
         val videoId = url.getVideoIdOrThrow()
 
         val requestBuilder = DownloadLinkRequestsBuilder.get(videoId, format)
@@ -55,49 +59,102 @@ class MusicDownloader {
         logd(response)
         return when (response.state) {
             RESPONSE_OK, RESPONSE_ERROR -> response
-            RESPONSE_WAIT, RESPONSE_PROCESSING -> fetchMeta(url, format)
+            RESPONSE_WAIT, RESPONSE_PROCESSING -> {
+                // If the video is processing, wait until it's compleated
+                delay(Random.nextLong(500, 1000))
+                fetchVideoDownloadInformation(url, format)
+            }
             else -> {
-                // Unknown response
+                // Unknown response received
                 loge(response)
-                com.andreacioccarelli.musicdownloader.extensions.error("Illegal server response (${response.state}) while downloading video ${response.videoId} [${response.reason}]")
+                ToastUtil.error("Illegal server response (${response.state}) while downloading video ${response.videoId} [${response.reason}]")
                 throw IllegalStateException()
             }
         }
     }
 
+    private fun startFileDownload(format: Format) {
+        UiController.displayRetrievingVideoInformation(activity, data)
+
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                val response = fetchVideoDownloadInformation(data[0], format)
+
+                delay(1000)
+                withContext(Dispatchers.Main) {
+                    downloadFile(response = response)
+                }
+            } catch (exception: RuntimeException) {
+                loge(exception)
+                withContext(Dispatchers.Main) {
+                    UiController.displayError(activity, KnownError.UNKNOWN_ERROR, data)
+                }
+            }
+        }
+    }
+
+    private fun startFilesDownload(format: Format) {
+        UiController.displayRetrievingListInformation(activity, data)
+
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                val responses = data.map {
+                    fetchVideoDownloadInformation(it, format)
+                }
+
+                delay(1000)
+                withContext(Dispatchers.Main) {
+                    downloadFileList(responses)
+                }
+            } catch (exception: RuntimeException) {
+                loge(exception)
+                withContext(Dispatchers.Main) {
+                    UiController.displayError(activity, KnownError.BATCH_FAILED, data)
+                }
+            }
+        }
+    }
+
+
+
     @UiThread
-    private fun downloadFiles(responses: List<DirectLinkResponse>) {
-        val successful = responses.filter { it.isSuccessful() }
-        if (successful.size != responses.size) {
-            val missed = responses.size - successful.size
-            error("$missed file${plural(missed)} couldn't be converted. Processing ${successful.size} file${plural(successful.size)}")
+    private fun downloadFileList(totalVideos: List<DirectLinkResponse>) {
+        val convertedVideos = totalVideos.filter {
+            it.isSuccessful()
         }
 
-        UiController.displayDownloadStarted(activity, successful)
-        val downloadManager = App.instance.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        if (convertedVideos.size != totalVideos.size) {
+            val missCount = totalVideos.size - convertedVideos.size
+            error("$missCount file${plural(missCount)} couldn't be converted. Processing ${convertedVideos.size} file${plural(convertedVideos.size)}")
+        }
 
-        for (response in responses) {
-            downloadFile(downloadManager = downloadManager, response = response, isSingle = false)
+        UiController.displayDownloadStarted(activity, convertedVideos)
+        val downloadManager = App.context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+
+        for (response in totalVideos) {
+            downloadFile(downloadManager = downloadManager,
+                    response = response,
+                    isSingle = false)
         }
     }
 
     @UiThread
-    private fun downloadFile(downloadManager: DownloadManager = App.instance.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager,
+    private fun downloadFile(downloadManager: DownloadManager = App.context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager,
                              response: DirectLinkResponse,
                              isSingle: Boolean = true) {
 
         ChecklistStore.remove(response.videoId)
 
         if (response.isUnsuccessful()) {
+            // If the conversion has failed and the download target was 1, we can print to the user the reason.
             if (isSingle) {
                 when (response.reason) {
-                    ERROR_LENGTH -> UiController.displayError(activity, KnownError.VIDEO_LENGTH, response.videoId)
-                    ERROR_MALFORMED -> UiController.displayError(activity, KnownError.MALFORMED_URL, response.videoId)
-                    ERROR_UNADDRESSABLE_VIDEO -> UiController.displayError(activity, KnownError.UNADDRESSABLE_VIDEO, response.videoId)
-                    else -> UiController.displayError(activity, KnownError.UNKNOWN_ERROR, response.videoId)
+                    ERROR_LENGTH ->                 UiController.displayError(activity, KnownError.VIDEO_LENGTH, response.videoId)
+                    ERROR_MALFORMED ->              UiController.displayError(activity, KnownError.MALFORMED_URL, response.videoId)
+                    ERROR_UNADDRESSABLE_VIDEO ->    UiController.displayError(activity, KnownError.UNADDRESSABLE_VIDEO, response.videoId)
+                    else ->                         UiController.displayError(activity, KnownError.UNKNOWN_ERROR, response.videoId)
                 }
             }
-
             return
         }
 
@@ -125,52 +182,11 @@ class MusicDownloader {
                 allowScanningByMediaScanner()
                 setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
 
-                setDestinationInExternalPublicDir("", "MusicDownloader/$fileName")
+                setDestinationInExternalPublicDir("", "MusicDownloader/$format/$fileName")
             }
 
             downloadManager.enqueue(downloadRequest)
             ChecklistStore.remove(response.videoId)
-        }
-    }
-
-    private fun startFileDownload(format: Format) {
-        UiController.displayProgressMetaRetrievingSingle(activity, data)
-
-        GlobalScope.launch(Dispatchers.IO) {
-            try {
-                val response = fetchMeta(data[0], format)
-
-                delay(1000)
-                withContext(Dispatchers.Main) {
-                    downloadFile(response = response)
-                }
-            } catch (exception: RuntimeException) {
-                loge(exception)
-                withContext(Dispatchers.Main) {
-                    UiController.displayError(activity, KnownError.UNKNOWN_ERROR, data)
-                }
-            }
-        }
-    }
-
-    private fun startFilesDownload(format: Format) {
-        UiController.displayProgressMetaRetrievingList(activity, data)
-
-        GlobalScope.launch(Dispatchers.IO) {
-            try {
-                val responses = data.map { fetchMeta(it, format) }
-
-                delay(1000)
-
-                withContext(Dispatchers.Main) {
-                    downloadFiles(responses)
-                }
-            } catch (exception: RuntimeException) {
-                loge(exception)
-                withContext(Dispatchers.Main) {
-                    UiController.displayError(activity, KnownError.BATCH_FAILED, data)
-                }
-            }
         }
     }
 }

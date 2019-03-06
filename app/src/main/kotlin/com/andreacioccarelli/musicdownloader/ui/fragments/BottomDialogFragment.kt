@@ -26,18 +26,19 @@ import com.andreacioccarelli.musicdownloader.constants.YOUTUBE_WATCH_URL
 import com.andreacioccarelli.musicdownloader.data.formats.Format
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.extensions.correctSpecialChars
-import com.andreacioccarelli.musicdownloader.extensions.success
 import com.andreacioccarelli.musicdownloader.extensions.toUri
 import com.andreacioccarelli.musicdownloader.ui.downloader.MusicDownloader
 import com.andreacioccarelli.musicdownloader.ui.drawables.GradientGenerator
 import com.andreacioccarelli.musicdownloader.util.ChecklistStore
+import com.andreacioccarelli.musicdownloader.util.ToastUtil
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayerView
-import com.pierfrancescosoffritti.androidyoutubeplayer.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import org.jetbrains.anko.find
 
 /**
@@ -83,14 +84,14 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
 
         val addTo = view.find<CardView>(R.id.add_to_list)
         val removeFrom = view.find<CardView>(R.id.remove_from_list)
-        isInChecklist = ChecklistStore.contains(remoteResult.snippet.title)
+        isInChecklist = ChecklistStore.contains(remoteResult.id.videoId)
 
         if (isInChecklist) {
             removeFrom.setOnClickListener {
                 ChecklistStore.remove(remoteResult.snippet.title)
                 dismiss()
                 VibrationUtil.medium()
-                success("Removed from Checklist")
+                ToastUtil.success("Removed from Checklist")
             }
 
             addTo.visibility = View.GONE
@@ -99,7 +100,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
                 ChecklistStore.add(remoteResult.snippet.title, watchLink, remoteResult.snippet.thumbnails.medium.url)
                 dismiss()
                 VibrationUtil.medium()
-                success("Added to Checklist")
+                ToastUtil.success("Added to Checklist")
             }
 
             removeFrom.visibility = View.GONE
@@ -132,13 +133,31 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
 
         dialog.window!!.setBackgroundDrawable(GradientGenerator.make(26F, R.color.Grey_1000, R.color.Grey_1000))
 
-        val youtubePlayer = dialog.getCustomView()!!.find<YouTubePlayerView>(R.id.player)
-        youtubePlayer.initialize({ initializedYouTubePlayer: YouTubePlayer ->
-            initializedYouTubePlayer.addListener(object : AbstractYouTubePlayerListener() {
-                override fun onReady() {
-                    initializedYouTubePlayer.loadVideo(remoteResult.id.videoId, 0f)
+        val youtubePlayer = dialog.getCustomView().find<YouTubePlayerView>(R.id.player)
+
+        youtubePlayer.initialize(object: YouTubePlayerListener {
+            override fun onReady(youTubePlayer: YouTubePlayer) {
+                youTubePlayer.loadVideo(remoteResult.id.videoId, 0f)
+            }
+
+            override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
+                when(error) {
+                    PlayerConstants.PlayerError.UNKNOWN -> ToastUtil.error("Unknown error while playing video")
+                    PlayerConstants.PlayerError.INVALID_PARAMETER_IN_REQUEST -> ToastUtil.error("Internal error while playing video")
+                    PlayerConstants.PlayerError.HTML_5_PLAYER -> ToastUtil.error("HTML player error")
+                    PlayerConstants.PlayerError.VIDEO_NOT_FOUND -> ToastUtil.warn("Video not found")
+                    PlayerConstants.PlayerError.VIDEO_NOT_PLAYABLE_IN_EMBEDDED_PLAYER -> ToastUtil.warn("MusicDownloader Can't play this type of video")
                 }
-            })
+            }
+
+            override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {}
+            override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {}
+            override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {}
+            override fun onVideoLoadedFraction(youTubePlayer: YouTubePlayer, loadedFraction: Float) {}
+            override fun onApiChange(youTubePlayer: YouTubePlayer) {}
+            override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {}
+            override fun onPlaybackQualityChange(youTubePlayer: YouTubePlayer, playbackQuality: PlayerConstants.PlaybackQuality) {}
+            override fun onPlaybackRateChange(youTubePlayer: YouTubePlayer, playbackRate: PlayerConstants.PlaybackRate) {}
         }, true)
 
         with(dialog) {
@@ -162,7 +181,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
 
         with(dialog) {
             show()
-            getInputField()?.let { input ->
+            getInputField().let { input ->
                 input.selectAll()
                 input.addTextChangedListener(object : TextWatcher {
                     override fun afterTextChanged(p0: Editable?) {
@@ -242,7 +261,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
         val clip = ClipData.newPlainText("", watchLink)
         clipboard.primaryClip = clip
 
-        success("Link copied", R.drawable.copy)
+        ToastUtil.success("Link copied", R.drawable.copy)
         VibrationUtil.medium()
         dismiss()
     }

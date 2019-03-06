@@ -12,13 +12,13 @@ import com.andreacioccarelli.musicdownloader.App
  */
 
 fun EditText.dismissKeyboard() {
-    val imm = App.instance.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    val imm = App.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.hideSoftInputFromWindow(this.windowToken, 0)
 }
 
 
 fun EditText.popUpKeyboard() {
-    val imm = App.instance.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    val imm = App.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.showSoftInput(this, SHOW_IMPLICIT)
 }
 
