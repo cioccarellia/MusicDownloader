@@ -20,10 +20,10 @@ interface ChecklistDao {
     fun getAll(): List<ChecklistEntry>
 
     @Query("SELECT * FROM checklist WHERE link LIKE :link")
-    fun _find(link: String): List<ChecklistEntry>
+    fun find(link: String): List<ChecklistEntry>
 
     @Query("DELETE from checklist WHERE link LIKE :link")
-    fun _remove(link: String)
+    fun remove(link: String)
 
     @Delete
     fun remove(entry: ChecklistEntry)

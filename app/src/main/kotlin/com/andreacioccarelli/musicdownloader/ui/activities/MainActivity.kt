@@ -453,7 +453,7 @@ class MainActivity : AppCompatActivity() {
                                         val format = Format.values()[index]
 
                                         MusicDownloader(this@MainActivity,
-                                                checklist.getAll().map { it.link.toYoutubeUrl() })
+                                                checklist.toDownloadInfoList())
                                                 .exec(format)
                                     }
                                     positiveButton(text = "SELECT")

@@ -27,11 +27,8 @@ import com.andreacioccarelli.musicdownloader.constants.YOUTUBE_WATCH_URL
 import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistEntry
 import com.andreacioccarelli.musicdownloader.data.enums.Format
 import com.andreacioccarelli.musicdownloader.data.model.DownloadInfo
-import com.andreacioccarelli.musicdownloader.data.serializers.UpdateDownloadInfo
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.extensions.escapeHtml
-import com.andreacioccarelli.musicdownloader.extensions.find
-import com.andreacioccarelli.musicdownloader.extensions.remove
 import com.andreacioccarelli.musicdownloader.extensions.toUri
 import com.andreacioccarelli.musicdownloader.ui.downloader.MusicDownloader
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
@@ -210,7 +207,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
                         }
 
                         val text = p0.toString()
-                        val inputField = dialog.getInputField()!!
+                        val inputField = dialog.getInputField()
 
                         if (text.contains("/")) {
                             inputField.error = "File name cannot contain /"
