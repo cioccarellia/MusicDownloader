@@ -26,8 +26,12 @@ import com.andreacioccarelli.musicdownloader.constants.YOUTUBE_CHANNEL_URL
 import com.andreacioccarelli.musicdownloader.constants.YOUTUBE_WATCH_URL
 import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistEntry
 import com.andreacioccarelli.musicdownloader.data.enums.Format
+import com.andreacioccarelli.musicdownloader.data.model.DownloadInfo
+import com.andreacioccarelli.musicdownloader.data.serializers.UpdateDownloadInfo
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.extensions.escapeHtml
+import com.andreacioccarelli.musicdownloader.extensions.find
+import com.andreacioccarelli.musicdownloader.extensions.remove
 import com.andreacioccarelli.musicdownloader.extensions.toUri
 import com.andreacioccarelli.musicdownloader.ui.downloader.MusicDownloader
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
@@ -87,7 +91,12 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
 
         val addTo = view.find<CardView>(R.id.add_to_list)
         val removeFrom = view.find<CardView>(R.id.remove_from_list)
-        isInChecklist = checklist.findByLink(remoteResult.id.videoId).isEmpty()
+        val mp3 = view.find<CardView>(R.id.mp3)
+        val mp4 = view.find<CardView>(R.id.mp4)
+
+
+        val list = checklist.find(remoteResult.id.videoId)
+        isInChecklist = list.isNotEmpty()
 
         if (isInChecklist) {
             removeFrom.setOnClickListener {
@@ -102,9 +111,10 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
             addTo.setOnClickListener {
                 checklist.add(
                         ChecklistEntry(
+                                remoteResult.id.videoId,
                                 title,
-                                watchLink,
-                                remoteResult.snippet.thumbnails.medium.url)
+                                remoteResult.snippet.thumbnails.medium.url
+                        )
                 )
 
                 dismiss()
@@ -115,8 +125,6 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
             removeFrom.visibility = View.GONE
         }
 
-        val mp3 = view.find<CardView>(R.id.mp3)
-        val mp4 = view.find<CardView>(R.id.mp4)
 
         mp3.apply {
             setOnClickListener { handleClick(Format.MP3) }
@@ -292,7 +300,8 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
     private fun handleClick(format: Format) {
         VibrationUtil.medium()
         dismiss()
-        MusicDownloader(activity, watchLink)
-                .exec(format)
+
+        val downloadInfo = DownloadInfo(watchLink, title)
+        MusicDownloader(activity, downloadInfo).exec(format)
     }
 }

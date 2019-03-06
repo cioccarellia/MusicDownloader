@@ -9,6 +9,7 @@ import com.andreacioccarelli.logkit.logd
  */
 
 fun String.toUri(): Uri = Uri.parse(this)
+fun String.toYoutubeUrl(): String = "https://www.youtube.com/watch?v=$this"
 
 val CharSequence.isUrl: Boolean
     get() = this.startsWith("http://") || this.startsWith("https://") || this.contains("youtu.be") || this.contains("youtube.com")

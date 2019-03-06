@@ -3,6 +3,7 @@ package com.andreacioccarelli.musicdownloader.data.checklist
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 
 
@@ -12,17 +13,17 @@ import androidx.room.Query
 
 @Dao
 interface ChecklistDao {
-    @Insert
+    @Insert(onConflict = REPLACE)
     fun add(entry: ChecklistEntry)
 
     @Query("SELECT * FROM checklist")
     fun getAll(): List<ChecklistEntry>
 
-    @Query("SELECT * FROM checklist WHERE link = :link")
-    fun findByLink(link: String): List<ChecklistEntry>
+    @Query("SELECT * FROM checklist WHERE link LIKE :link")
+    fun _find(link: String): List<ChecklistEntry>
 
-    @Query("DELETE from checklist WHERE link = :link")
-    fun remove(link: String)
+    @Query("DELETE from checklist WHERE link LIKE :link")
+    fun _remove(link: String)
 
     @Delete
     fun remove(entry: ChecklistEntry)

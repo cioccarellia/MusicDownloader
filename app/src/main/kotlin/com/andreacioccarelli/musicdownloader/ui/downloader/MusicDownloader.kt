@@ -12,6 +12,7 @@ import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.constants.*
 import com.andreacioccarelli.musicdownloader.data.enums.Format
 import com.andreacioccarelli.musicdownloader.data.enums.KnownError
+import com.andreacioccarelli.musicdownloader.data.model.DownloadInfo
 import com.andreacioccarelli.musicdownloader.data.requests.DownloadLinkRequestsBuilder
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
 import com.andreacioccarelli.musicdownloader.extensions.*
@@ -28,25 +29,25 @@ import kotlin.random.Random
 class MusicDownloader {
 
     private var activity: Activity?
-    private val data: MutableList<String>
+    private val data: MutableList<DownloadInfo>
     private lateinit var format: Format
 
-    constructor(activity: Activity?, url: String) {
-        data = mutableListOf(url)
+    constructor(activity: Activity?, info: DownloadInfo) {
+        data = mutableListOf(info)
         this.activity = activity
     }
 
-    constructor(activity: Activity?, urls: List<String>) {
+    constructor(activity: Activity?, urls: List<DownloadInfo>) {
         data = urls.toMutableList()
         this.activity = activity
     }
 
-    fun exec(_format: Format) {
-        format = _format
+    fun exec(outputFormat: Format) {
+        format = outputFormat
         when {
-            data.size > 1 -> startFilesDownload(_format)
-            data.size == 1 -> startFileDownload(_format)
-            else -> throw IllegalStateException()
+            data.size > 1 -> startFilesDownload(outputFormat)
+            data.size == 1 -> startFileDownload(outputFormat)
+            else -> throw IllegalStateException("Negative data size")
         }
     }
 
@@ -56,8 +57,8 @@ class MusicDownloader {
         return if (trimToSdcard) path else Environment.getExternalStorageDirectory().absolutePath + "/" + path
     }
 
-    private suspend fun fetchVideoDownloadInformation(url: String, format: Format): DirectLinkResponse {
-        val videoId = url.getVideoIdOrThrow()
+    private suspend fun fetchVideoDownloadInformation(downloadInfo: DownloadInfo, format: Format): DirectLinkResponse {
+        val videoId = downloadInfo.url.getVideoIdOrThrow()
 
         val requestBuilder = DownloadLinkRequestsBuilder.get(videoId, format)
         val request = OkHttpClient().newCall(requestBuilder).execute()
@@ -66,11 +67,15 @@ class MusicDownloader {
 
         logd(response)
         return when (response.state) {
-            RESPONSE_OK, RESPONSE_ERROR -> response
+            RESPONSE_OK, RESPONSE_ERROR -> {
+                response.apply {
+                    fileName = downloadInfo.fileName
+                }
+            }
             RESPONSE_WAIT, RESPONSE_PROCESSING -> {
                 // If the video is processing, wait until it's compleated
                 delay(Random.nextLong(500, 1000))
-                fetchVideoDownloadInformation(url, format)
+                fetchVideoDownloadInformation(downloadInfo, format)
             }
             else -> {
                 // Unknown response received
@@ -88,14 +93,13 @@ class MusicDownloader {
             try {
                 val response = fetchVideoDownloadInformation(data[0], format)
 
-                delay(1000)
                 withContext(Dispatchers.Main) {
                     downloadFile(response = response)
                 }
             } catch (exception: RuntimeException) {
                 loge(exception)
                 withContext(Dispatchers.Main) {
-                    UiController.displayError(activity, KnownError.UNKNOWN_ERROR, data)
+                    UiController.displayError(activity, KnownError.UNKNOWN_ERROR, data.map { it.fileName })
                 }
             }
         }
@@ -110,19 +114,17 @@ class MusicDownloader {
                     fetchVideoDownloadInformation(it, format)
                 }
 
-                delay(1000)
                 withContext(Dispatchers.Main) {
                     downloadFileList(responses)
                 }
             } catch (exception: RuntimeException) {
                 loge(exception)
                 withContext(Dispatchers.Main) {
-                    UiController.displayError(activity, KnownError.BATCH_FAILED, data)
+                    UiController.displayError(activity, KnownError.BATCH_FAILED, data.map { it.fileName })
                 }
             }
         }
     }
-
 
 
     @UiThread
@@ -133,7 +135,7 @@ class MusicDownloader {
 
         if (convertedVideos.size != totalVideos.size) {
             val missCount = totalVideos.size - convertedVideos.size
-            error("$missCount file${plural(missCount)} couldn't be converted. Processing ${convertedVideos.size} file${plural(convertedVideos.size)}")
+            ToastUtil.error("$missCount file${plural(missCount)} couldn't be converted. Processing ${convertedVideos.size} file${plural(convertedVideos.size)}")
         }
 
         UiController.displayDownloadStarted(activity, convertedVideos)
@@ -157,10 +159,10 @@ class MusicDownloader {
             // If the conversion has failed and the download target was 1, we can print to the user the reason.
             if (isSingle) {
                 when (response.reason) {
-                    ERROR_LENGTH ->                 UiController.displayError(activity, KnownError.VIDEO_LENGTH, response.videoId)
-                    ERROR_MALFORMED ->              UiController.displayError(activity, KnownError.MALFORMED_URL, response.videoId)
-                    ERROR_UNADDRESSABLE_VIDEO ->    UiController.displayError(activity, KnownError.UNADDRESSABLE_VIDEO, response.videoId)
-                    else ->                         UiController.displayError(activity, KnownError.UNKNOWN_ERROR, response.videoId)
+                    ERROR_LENGTH ->                 UiController.displayError(activity, KnownError.VIDEO_LENGTH, response.fileName)
+                    ERROR_MALFORMED ->              UiController.displayError(activity, KnownError.MALFORMED_URL, response.fileName)
+                    ERROR_UNADDRESSABLE_VIDEO ->    UiController.displayError(activity, KnownError.UNADDRESSABLE_VIDEO, response.fileName)
+                    else ->                         UiController.displayError(activity, KnownError.UNKNOWN_ERROR, response.fileName)
                 }
             }
             return
@@ -172,7 +174,7 @@ class MusicDownloader {
 
 
         GlobalScope.launch(Dispatchers.IO) {
-            val fileName = "${response.title}.${response.format}"
+            val fileName = "${response.fileName}.${response.format}"
             val fileDownloadLink = response.download.sanitizeUrl()
 
             File(getFileDownloadPath(fileName)).delete()

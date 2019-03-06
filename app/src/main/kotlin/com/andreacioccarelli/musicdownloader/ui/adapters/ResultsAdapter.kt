@@ -11,7 +11,6 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
-import com.andreacioccarelli.logkit.logd
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchResponse
@@ -45,10 +44,7 @@ class ResultsAdapter(response: YoutubeSearchResponse, private val activity: Acti
                 .thumbnail(0.1F)
                 .into(holder.icon)
 
-        logd("Before: ${data[i].snippet.title}")
         holder.title.text = data[i].snippet.title.escapeHtml()
-        logd("After: ${data[i].snippet.title}")
-
         holder.card.setOnClickListener {
             val bottomSheetFragment = BottomDialogFragment(data[i])
             bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)

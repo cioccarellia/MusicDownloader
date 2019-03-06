@@ -7,3 +7,5 @@ import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistDao
  */
 
 fun ChecklistDao.isEmpty() = getAll().isEmpty()
+fun ChecklistDao.find(link: String) = _find("%$link%")
+fun ChecklistDao.remove(link: String) = _remove("%$link%")

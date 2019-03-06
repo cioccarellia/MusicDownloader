@@ -1,5 +1,6 @@
 package com.andreacioccarelli.musicdownloader.data.serializers
 
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -13,4 +14,5 @@ data class DirectLinkResponse(
         @SerializedName("format")       val format: String,
         @SerializedName("download")     val download: String,
         @SerializedName("percentage")   val percentage: String,
-        @SerializedName("reason")       val reason: String)
+        @SerializedName("reason")       val reason: String,
+        @Expose(serialize = false, deserialize = false) var fileName: String)

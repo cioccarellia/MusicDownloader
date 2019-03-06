@@ -12,9 +12,9 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.R
+import com.andreacioccarelli.musicdownloader.extensions.toYoutubeUrl
 import com.andreacioccarelli.musicdownloader.ui.activities.MainActivity
 import com.bumptech.glide.Glide
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.jetbrains.anko.find
 
 /**
@@ -45,15 +45,16 @@ class ChecklistAdapter(private val activity: Activity) : RecyclerView.Adapter<Ch
 
         with(holder.card) {
             setOnClickListener {
+                // Dismisses dialog, puts text inside the box and searches
                 val ref = (activity as MainActivity)
 
                 val search = ref.find<TextView>(R.id.search)
-                val fab = ref.find<FloatingActionButton>(R.id.fab)
-                val rv = ref.find<RecyclerView>(R.id.resultsRecyclerView)
+                val rv: RecyclerView? = ref.find(R.id.resultsRecyclerView)
 
                 search.text = data[holder.adapterPosition].title
-                fab.performClick()
-                rv.smoothScrollToPosition(0)
+                rv?.smoothScrollToPosition(0)
+
+                ref.performSearch(data[holder.adapterPosition].link.toYoutubeUrl())
                 ref.checklistDialog.dismiss()
             }
 

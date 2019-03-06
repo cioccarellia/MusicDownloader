@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.annotation.UiThread
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.data.enums.KnownError
+import com.andreacioccarelli.musicdownloader.data.model.DownloadInfo
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
 import com.tapadoo.alerter.Alerter
@@ -15,11 +16,11 @@ import com.tapadoo.alerter.Alerter
 object UiController {
 
     @UiThread
-    fun displayProgressMetaRetrievingSingle(activity: Activity?, download: String)
+    fun displayProgressMetaRetrievingSingle(activity: Activity?, download: DownloadInfo)
             = displayRetrievingVideoInformation(activity, listOf(download))
 
     @UiThread
-    fun displayRetrievingVideoInformation(activity: Activity?, downloads: List<String>) {
+    fun displayRetrievingVideoInformation(activity: Activity?, downloads: List<DownloadInfo>) {
         if (activity == null) return
         if (activity.isDestroyed || activity.isFinishing) return
 
@@ -35,7 +36,7 @@ object UiController {
     }
 
     @UiThread
-    fun displayRetrievingListInformation(activity: Activity?, downloads: List<String>) {
+    fun displayRetrievingListInformation(activity: Activity?, downloads: List<DownloadInfo>) {
         if (activity == null) return
         if (activity.isDestroyed || activity.isFinishing) return
 
@@ -50,10 +51,8 @@ object UiController {
                 .show()
     }
 
-    @UiThread
-    fun displayDownloadStarted(activity: Activity?, downloads: DirectLinkResponse) = displayDownloadStarted(activity, listOf(downloads))
-    @UiThread
-    fun displayDownloadStarted(activity: Activity?, downloads: List<DirectLinkResponse>) {
+    @UiThread fun displayDownloadStarted(activity: Activity?, downloads: DirectLinkResponse) = displayDownloadStarted(activity, listOf(downloads))
+    @UiThread fun displayDownloadStarted(activity: Activity?, downloads: List<DirectLinkResponse>) {
         if (activity == null) return
         if (activity.isDestroyed || activity.isFinishing) return
 
@@ -80,10 +79,8 @@ object UiController {
         }
     }
 
-    @UiThread
-    fun displayError(activity: Activity?, error: KnownError, link: String) = displayError(activity, error, listOf(link))
-    @UiThread
-    fun displayError(activity: Activity?, error: KnownError, links: List<String>) {
+    @UiThread fun displayError(activity: Activity?, error: KnownError, link: String) = displayError(activity, error, listOf(link))
+    @UiThread fun displayError(activity: Activity?, error: KnownError, links: List<String>) {
         if (activity == null) return
         if (activity.isDestroyed || activity.isFinishing) return
 

@@ -189,10 +189,10 @@ class MainActivity : AppCompatActivity() {
 
     private var snack: Snackbar? = null
     private val searches = mutableListOf<Int>()
-    private var searchId = 0
+    private var searchCount = 0
 
-    private fun initFab() = with(fab) {
-        setOnClickListener { view ->
+    private fun initFab() {
+        fab.setOnClickListener { view ->
             if (!arePermissionsGranted) {
                 askForPermissions(Permission.WRITE_EXTERNAL_STORAGE) {
                     if (it.isAllGranted(Permission.WRITE_EXTERNAL_STORAGE)) {
@@ -224,13 +224,6 @@ class MainActivity : AppCompatActivity() {
             }
 
 
-            searchLayout.isErrorEnabled = false
-            search.dismissKeyboard()
-            resultsRecyclerView.smoothScrollToPosition(0)
-
-            searches.add(searchId++)
-            isSearching = true
-
             snack = Snackbar.make(view, "Searching", Snackbar.LENGTH_INDEFINITE)
                     .setAction("CANCEL") {
                         isSearching = false
@@ -239,58 +232,83 @@ class MainActivity : AppCompatActivity() {
                     }
                     .setActionTextColor(ContextCompat.getColor(this@MainActivity, R.color.Orange_600))
 
-            fab.hide()
-            snack!!.show()
+            performSearch()
+        }
+    }
 
-            GlobalScope.launch(Dispatchers.IO) {
-                try {
-                    val requestBuilder = YoutubeRequestBuilder.get(search.text)
-                    val request = OkHttpClient().newCall(requestBuilder).execute()
+    fun performSearch(hiddenLink: String = "") {
+        searchLayout.isErrorEnabled = false
+        search.dismissKeyboard()
+        resultsRecyclerView?.smoothScrollToPosition(0)
 
-                    val jsonRequest = request.body()!!.string()
-                    val response = Gson().fromJson(
-                            jsonRequest,
-                            YoutubeSearchResponse::class.java)
+        searches.add(searchCount++)
+        isSearching = true
 
-                    withContext(Dispatchers.Main) {
-                        if (!isSearching || searches.contains(searchId)) return@withContext
+        fab.hide()
+
+        if (snack == null) {
+            snack = Snackbar.make(window.decorView.findViewById(android.R.id.content), "Searching", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("CANCEL") {
                         isSearching = false
-
-                        if (response.pageInfo.totalResults == 0) {
-                            empty_result.visibility = View.VISIBLE
-                            resultsRecyclerView.visibility = View.GONE
-                        } else {
-                            empty_result.visibility = View.GONE
-
-                            with(resultsRecyclerView) {
-                                visibility = View.VISIBLE
-                                adapter = ResultsAdapter(response, this@MainActivity, supportFragmentManager)
-                                layoutManager = LinearLayoutManager(this@MainActivity)
-                            }
-                        }
-
-                        if (response.pageInfo.totalResults == 1) {
-                            delay(300)
-                            if (!isSearching)
-                                resultsRecyclerView.getChildAt(0).performClick()
-                        }
-
+                        search.isEnabled = true
                         fab.show()
-                        snack!!.dismiss()
                     }
-                } catch (timeout: IOException) {
-                    withContext(Dispatchers.Main) {
-                        fab.show()
-                        snack!!.dismiss()
-                        VibrationUtil.medium()
+                    .setActionTextColor(ContextCompat.getColor(this@MainActivity, R.color.Orange_600))
+            snack?.show()
+        } else snack?.show()
 
-                        Alerter.create(this@MainActivity)
-                                .setTitle("No internet connection")
-                                .setText("Cannot reach youtube servers, please check your connection")
-                                .setIcon(ContextCompat.getDrawable(this@MainActivity, R.drawable.warning)!!)
-                                .setBackgroundDrawable(GradientGenerator.appThemeGradient)
-                                .show()
+        val query = if (hiddenLink.isEmpty()) search.text else hiddenLink
+
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                val requestBuilder = YoutubeRequestBuilder.get(query)
+                val request = OkHttpClient().newCall(requestBuilder).execute()
+
+                val jsonRequest = request.body()!!.string()
+                val response = Gson().fromJson(
+                        jsonRequest,
+                        YoutubeSearchResponse::class.java)
+
+                withContext(Dispatchers.Main) {
+                    if (!isSearching || searches.contains(searchCount)) {
+                        // Another search has started
+                        return@withContext
                     }
+                    isSearching = false
+
+                    if (response.pageInfo.totalResults == 0) {
+                        emptyResult.visibility = View.VISIBLE
+                        resultsRecyclerView.visibility = View.GONE
+                    } else {
+                        emptyResult.visibility = View.GONE
+
+                        with(resultsRecyclerView) {
+                            visibility = View.VISIBLE
+                            adapter = ResultsAdapter(response, this@MainActivity, supportFragmentManager)
+                            layoutManager = LinearLayoutManager(this@MainActivity)
+                        }
+                    }
+
+                    if (resultsRecyclerView.adapter?.itemCount == 1) {
+                        delay(207)
+                        resultsRecyclerView.getChildAt(0)?.performClick()
+                    }
+
+                    fab.show()
+                    snack?.dismiss()
+                }
+            } catch (timeout: IOException) {
+                withContext(Dispatchers.Main) {
+                    fab.show()
+                    snack?.dismiss()
+                    VibrationUtil.medium()
+
+                    Alerter.create(this@MainActivity)
+                            .setTitle("No internet connection")
+                            .setText("Cannot reach YouTube servers, please check your connection")
+                            .setIcon(ContextCompat.getDrawable(this@MainActivity, R.drawable.toast_warning)!!)
+                            .setBackgroundDrawable(GradientGenerator.appThemeGradient)
+                            .show()
                 }
             }
         }
@@ -435,7 +453,7 @@ class MainActivity : AppCompatActivity() {
                                         val format = Format.values()[index]
 
                                         MusicDownloader(this@MainActivity,
-                                                checklist.getAll().map { it.link })
+                                                checklist.getAll().map { it.link.toYoutubeUrl() })
                                                 .exec(format)
                                     }
                                     positiveButton(text = "SELECT")
