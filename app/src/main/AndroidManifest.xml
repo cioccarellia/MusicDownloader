@@ -26,6 +26,7 @@
             android:name=".ui.activities.MainActivity"
             android:label="Music Downloader"
             android:configChanges="orientation|keyboardHidden|screenLayout|screenSize"
+            android:windowSoftInputMode="stateAlwaysVisible"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,13 +42,13 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.provider"
+            android:authorities="com.andreacioccarelli.musicdownloader.updater"
             android:exported="false"
             android:grantUriPermissions="true">
 
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/download_cache_path" />
+                android:resource="@xml/download_path" />
 
         </provider>
     </application>

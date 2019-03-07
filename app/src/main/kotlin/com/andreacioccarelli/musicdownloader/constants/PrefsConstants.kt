@@ -9,8 +9,6 @@ const val FILE = "settings"
 
 object Keys {
     const val ignoring = "@ignoring->"
-    const val list = "@checklist"
-    const val updateSubpath = "@sub"
-
+    const val lastVersionName = "@last->"
     const val oneOf3 = "@1of4"
 }

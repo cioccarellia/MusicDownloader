@@ -7,7 +7,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import androidx.core.content.FileProvider
-import com.andreacioccarelli.musicdownloader.App
+import com.andreacioccarelli.logkit.logd
+import com.andreacioccarelli.musicdownloader.App.Companion.prefs
 import com.andreacioccarelli.musicdownloader.BuildConfig
 import com.andreacioccarelli.musicdownloader.constants.Keys
 import com.andreacioccarelli.musicdownloader.data.serializers.UpdateCheck
@@ -19,34 +20,31 @@ import java.io.File
 
 object UpdateUtil {
 
-    private const val SUBFOLDER = "MusicDownloader"
     private const val APK_MIME = "application/vnd.android.package-archive"
 
-    fun getNotificationTitle(check: UpdateCheck) = "MusicDownloader (${BuildConfig.VERSION_NAME} -> ${check.versionName})"
+    fun getNotificationTitle(check: UpdateCheck) = "${BuildConfig.VERSION_NAME} -> ${check.versionName}"
     fun getNotificationContent() = "Downloading update package"
 
     fun getDestinationSubpath(check: UpdateCheck): String {
-        val subPath = "$SUBFOLDER/music-downloader-${check.versionName}.apk"
-        App.prefs.put(Keys.updateSubpath, subPath)
+        val subPath = Environment.DIRECTORY_DOWNLOADS + "/music-downloader-${check.versionName}.apk"
 
-        clearDuplicatedInstallationPackage()
+        clearDuplicatedInstallationPackage(subPath)
 
         return subPath
     }
 
-    fun clearDuplicatedInstallationPackage() {
+    fun clearDuplicatedInstallationPackage(name: String ) {
         File("${Environment.getExternalStorageDirectory().absolutePath}/" +
-                "${Environment.DIRECTORY_DOWNLOADS}/" + App.prefs.get(Keys.updateSubpath, "")).delete()
+                "${Environment.DIRECTORY_DOWNLOADS}/" + name).delete()
     }
 
     private fun getPackagePath(): File = File(
             "${Environment.getExternalStorageDirectory().absolutePath}/" +
-                    "${Environment.DIRECTORY_DOWNLOADS}/" +
-                    App.prefs.get(Keys.updateSubpath, ""))
+                    "${Environment.DIRECTORY_DOWNLOADS}/")
 
     fun hasPackageBeenDownloaded(newVersionName: String): Boolean {
         val file = File("${Environment.getExternalStorageDirectory().absolutePath}/" +
-                "${Environment.DIRECTORY_DOWNLOADS}/$SUBFOLDER/music-downloader-$newVersionName.apk")
+                "${Environment.DIRECTORY_DOWNLOADS}/music-downloader-$newVersionName.apk")
 
         return file.exists()
     }
@@ -54,12 +52,19 @@ object UpdateUtil {
     fun openUpdateInPackageManager(context: Context) {
         val cachedUpdatePackage = UpdateUtil.getPackagePath()
 
-        val uriForFile = FileProvider.getUriForFile(context, "${context.packageName}.provider", cachedUpdatePackage)
+        logd(cachedUpdatePackage)
 
         if (Build.VERSION.SDK_INT >= 24) {
-            val intent = Intent(Intent.ACTION_VIEW)
-                    .setDataAndType(uriForFile, APK_MIME)
-            intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION + Intent.FLAG_ACTIVITY_NEW_TASK
+            val uri = FileProvider.getUriForFile(context, "com.andreacioccarelli.musicdownloader.updater",
+                    File("${Environment.getExternalStorageDirectory().absolutePath}/" +
+                            "${Environment.DIRECTORY_DOWNLOADS}/music-downloader-${prefs.get(Keys.lastVersionName, "")}.apk"))
+
+            val intent = Intent(Intent.ACTION_INSTALL_PACKAGE, uri)
+
+
+            intent.flags += Intent.FLAG_GRANT_READ_URI_PERMISSION
+            intent.flags += Intent.FLAG_ACTIVITY_NEW_TASK
+
 
             val pm = context.packageManager
             if (intent.resolveActivity(pm) != null) {

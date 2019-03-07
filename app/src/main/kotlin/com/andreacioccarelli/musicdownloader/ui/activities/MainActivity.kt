@@ -16,7 +16,6 @@ import android.text.ClipboardManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,6 +31,7 @@ import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.andreacioccarelli.logkit.loge
 import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.App.Companion.checklist
+import com.andreacioccarelli.musicdownloader.App.Companion.prefs
 import com.andreacioccarelli.musicdownloader.BuildConfig
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.constants.APK_URL
@@ -111,22 +111,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_layout)
 
-        initInput()
         initPermissions()
         initToolbar()
         initFab()
         initNetwork()
         initUpdateChecker()
         initClipboard()
-
-        when {
-            intent?.action == Intent.ACTION_SEND -> {
-                if ("text/plain" == intent.type) {
-                    search.text = intent.getStringExtra(Intent.EXTRA_TEXT).toEditable()
-                    fab.performClick()
-                }
-            }
-        }
+        initInput()
+        initIntents()
     }
 
     private fun initClipboard() {
@@ -141,27 +133,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initInput() {
-        search.onSubmit {
-            fab.performClick()
-            search.dismissKeyboard()
-        }
-
-        search.setOnClickListener {
-            if (isSearching) {
-                isSearching = false
-                snack?.dismiss()
-                fab.show()
+        with(search) {
+            onSubmit {
+                fab.performClick()
+                search.dismissKeyboard()
             }
 
-            if (isInError) {
-                fab.show()
-            }
-        }
+            setOnClickListener {
+                if (isSearching) {
+                    isSearching = false
+                    snack?.dismiss()
+                    fab.show()
+                }
 
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        Handler().postDelayed({
-            search.popUpKeyboard()
-        }, 107)
+                if (isInError) {
+                    fab.show()
+                }
+            }
+
+            popUpKeyboard()
+            requestFocus()
+        }
     }
 
     private fun initPermissions() {
@@ -317,6 +309,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun initIntents() {
+        when {
+            intent?.action == Intent.ACTION_SEND -> {
+                if ("text/plain" == intent.type) {
+                    search.text = intent.getStringExtra(Intent.EXTRA_TEXT).toEditable()
+                    fab.performClick()
+                }
+            }
+        }
+    }
+
     private var isInError = false
     private fun displayFormError() {
         isInError = true
@@ -335,13 +338,14 @@ class MainActivity : AppCompatActivity() {
             val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
             if (id == -1L) return
 
-            Thread.sleep(1000)
-
-            UpdateUtil.openUpdateInPackageManager(context)
-
             try {
                 Alerter.clearCurrent(this@MainActivity)
-            } catch (invalid: Exception) { loge(invalid) }
+            } catch (ignored: Exception) {}
+
+            GlobalScope.launch(Dispatchers.IO) {
+                delay(107)
+                UpdateUtil.openUpdateInPackageManager(context)
+            }
         }
     }
 
@@ -357,7 +361,7 @@ class MainActivity : AppCompatActivity() {
                     jsonRequest,
                     UpdateCheck::class.java)
 
-
+            prefs.put(Keys.lastVersionName, updateCheck.versionName)
 
             if (updateCheck.versionCode > BuildConfig.VERSION_CODE && !App.prefs.get(Keys.ignoring + updateCheck.versionCode, false)) {
                 withContext(Dispatchers.Main) {
@@ -384,8 +388,7 @@ class MainActivity : AppCompatActivity() {
                                         setDescription(UpdateUtil.getNotificationContent())
                                         setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
 
-                                        setDestinationInExternalPublicDir("",
-                                                UpdateUtil.getDestinationSubpath(updateCheck))
+                                        setDestinationInExternalPublicDir("", UpdateUtil.getDestinationSubpath(updateCheck))
                                     }
 
                                     val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
@@ -405,7 +408,7 @@ class MainActivity : AppCompatActivity() {
                             }
                             .negativeButton(text = "NO") { dialog ->
                                 if (dialog.isCheckPromptChecked() && UpdateUtil.hasPackageBeenDownloaded(updateCheck.versionName)) {
-                                    UpdateUtil.clearDuplicatedInstallationPackage()
+                                    UpdateUtil.clearDuplicatedInstallationPackage("music-downloader-${updateCheck.versionName}.apk")
                                 }
                                 dialog.dismiss()
                             }
@@ -442,7 +445,6 @@ class MainActivity : AppCompatActivity() {
             checklistDialog = MaterialDialog(this)
 
             GlobalScope.launch(Dispatchers.IO) {
-
                 if (checklist.isEmpty()) {
                     checklistDialog
                             .customView(R.layout.empty_view_checklist)
