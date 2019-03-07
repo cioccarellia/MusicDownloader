@@ -1,6 +1,5 @@
 package com.andreacioccarelli.musicdownloader.ui.activities
 
-import android.annotation.SuppressLint
 import android.app.DownloadManager
 import android.app.DownloadManager.Request.VISIBILITY_VISIBLE
 import android.content.BroadcastReceiver
@@ -63,7 +62,6 @@ import java.io.IOException
  *  Designed and Developed by Andrea Cioccarelli
  */
 
-@SuppressLint("GoogleAppIndexingApiWarning")
 class MainActivity : AppCompatActivity() {
 
     private var wasOffline = false
@@ -77,10 +75,10 @@ class MainActivity : AppCompatActivity() {
             if (NetworkUtil.connectionStatus == ConnectionStatus.ONLINE) {
                 if (wasOffline) {
                     Alerter.create(this@MainActivity)
-                            .setTitle("Here we go!")
+                            .setTitle("Connection detected")
                             .setText("Device is back online")
                             .setDuration(4_000)
-                            .setIcon(R.drawable.download_success)
+                            .setIcon(R.drawable.access_point_network)
                             .enableSwipeToDismiss()
                             .setBackgroundDrawable(GradientGenerator.successGradient)
                             .show()
@@ -91,10 +89,10 @@ class MainActivity : AppCompatActivity() {
                 isOffline = false
             } else {
                 Alerter.create(this@MainActivity)
-                        .setTitle("Device offline")
+                        .setTitle("Device is offline")
                         .setText("You need an active internet connection to use this app")
                         .setDuration(7_000)
-                        .setIcon(R.drawable.download_error)
+                        .setIcon(R.drawable.access_point_network_off)
                         .enableSwipeToDismiss()
                         .setBackgroundDrawable(GradientGenerator.errorGradient)
                         .setOnClickListener(
@@ -366,7 +364,7 @@ class MainActivity : AppCompatActivity() {
             if (updateCheck.versionCode > BuildConfig.VERSION_CODE && !App.prefs.get(Keys.ignoring + updateCheck.versionCode, false)) {
                 withContext(Dispatchers.Main) {
                     MaterialDialog(this@MainActivity)
-                            .title(text = "Version ${updateCheck.versionName} found!")
+                            .title(text = "Update ${updateCheck.versionName} found!")
                             .message(text = updateCheck.changelog)
                             .positiveButton(text = if (UpdateUtil.hasPackageBeenDownloaded(updateCheck.versionName))
                                 "INSTALL UPDATE" else "DOWNLOAD UPDATE") { dialog ->
@@ -402,7 +400,8 @@ class MainActivity : AppCompatActivity() {
                                             .setText(UpdateUtil.getNotificationTitle(updateCheck))
                                             .setBackgroundDrawable(GradientGenerator.successGradient)
                                             .setIcon(R.drawable.download)
-                                            .setDuration(7_000)
+                                            .setDuration(9_000)
+                                            .setDismissable(false)
                                             .show()
                                 }
                             }
