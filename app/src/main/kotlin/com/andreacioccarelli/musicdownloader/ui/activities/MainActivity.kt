@@ -342,6 +342,7 @@ class MainActivity : AppCompatActivity() {
 
             GlobalScope.launch(Dispatchers.IO) {
                 delay(107)
+                UpdateUtil.getDownloadedPackageFile(BuildConfig.VERSION_NAME).delete()
                 UpdateUtil.openUpdateInPackageManager(context)
             }
         }
@@ -366,14 +367,18 @@ class MainActivity : AppCompatActivity() {
                     MaterialDialog(this@MainActivity)
                             .title(text = "Update ${updateCheck.versionName} found!")
                             .message(text = updateCheck.changelog)
-                            .positiveButton(text = if (UpdateUtil.hasPackageBeenDownloaded(updateCheck.versionName))
+                            .positiveButton(text = if (UpdateUtil.getDownloadedPackageFile(updateCheck.versionName).exists())
                                 "INSTALL UPDATE" else "DOWNLOAD UPDATE") { dialog ->
-                                if (UpdateUtil.hasPackageBeenDownloaded(updateCheck.versionName)) {
+                                if (UpdateUtil.getDownloadedPackageFile(updateCheck.versionName).exists()) {
                                     UpdateUtil.openUpdateInPackageManager(this@MainActivity)
                                     dialog.dismiss()
                                 } else {
-                                    val uri = Uri.parse(if (updateCheck.downloadInfo.useBundledUpdateLink)
-                                        APK_URL else updateCheck.downloadInfo.updateLink!!)
+                                    val uri = Uri.parse(
+                                            if (updateCheck.downloadInfo.useBundledUpdateLink)
+                                                APK_URL
+                                            else
+                                                updateCheck.downloadInfo.updateLink!!
+                                    )
                                     val downloadRequest = DownloadManager.Request(uri)
 
                                     with(downloadRequest) {
@@ -406,7 +411,7 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }
                             .negativeButton(text = "NO") { dialog ->
-                                if (dialog.isCheckPromptChecked() && UpdateUtil.hasPackageBeenDownloaded(updateCheck.versionName)) {
+                                if (dialog.isCheckPromptChecked() && UpdateUtil.getDownloadedPackageFile(updateCheck.versionName).exists()) {
                                     UpdateUtil.clearDuplicatedInstallationPackage("music-downloader-${updateCheck.versionName}.apk")
                                 }
                                 dialog.dismiss()

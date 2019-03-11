@@ -10,12 +10,14 @@ import es.dmoral.toasty.Toasty
  * Designed and Developed by Andrea Cioccarelli
  */
 
-
 @Suppress("unused")
 object ToastUtil {
+    private const val toastDuration = 5000
+
     fun success(text: String,
                 @DrawableRes icon: Int = R.drawable.toast_check,
-                duration: Int = 5000) = Toasty.custom(App.context,
+                duration: Int = toastDuration) =
+        Toasty.custom(App.context,
             text,
             icon,
             ContextCompat.getColor(App.context, R.color.Green_A400),
@@ -26,7 +28,8 @@ object ToastUtil {
 
     fun warn(text: String,
              @DrawableRes icon: Int = R.drawable.toast_warning,
-             duration: Int = 5000) = Toasty.custom(App.context,
+             duration: Int = toastDuration) =
+        Toasty.custom(App.context,
             text,
             icon,
             ContextCompat.getColor(App.context, R.color.Amber_600),
@@ -37,7 +40,8 @@ object ToastUtil {
 
     fun error(text: String,
               @DrawableRes icon: Int = R.drawable.toast_error,
-              duration: Int = 5000) = Toasty.custom(App.context,
+              duration: Int = toastDuration) =
+        Toasty.custom(App.context,
             text,
             icon,
             ContextCompat.getColor(App.context, R.color.Red_600),
@@ -48,7 +52,8 @@ object ToastUtil {
 
     fun info(text: String,
              @DrawableRes icon: Int = R.drawable.toast_info,
-             duration: Int = 5000) = Toasty.custom(App.context,
+             duration: Int = toastDuration) =
+        Toasty.custom(App.context,
             text,
             icon,
             ContextCompat.getColor(App.context, R.color.Blue_600),

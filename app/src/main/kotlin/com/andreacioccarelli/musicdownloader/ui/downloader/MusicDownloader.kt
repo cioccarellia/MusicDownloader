@@ -66,15 +66,21 @@ class MusicDownloader {
         val response = Gson().fromJson(request.body()!!.string(), DirectLinkResponse::class.java)
 
         logd(response)
+
         return when (response.state) {
             RESPONSE_OK, RESPONSE_ERROR -> {
-                response.apply {
-                    fileName = downloadInfo.fileName
+                if (response.fileName == "null") {
+                    // That's an html page, not our converted video
+                    fetchVideoDownloadInformation(downloadInfo, format)
+                } else {
+                    response.apply {
+                        fileName = downloadInfo.fileName
+                    }
                 }
             }
             RESPONSE_WAIT, RESPONSE_PROCESSING -> {
                 // If the video is processing, wait until it's compleated
-                delay(Random.nextLong(500, 1000))
+                delay(Random.nextLong(250, 1000))
                 fetchVideoDownloadInformation(downloadInfo, format)
             }
             else -> {

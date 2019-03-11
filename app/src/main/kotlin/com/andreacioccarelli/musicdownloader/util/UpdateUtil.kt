@@ -42,11 +42,9 @@ object UpdateUtil {
             "${Environment.getExternalStorageDirectory().absolutePath}/" +
                     "${Environment.DIRECTORY_DOWNLOADS}/")
 
-    fun hasPackageBeenDownloaded(newVersionName: String): Boolean {
-        val file = File("${Environment.getExternalStorageDirectory().absolutePath}/" +
+    fun getDownloadedPackageFile(newVersionName: String): File {
+        return File("${Environment.getExternalStorageDirectory().absolutePath}/" +
                 "${Environment.DIRECTORY_DOWNLOADS}/music-downloader-$newVersionName.apk")
-
-        return file.exists()
     }
 
     fun openUpdateInPackageManager(context: Context) {

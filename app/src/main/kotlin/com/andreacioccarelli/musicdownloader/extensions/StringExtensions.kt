@@ -27,7 +27,7 @@ fun CharSequence.toEditable() = SpannableStringBuilder(this)
 fun String.getVideoIdOrThrow(): String {
     if (this.contains("?v="))
         return split("?v=")[1].split("&")[0]
-    else throw IllegalStateException()
+    else throw IllegalStateException("Invalid YouTube video id: $this")
 }
 
 fun String.escapeHtml(): String {
