@@ -75,9 +75,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
                 .into(view.find(R.id.thumb_icon))
 
         with(view) {
-            find<CardView>(R.id.thumbCard).setOnClickListener {
-                showChangeFileNameDialog()
-            }
+            find<CardView>(R.id.thumbCard).setOnClickListener { showChangeFileNameDialog() }
             find<CardView>(R.id.play).setOnClickListener { openVideoInDialog() }
             find<CardView>(R.id.open_video).setOnClickListener { openVideo() }
             find<CardView>(R.id.open_channel).setOnClickListener { openChannel() }
