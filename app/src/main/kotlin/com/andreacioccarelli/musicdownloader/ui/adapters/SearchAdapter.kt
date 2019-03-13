@@ -59,10 +59,10 @@ class SearchAdapter(response: YoutubeSearchResponse, private val activity: Activ
             card.setOnLongClickListener {
                 VibrationUtil.medium()
                 if (checklist.contains(data[i].id.videoId)) {
-                    ToastUtil.success("Removed from checklist", R.drawable.remove_outline)
+                    ToastUtil.success("Removed from checklist", R.drawable.remove_outline, duration = 0)
                     checklist.remove(data[i].id.videoId)
                 } else {
-                    ToastUtil.success("Added to checklist", R.drawable.add_outline)
+                    ToastUtil.success("Added to checklist", R.drawable.add_outline, duration = 0)
                     checklist.add(
                             ChecklistEntry(
                                     data[i].id.videoId,

@@ -34,7 +34,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.tapadoo.alerter.Alerter
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
-import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.activity_content.*
 import kotlinx.android.synthetic.main.activity_layout.*
 import kotlinx.coroutines.*
@@ -202,7 +201,6 @@ class MainActivity : BaseActivity() {
                                 setFirstOnly(true)
                                 setHasFixedSize(true)
                             }
-                            itemAnimator = LandingAnimator()
                         }
                     }
 
@@ -297,7 +295,7 @@ class MainActivity : BaseActivity() {
                         ScaleInAnimationAdapter(checklistAdapter).apply {
                             setDuration(500)
                             setInterpolator(OvershootInterpolator())
-                            setFirstOnly(true)
+                            setFirstOnly(false)
                         }
                     )
                 }

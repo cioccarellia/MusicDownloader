@@ -69,18 +69,13 @@ class DownloadClient {
 
         return when (response.state) {
             RESPONSE_OK, RESPONSE_ERROR -> {
-                if (response.fileName == "null") {
-                    // That's an html page, not our converted video
-                    fetchVideoDownloadInformation(downloadInfo, format)
-                } else {
-                    response.apply {
-                        fileName = downloadInfo.fileName
-                    }
+                response.apply {
+                    fileName = downloadInfo.fileName
                 }
             }
             RESPONSE_WAIT, RESPONSE_PROCESSING -> {
                 // If the video is processing, wait until it's compleated
-                delay(Random.nextLong(250, 1000))
+                delay(Random.nextLong(107, 1000))
                 fetchVideoDownloadInformation(downloadInfo, format)
             }
             else -> {
