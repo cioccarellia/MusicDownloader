@@ -22,7 +22,7 @@ import com.bumptech.glide.Glide
  *  Designed and developed by Andrea Cioccarelli
  */
 
-class ResultsAdapter(response: YoutubeSearchResponse, private val activity: Activity, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<ResultsAdapter.ViewHolder>() {
+class SearchAdapter(response: YoutubeSearchResponse, private val activity: Activity, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
 
     val data by lazy { ArrayList<Result>() }
 
@@ -44,18 +44,22 @@ class ResultsAdapter(response: YoutubeSearchResponse, private val activity: Acti
                 .thumbnail(0.1F)
                 .into(holder.icon)
 
-        holder.title.text = data[i].snippet.title.escapeHtml()
-        holder.card.setOnClickListener {
-            val bottomSheetFragment = BottomDialogFragment(data[i])
-            bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
-        }
-
-        Handler().post {
-            if (holder.title.lineCount == 1) {
-                holder.title.height = activity.resources.getDimension(R.dimen.result_thumb_width).toInt()
+        with(holder) {
+            title.text = data[i].snippet.title.escapeHtml()
+            card.setOnClickListener {
+                val bottomSheetFragment = BottomDialogFragment(data[i])
+                bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
             }
 
-            holder.titleLayout.visibility = View.VISIBLE
+            Handler().post {
+                Handler().postDelayed({
+                    if (title.lineCount == 1) {
+                        title.height = activity.resources.getDimension(R.dimen.result_thumb_width).toInt()
+                    }
+
+                    titleLayout.visibility = View.VISIBLE
+                }, 3)
+            }
         }
     }
 

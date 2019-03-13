@@ -9,6 +9,7 @@ import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.OvershootInterpolator
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.assent.Permission
@@ -25,13 +26,15 @@ import com.andreacioccarelli.musicdownloader.data.requests.YoutubeRequestBuilder
 import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchResponse
 import com.andreacioccarelli.musicdownloader.extensions.*
 import com.andreacioccarelli.musicdownloader.ui.adapters.ChecklistAdapter
-import com.andreacioccarelli.musicdownloader.ui.adapters.ResultsAdapter
+import com.andreacioccarelli.musicdownloader.ui.adapters.SearchAdapter
 import com.andreacioccarelli.musicdownloader.ui.base.BaseActivity
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.tapadoo.alerter.Alerter
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
+import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.activity_content.*
 import kotlinx.android.synthetic.main.activity_layout.*
 import kotlinx.coroutines.*
@@ -52,8 +55,9 @@ class MainActivity : BaseActivity() {
         setContentView(R.layout.activity_layout)
 
         initToolbar()
-        initFab()
         initInput()
+        initRecyclerView()
+        initFab()
         initIntentReceiver()
     }
 
@@ -90,6 +94,12 @@ class MainActivity : BaseActivity() {
     private val searches = mutableListOf<Int>()
     private var searchCount = 0
 
+    private fun initRecyclerView() {
+        with(resultsRecyclerView) {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+        }
+    }
+
     private fun initFab() {
         fab.setOnClickListener { view ->
             if (!areAllPermissionsGranted) {
@@ -109,7 +119,7 @@ class MainActivity : BaseActivity() {
             }
 
             if (search.text.isEmpty() || search.text.isBlank()) {
-                searchLayout.error = "Fill the search field"
+                searchLayout.error = "Fill in the search field"
 
                 displayFormError()
                 return@setOnClickListener
@@ -170,23 +180,33 @@ class MainActivity : BaseActivity() {
 
                 withContext(Dispatchers.Main) {
                     if (!isSearching || searches.contains(searchCount)) {
-                        // Another search has started
+                        // Another search has just started, dismissing
                         return@withContext
                     }
                     isSearching = false
 
-                    if (response.pageInfo.totalResults == 0) {
+                    val searchResultsCount = response.pageInfo.totalResults
+
+                    if (searchResultsCount == 0) {
                         emptyResult.visibility = View.VISIBLE
                         resultsRecyclerView.visibility = View.GONE
                     } else {
                         emptyResult.visibility = View.GONE
+                        val searchAdapter = SearchAdapter(response, this@MainActivity, supportFragmentManager)
 
                         with(resultsRecyclerView) {
                             visibility = View.VISIBLE
-                            adapter = ResultsAdapter(response, this@MainActivity, supportFragmentManager)
-                            layoutManager = LinearLayoutManager(this@MainActivity)
+                            adapter = ScaleInAnimationAdapter(searchAdapter).apply {
+                                setDuration(800)
+                                setInterpolator(OvershootInterpolator())
+                                setFirstOnly(true)
+                                setHasFixedSize(true)
+                            }
+                            itemAnimator = LandingAnimator()
                         }
                     }
+
+
 
                     if (resultsRecyclerView.adapter?.itemCount == 1) {
                         delay(107)
@@ -195,6 +215,7 @@ class MainActivity : BaseActivity() {
 
                     fab.show()
                     snack?.dismiss()
+                    search.clearFocus()
                 }
             } catch (timeout: IOException) {
                 withContext(Dispatchers.Main) {

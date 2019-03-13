@@ -20,6 +20,7 @@ import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.R
+import com.andreacioccarelli.musicdownloader.client.DownloadClient
 import com.andreacioccarelli.musicdownloader.constants.MIME_TEXT_PLAIN
 import com.andreacioccarelli.musicdownloader.constants.PACKAGE_YOUTUBE
 import com.andreacioccarelli.musicdownloader.constants.YOUTUBE_CHANNEL_URL
@@ -29,9 +30,7 @@ import com.andreacioccarelli.musicdownloader.data.enums.Format
 import com.andreacioccarelli.musicdownloader.data.model.DownloadInfo
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.extensions.escapeHtml
-
 import com.andreacioccarelli.musicdownloader.extensions.toUri
-import com.andreacioccarelli.musicdownloader.client.DownloadClient
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
 import com.andreacioccarelli.musicdownloader.util.ToastUtil
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
@@ -43,6 +42,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import org.jetbrains.anko.find
+
 
 /**
  * Created by La mejor on 2018/Aug.
@@ -155,11 +155,11 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
 
             override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
                 when(error) {
-                    PlayerConstants.PlayerError.UNKNOWN -> ToastUtil.error("Unknown error while playing video")
-                    PlayerConstants.PlayerError.INVALID_PARAMETER_IN_REQUEST -> ToastUtil.error("Internal error while playing video")
-                    PlayerConstants.PlayerError.HTML_5_PLAYER -> ToastUtil.error("HTML player error")
-                    PlayerConstants.PlayerError.VIDEO_NOT_FOUND -> ToastUtil.warn("Video not found")
-                    PlayerConstants.PlayerError.VIDEO_NOT_PLAYABLE_IN_EMBEDDED_PLAYER -> ToastUtil.warn("MusicDownloader Can't play this type of video")
+                    PlayerConstants.PlayerError.UNKNOWN ->                                  ToastUtil.error("An unknown error has occurred while playing video")
+                    PlayerConstants.PlayerError.INVALID_PARAMETER_IN_REQUEST ->             ToastUtil.error("An internal error has occurred while playing video")
+                    PlayerConstants.PlayerError.HTML_5_PLAYER ->                            ToastUtil.error("Internal HTML player error")
+                    PlayerConstants.PlayerError.VIDEO_NOT_FOUND ->                          ToastUtil.warn("Video not found")
+                    PlayerConstants.PlayerError.VIDEO_NOT_PLAYABLE_IN_EMBEDDED_PLAYER ->    ToastUtil.warn("MusicDownloader can't play this type of video")
                 }
             }
 
@@ -185,12 +185,13 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
 
     private fun showChangeFileNameDialog() {
         val dialog = MaterialDialog(requireContext())
-                .title(text = "Change file name")
+                .title(text = "Edit file name")
                 .input(prefill = titleTextView.text, waitForPositiveButton = true) { _, text ->
                     titleTextView.text = text
                     title = text.toString()
                 }
                 .positiveButton(text = "SUBMIT")
+
 
         with(dialog) {
             show()
