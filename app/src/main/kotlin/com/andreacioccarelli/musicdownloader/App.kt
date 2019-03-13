@@ -24,7 +24,12 @@ class App : Application() {
             val db = Room.databaseBuilder(
                     context,
                     ChecklistDatabase::class.java, "checklist"
-            ).allowMainThreadQueries()
+            )
+
+            with(db) {
+                allowMainThreadQueries()
+                fallbackToDestructiveMigration()
+            }
 
             db.build().checklistDao()
         }

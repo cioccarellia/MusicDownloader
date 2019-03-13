@@ -8,4 +8,5 @@ import com.andreacioccarelli.musicdownloader.data.model.DownloadInfo
  */
 
 fun ChecklistDao.isEmpty() = getAll().isEmpty()
-fun ChecklistDao.toDownloadInfoList() = getAll().map { DownloadInfo(it.link.toYoutubeUrl(), it.title) }
+fun ChecklistDao.toDownloadInfoList() = getAll().map { DownloadInfo(it.videoId.toYoutubeUrl(), it.title) }
+fun ChecklistDao.contains(videoId: String) = getAll().any { it.videoId == videoId }

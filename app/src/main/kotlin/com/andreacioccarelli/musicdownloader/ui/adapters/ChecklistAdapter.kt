@@ -14,6 +14,7 @@ import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.extensions.toYoutubeUrl
 import com.andreacioccarelli.musicdownloader.ui.activities.MainActivity
+import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.bumptech.glide.Glide
 import org.jetbrains.anko.find
 
@@ -26,7 +27,6 @@ class ChecklistAdapter(private val activity: Activity) : RecyclerView.Adapter<Ch
     val data = checklist
             .getAll()
             .toMutableList()
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.result_item, parent, false)
@@ -54,11 +54,13 @@ class ChecklistAdapter(private val activity: Activity) : RecyclerView.Adapter<Ch
                 search.text = data[holder.adapterPosition].title
                 rv?.smoothScrollToPosition(0)
 
-                ref.performSearch(data[holder.adapterPosition].link.toYoutubeUrl())
+                ref.performSearch(implicitLink = data[holder.adapterPosition].videoId.toYoutubeUrl())
                 ref.checklistDialog.dismiss()
             }
 
             setOnLongClickListener {
+                VibrationUtil.weak()
+
                 checklist.remove(data[holder.adapterPosition])
                 data.removeAt(holder.adapterPosition)
                 notifyItemRemoved(holder.adapterPosition)

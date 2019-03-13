@@ -97,7 +97,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
                 checklist.remove(remoteResult.id.videoId)
                 dismiss()
                 VibrationUtil.medium()
-                ToastUtil.success("Removed from Checklist")
+                ToastUtil.success("Removed from Checklist", R.drawable.remove_outline)
             }
 
             addTo.visibility = View.GONE
@@ -113,7 +113,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
 
                 dismiss()
                 VibrationUtil.medium()
-                ToastUtil.success("Added to Checklist")
+                ToastUtil.success("Added to Checklist", R.drawable.add_outline)
             }
 
             removeFrom.visibility = View.GONE
@@ -290,7 +290,9 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
         VibrationUtil.medium()
         dismiss()
 
-        val downloadInfo = DownloadInfo(watchLink, title)
-        DownloadClient(activity, downloadInfo).exec(format)
+        activity?.let {
+            val downloadInfo = DownloadInfo(watchLink, title)
+            DownloadClient(activity, downloadInfo).exec(format)
+        }
     }
 }

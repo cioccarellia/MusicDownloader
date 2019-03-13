@@ -9,6 +9,6 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "checklist")
 data class ChecklistEntry(
-        @PrimaryKey val link: String,
+        @PrimaryKey val videoId: String,
         val title: String,
         val thumbnailLink: String)

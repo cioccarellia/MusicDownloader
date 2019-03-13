@@ -11,11 +11,16 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
+import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.R
+import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistEntry
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchResponse
+import com.andreacioccarelli.musicdownloader.extensions.contains
 import com.andreacioccarelli.musicdownloader.extensions.escapeHtml
 import com.andreacioccarelli.musicdownloader.ui.fragments.BottomDialogFragment
+import com.andreacioccarelli.musicdownloader.util.ToastUtil
+import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.bumptech.glide.Glide
 
 /**
@@ -49,6 +54,25 @@ class SearchAdapter(response: YoutubeSearchResponse, private val activity: Activ
             card.setOnClickListener {
                 val bottomSheetFragment = BottomDialogFragment(data[i])
                 bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
+            }
+
+            card.setOnLongClickListener {
+                VibrationUtil.medium()
+                if (checklist.contains(data[i].id.videoId)) {
+                    ToastUtil.success("Removed from checklist", R.drawable.remove_outline)
+                    checklist.remove(data[i].id.videoId)
+                } else {
+                    ToastUtil.success("Added to checklist", R.drawable.add_outline)
+                    checklist.add(
+                            ChecklistEntry(
+                                    data[i].id.videoId,
+                                    data[i].snippet.title.escapeHtml(),
+                                    data[i].snippet.thumbnails.medium.url
+                            )
+                    )
+                }
+
+                true
             }
 
             Handler().post {

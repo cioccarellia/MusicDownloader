@@ -22,9 +22,10 @@
 
         <EditText
             android:id="@+id/search"
-            android:inputType="text|textCapSentences"
+            android:inputType="text|textCapSentences|textNoSuggestions|textAutoCorrect"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:importantForAutofill="no"
             android:hint="Search" />
 
     </com.google.android.material.textfield.TextInputLayout>

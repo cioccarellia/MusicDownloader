@@ -268,34 +268,38 @@ class MainActivity : BaseActivity() {
     lateinit var checklistDialog: MaterialDialog
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.action_list -> {
+
             checklistDialog = MaterialDialog(this)
 
-            GlobalScope.launch(Dispatchers.IO) {
-                if (checklist.isEmpty()) {
-                    checklistDialog
-                            .customView(R.layout.empty_view_checklist)
-
-                } else {
-                    checklistDialog
-                            .title(text = "Checklist")
-                            .customListAdapter(ChecklistAdapter(this@MainActivity))
-                            .positiveButton(text = "DOWNLOAD ALL") {
-                                MaterialDialog(this@MainActivity).show {
-                                    title(text = "Select Format")
-                                    listItemsSingleChoice(items = listOf("MP3", "MP4"), initialSelection = 0) { _, index, _ ->
-                                        val format = Format.values()[index]
-
-                                        DownloadClient(this@MainActivity,
-                                                checklist.toDownloadInfoList())
-                                                .exec(format)
-                                    }
-                                    positiveButton(text = "SELECT")
-                                }
-                            }
+            if (checklist.isEmpty()) {
+                checklistDialog =  MaterialDialog(this).show {
+                    customView(R.layout.empty_view_checklist)
                 }
 
-                withContext(Dispatchers.Main) {
-                    checklistDialog.show()
+            } else {
+                val checklistAdapter = ChecklistAdapter(this@MainActivity)
+                checklistDialog = MaterialDialog(this).show {
+                    title(text = "Checklist")
+                    positiveButton(text = "DOWNLOAD ALL") {
+                        MaterialDialog(this@MainActivity).show {
+                            title(text = "Select Format")
+                            listItemsSingleChoice(items = listOf("MP3", "MP4"), initialSelection = 0) { _, index, _ ->
+                                val format = Format.values()[index]
+
+                                DownloadClient(this@MainActivity,
+                                        checklist.toDownloadInfoList())
+                                        .exec(format)
+                            }
+                            positiveButton(text = "SELECT")
+                        }
+                    }
+                    customListAdapter(
+                        ScaleInAnimationAdapter(checklistAdapter).apply {
+                            setDuration(500)
+                            setInterpolator(OvershootInterpolator())
+                            setFirstOnly(true)
+                        }
+                    )
                 }
             }
             true
