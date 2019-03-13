@@ -1,4 +1,4 @@
-package com.andreacioccarelli.musicdownloader.ui.downloader
+package com.andreacioccarelli.musicdownloader.client
 
 import android.app.Activity
 import androidx.annotation.UiThread

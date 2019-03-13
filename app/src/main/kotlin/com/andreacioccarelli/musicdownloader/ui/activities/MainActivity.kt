@@ -1,53 +1,33 @@
 package com.andreacioccarelli.musicdownloader.ui.activities
 
-import android.app.DownloadManager
-import android.app.DownloadManager.Request.VISIBILITY_VISIBLE
-import android.content.BroadcastReceiver
-import android.content.Context
+import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.IntentFilter
-import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-import android.text.ClipboardManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.assent.Permission
 import com.afollestad.assent.askForPermissions
-import com.afollestad.assent.isAllGranted
 import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
-import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.list.customListAdapter
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
-import com.andreacioccarelli.logkit.loge
-import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.App.Companion.checklist
-import com.andreacioccarelli.musicdownloader.App.Companion.prefs
-import com.andreacioccarelli.musicdownloader.BuildConfig
 import com.andreacioccarelli.musicdownloader.R
-import com.andreacioccarelli.musicdownloader.constants.APK_URL
-import com.andreacioccarelli.musicdownloader.constants.Keys
+import com.andreacioccarelli.musicdownloader.client.DownloadClient
 import com.andreacioccarelli.musicdownloader.data.enums.Format
-import com.andreacioccarelli.musicdownloader.data.requests.UpdateRequestBuilder
 import com.andreacioccarelli.musicdownloader.data.requests.YoutubeRequestBuilder
-import com.andreacioccarelli.musicdownloader.data.serializers.UpdateCheck
 import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchResponse
 import com.andreacioccarelli.musicdownloader.extensions.*
 import com.andreacioccarelli.musicdownloader.ui.adapters.ChecklistAdapter
 import com.andreacioccarelli.musicdownloader.ui.adapters.ResultsAdapter
-import com.andreacioccarelli.musicdownloader.ui.downloader.MusicDownloader
+import com.andreacioccarelli.musicdownloader.ui.base.BaseActivity
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
-import com.andreacioccarelli.musicdownloader.util.ConnectionStatus
-import com.andreacioccarelli.musicdownloader.util.NetworkUtil
-import com.andreacioccarelli.musicdownloader.util.UpdateUtil
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
@@ -62,72 +42,24 @@ import java.io.IOException
  *  Designed and Developed by Andrea Cioccarelli
  */
 
-class MainActivity : AppCompatActivity() {
+@SuppressLint("GoogleAppIndexingApiWarning")
+class MainActivity : BaseActivity() {
 
-    private var wasOffline = false
-    private var isOffline = false
-    private var arePermissionsGranted = false
     private var isSearching = false
-
-    private val networkConnectionListener = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-
-            if (NetworkUtil.connectionStatus == ConnectionStatus.ONLINE) {
-                if (wasOffline) {
-                    Alerter.create(this@MainActivity)
-                            .setTitle("Connection detected")
-                            .setText("Device is back online")
-                            .setDuration(4_000)
-                            .setIcon(R.drawable.access_point_network)
-                            .enableSwipeToDismiss()
-                            .setBackgroundDrawable(GradientGenerator.successGradient)
-                            .show()
-
-                    searchLayout.isErrorEnabled = false
-                }
-
-                isOffline = false
-            } else {
-                Alerter.create(this@MainActivity)
-                        .setTitle("Device is offline")
-                        .setText("You need an active internet connection to use this app")
-                        .setDuration(7_000)
-                        .setIcon(R.drawable.access_point_network_off)
-                        .enableSwipeToDismiss()
-                        .setBackgroundDrawable(GradientGenerator.errorGradient)
-                        .setOnClickListener(
-                                View.OnClickListener { startActivityForResult(Intent(android.provider.Settings.ACTION_WIFI_SETTINGS), 0) })
-                        .show()
-
-                wasOffline = true
-                isOffline = true
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_layout)
 
-        initPermissions()
         initToolbar()
         initFab()
-        initNetwork()
-        initUpdateChecker()
-        initClipboard()
         initInput()
-        initIntents()
+        initIntentReceiver()
     }
 
-    private fun initClipboard() {
-        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val text = clipboard.text
-
-        text?.let {
-            if (it.isUrl && intent?.getStringExtra(Intent.EXTRA_TEXT) == null) {
-                search.text = clipboard.text.toEditable()
-            }
-        }
+    private fun initToolbar() {
+        setSupportActionBar(toolbar)
+        title = "Music Downloader"
     }
 
     private fun initInput() {
@@ -144,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                     fab.show()
                 }
 
-                if (isInError) {
+                if (isShowingError) {
                     fab.show()
                 }
             }
@@ -154,42 +86,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initPermissions() {
-        if (!isAllGranted(Permission.WRITE_EXTERNAL_STORAGE)) {
-            askForPermissions(Permission.WRITE_EXTERNAL_STORAGE) {
-                arePermissionsGranted = if (!it.isAllGranted(Permission.WRITE_EXTERNAL_STORAGE)) {
-                    Alerter.create(this@MainActivity)
-                            .setTitle("Cannot read external storage")
-                            .setText("You have to grant the requested permission to correctly use this app")
-                            .setDuration(5_000)
-                            .setIcon(R.drawable.folder)
-                            .setBackgroundDrawable(GradientGenerator.errorGradient)
-                            .setOnClickListener( View.OnClickListener { initPermissions() })
-                            .show()
-                    false
-                } else {
-                    Alerter.clearCurrent(this)
-                    true
-                }
-            }
-        } else arePermissionsGranted = true
-    }
-
-    private fun initToolbar() {
-        setSupportActionBar(toolbar)
-        title = "Music Downloader"
-    }
-
     private var snack: Snackbar? = null
     private val searches = mutableListOf<Int>()
     private var searchCount = 0
 
     private fun initFab() {
         fab.setOnClickListener { view ->
-            if (!arePermissionsGranted) {
+            if (!areAllPermissionsGranted) {
                 askForPermissions(Permission.WRITE_EXTERNAL_STORAGE) {
                     if (it.isAllGranted(Permission.WRITE_EXTERNAL_STORAGE)) {
-                        arePermissionsGranted = true
+                        areAllPermissionsGranted = true
                         fab.performClick()
                     } else {
                         val intent = Intent()
@@ -229,7 +135,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun performSearch(hiddenLink: String = "") {
+    fun performSearch(implicitLink: String = "") {
         searchLayout.isErrorEnabled = false
         search.dismissKeyboard()
         resultsRecyclerView?.smoothScrollToPosition(0)
@@ -250,7 +156,7 @@ class MainActivity : AppCompatActivity() {
             snack?.show()
         } else snack?.show()
 
-        val query = if (hiddenLink.isEmpty()) search.text else hiddenLink
+        val query = if (implicitLink.isEmpty()) search.text else implicitLink
 
         GlobalScope.launch(Dispatchers.IO) {
             try {
@@ -307,7 +213,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initIntents() {
+    private fun initIntentReceiver() {
         when {
             intent?.action == Intent.ACTION_SEND -> {
                 if ("text/plain" == intent.type) {
@@ -318,125 +224,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private var isInError = false
+    private var isShowingError = false
     private fun displayFormError() {
-        isInError = true
+        isShowingError = true
         fab.hide()
         VibrationUtil.strong()
 
         Handler().postDelayed({
-            fab.show()
-            searchLayout.isErrorEnabled = false
-            isInError = false
+            fab?.show()
+            searchLayout?.isErrorEnabled = false
+            isShowingError = false
         }, 2500)
     }
 
-    private val onPackageDownloadCompleated: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-            if (id == -1L) return
 
-            try {
-                Alerter.clearCurrent(this@MainActivity)
-            } catch (ignored: Exception) {}
-
-            GlobalScope.launch(Dispatchers.IO) {
-                delay(107)
-                UpdateUtil.getDownloadedPackageFile(BuildConfig.VERSION_NAME).delete()
-                UpdateUtil.openUpdateInPackageManager(context)
-            }
-        }
-    }
-
-    private fun initUpdateChecker() = onceFor3 {
-        GlobalScope.launch(Dispatchers.IO) {
-            val requestBuilder = UpdateRequestBuilder.get()
-            val request = OkHttpClient().newCall(requestBuilder).execute()
-
-            val jsonRequest = request.body()!!.string()
-
-            val gson = Gson()
-            val updateCheck = gson.fromJson(
-                    jsonRequest,
-                    UpdateCheck::class.java)
-
-            prefs.put(Keys.lastVersionName, updateCheck.versionName)
-
-            if (updateCheck.versionCode > BuildConfig.VERSION_CODE && !App.prefs.get(Keys.ignoring + updateCheck.versionCode, false)) {
-                withContext(Dispatchers.Main) {
-                    MaterialDialog(this@MainActivity)
-                            .title(text = "Update ${updateCheck.versionName} found!")
-                            .message(text = updateCheck.changelog)
-                            .positiveButton(text = if (UpdateUtil.getDownloadedPackageFile(updateCheck.versionName).exists())
-                                "INSTALL UPDATE" else "DOWNLOAD UPDATE") { dialog ->
-                                if (UpdateUtil.getDownloadedPackageFile(updateCheck.versionName).exists()) {
-                                    UpdateUtil.openUpdateInPackageManager(this@MainActivity)
-                                    dialog.dismiss()
-                                } else {
-                                    val uri = Uri.parse(
-                                            if (updateCheck.downloadInfo.useBundledUpdateLink)
-                                                APK_URL
-                                            else
-                                                updateCheck.downloadInfo.updateLink!!
-                                    )
-                                    val downloadRequest = DownloadManager.Request(uri)
-
-                                    with(downloadRequest) {
-                                        setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
-                                        setAllowedOverRoaming(true)
-                                        setVisibleInDownloadsUi(true)
-                                        setAllowedOverMetered(true)
-                                        setNotificationVisibility(VISIBILITY_VISIBLE)
-                                        setTitle(UpdateUtil.getNotificationTitle(updateCheck))
-                                        setDescription(UpdateUtil.getNotificationContent())
-                                        setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-
-                                        setDestinationInExternalPublicDir("", UpdateUtil.getDestinationSubpath(updateCheck))
-                                    }
-
-                                    val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-                                    downloadManager.enqueue(downloadRequest)
-
-                                    registerReceiver(onPackageDownloadCompleated, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-                                    dialog.dismiss()
-
-                                    Alerter.create(this@MainActivity)
-                                            .setTitle(UpdateUtil.getNotificationContent())
-                                            .setText(UpdateUtil.getNotificationTitle(updateCheck))
-                                            .setBackgroundDrawable(GradientGenerator.successGradient)
-                                            .setIcon(R.drawable.download)
-                                            .setDuration(9_000)
-                                            .setDismissable(false)
-                                            .show()
-                                }
-                            }
-                            .negativeButton(text = "NO") { dialog ->
-                                if (dialog.isCheckPromptChecked() && UpdateUtil.getDownloadedPackageFile(updateCheck.versionName).exists()) {
-                                    UpdateUtil.clearDuplicatedInstallationPackage("music-downloader-${updateCheck.versionName}.apk")
-                                }
-                                dialog.dismiss()
-                            }
-                            .checkBoxPrompt(text = "Ignore this update", isCheckedDefault = false) { state ->
-                                App.prefs.put(Keys.ignoring + updateCheck.versionCode, state)
-                            }
-                            .noAutoDismiss()
-                            .show()
-                }
-            }
-        }
-    }
-
-    private fun initNetwork() = registerReceiver(networkConnectionListener, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
-
-    private fun unregisterReceivers() = try {
-        unregisterReceiver(networkConnectionListener)
-        unregisterReceiver(onPackageDownloadCompleated)
-    } catch (notRegistered: RuntimeException) { loge(notRegistered) }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceivers()
-    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
@@ -463,7 +264,7 @@ class MainActivity : AppCompatActivity() {
                                     listItemsSingleChoice(items = listOf("MP3", "MP4"), initialSelection = 0) { _, index, _ ->
                                         val format = Format.values()[index]
 
-                                        MusicDownloader(this@MainActivity,
+                                        DownloadClient(this@MainActivity,
                                                 checklist.toDownloadInfoList())
                                                 .exec(format)
                                     }

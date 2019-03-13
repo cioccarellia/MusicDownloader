@@ -31,7 +31,7 @@ import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.extensions.escapeHtml
 
 import com.andreacioccarelli.musicdownloader.extensions.toUri
-import com.andreacioccarelli.musicdownloader.ui.downloader.MusicDownloader
+import com.andreacioccarelli.musicdownloader.client.DownloadClient
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
 import com.andreacioccarelli.musicdownloader.util.ToastUtil
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
@@ -290,6 +290,6 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
         dismiss()
 
         val downloadInfo = DownloadInfo(watchLink, title)
-        MusicDownloader(activity, downloadInfo).exec(format)
+        DownloadClient(activity, downloadInfo).exec(format)
     }
 }

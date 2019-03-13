@@ -1,4 +1,4 @@
-package com.andreacioccarelli.musicdownloader.ui.downloader
+package com.andreacioccarelli.musicdownloader.client
 
 import android.app.Activity
 import android.app.DownloadManager
@@ -27,7 +27,7 @@ import kotlin.random.Random
  * Designed and Developed by Andrea Cioccarelli
  */
 
-class MusicDownloader {
+class DownloadClient {
     private var activity: Activity?
     private val data: MutableList<DownloadInfo>
     private lateinit var format: Format
