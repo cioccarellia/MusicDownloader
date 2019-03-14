@@ -1,11 +1,13 @@
 package com.andreacioccarelli.musicdownloader.ui.activities
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.text.ClipboardManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -56,6 +58,7 @@ class MainActivity : BaseActivity() {
 
         initToolbar()
         initInput()
+        initClipboard()
         initRecyclerView()
         initFab()
         initIntentReceiver()
@@ -87,6 +90,18 @@ class MainActivity : BaseActivity() {
 
             popUpKeyboard()
             requestFocus()
+        }
+    }
+
+    private fun initClipboard() {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val text = clipboard.text
+
+        text?.let {
+            if (it.isUrl && intent?.getStringExtra(Intent.EXTRA_TEXT) == null) {
+                search.text = clipboard.text.toEditable()
+                performSearch(clipboard.text.toString())
+            }
         }
     }
 

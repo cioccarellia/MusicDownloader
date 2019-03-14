@@ -77,25 +77,12 @@ open class BaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         initNetwork()
-        initClipboard()
         initPermissions()
         initUpdateChecker()
     }
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase))
-    }
-
-
-    private fun initClipboard() {
-        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val text = clipboard.text
-
-        text?.let {
-            if (it.isUrl && intent?.getStringExtra(Intent.EXTRA_TEXT) == null) {
-                search.text = clipboard.text.toEditable()
-            }
-        }
     }
 
     private fun initPermissions() {
