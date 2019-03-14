@@ -2,6 +2,7 @@
 
 
 # MusicDownloader
+[![APK](https://img.shields.io/badge/download-APK-E53935.svg)](https://github.com/AndreaCioccarelli/MusicDownloader/blob/master/bin/music-downloader.apk?raw=true)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/36e37693034c45ef80c4758d256ffe81)](https://www.codacy.com/project/cioccarelliandrea01/MusicDownloader/dashboard)
 [![Min sdk](https://img.shields.io/badge/platform-Android-00E676.svg)](https://github.com/AndreaCioccarelli/MusicDownloader/blob/master/app/build.gradle)
 [![Min sdk](https://img.shields.io/badge/minsdk-21-yellow.svg)](https://github.com/AndreaCioccarelli/MusicDownloader/blob/master/app/build.gradle)
