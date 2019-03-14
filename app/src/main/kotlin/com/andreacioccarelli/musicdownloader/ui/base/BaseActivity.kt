@@ -34,6 +34,7 @@ open class BaseActivity : AppCompatActivity() {
     internal var areAllPermissionsGranted = false
     private var wasOffline = false
     var isOffline = false
+    val isTablet by lazy { resources.getBoolean(R.bool.isTablet) }
 
     private val networkConnectionListener = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {

@@ -1,7 +1,7 @@
 {
-  "versionCode": 12,
-  "versionName": "1.3.3",
-  "changelog": "Performances & usability improvements, bug fixes, enhanced user experience, UI changes",
+  "versionCode": 13,
+  "versionName": "1.3.4",
+  "changelog": "Performances & usability improvements, improved tablet support, bug fixes, enhanced user experience, UI polishment",
 
   "downloadInfo": {
     "useBundledUpdateLink": true,

@@ -1,4 +1,4 @@
-package com.andreacioccarelli.musicdownloader.util
+package com.andreacioccarelli.musicdownloader.ui.toast
 
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat

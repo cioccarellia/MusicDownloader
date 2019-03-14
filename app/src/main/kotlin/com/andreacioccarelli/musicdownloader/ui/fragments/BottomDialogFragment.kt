@@ -32,7 +32,7 @@ import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.extensions.escapeHtml
 import com.andreacioccarelli.musicdownloader.extensions.toUri
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
-import com.andreacioccarelli.musicdownloader.util.ToastUtil
+import com.andreacioccarelli.musicdownloader.ui.toast.ToastUtil
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog

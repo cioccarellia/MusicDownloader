@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.OvershootInterpolator
 import androidx.core.content.ContextCompat
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.assent.Permission
 import com.afollestad.assent.askForPermissions
@@ -196,10 +197,15 @@ class MainActivity : BaseActivity() {
                         with(resultsRecyclerView) {
                             visibility = View.VISIBLE
                             adapter = ScaleInAnimationAdapter(searchAdapter).apply {
-                                setDuration(800)
-                                setInterpolator(OvershootInterpolator())
+                                setDuration(207)
                                 setFirstOnly(true)
                                 setHasFixedSize(true)
+
+                                if (isTablet) {
+                                    setInterpolator(LinearOutSlowInInterpolator())
+                                } else {
+                                    setInterpolator(OvershootInterpolator())
+                                }
                             }
                         }
                     }
@@ -293,8 +299,8 @@ class MainActivity : BaseActivity() {
                     }
                     customListAdapter(
                         ScaleInAnimationAdapter(checklistAdapter).apply {
-                            setDuration(500)
-                            setInterpolator(OvershootInterpolator())
+                            setDuration(207)
+                            setInterpolator(LinearOutSlowInInterpolator())
                             setFirstOnly(false)
                         }
                     )

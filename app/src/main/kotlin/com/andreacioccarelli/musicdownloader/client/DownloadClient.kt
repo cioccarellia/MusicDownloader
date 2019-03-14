@@ -16,7 +16,7 @@ import com.andreacioccarelli.musicdownloader.data.model.DownloadInfo
 import com.andreacioccarelli.musicdownloader.data.requests.DownloadLinkRequestsBuilder
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
 import com.andreacioccarelli.musicdownloader.extensions.*
-import com.andreacioccarelli.musicdownloader.util.ToastUtil
+import com.andreacioccarelli.musicdownloader.ui.toast.ToastUtil
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient

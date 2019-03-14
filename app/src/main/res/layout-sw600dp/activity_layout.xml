@@ -27,9 +27,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         layout="@layout/activity_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="60dp"
-        android:layout_marginEnd="60dp"/>
+        android:layout_marginTop="46dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

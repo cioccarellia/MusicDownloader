@@ -19,7 +19,7 @@ import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchRespo
 import com.andreacioccarelli.musicdownloader.extensions.contains
 import com.andreacioccarelli.musicdownloader.extensions.escapeHtml
 import com.andreacioccarelli.musicdownloader.ui.fragments.BottomDialogFragment
-import com.andreacioccarelli.musicdownloader.util.ToastUtil
+import com.andreacioccarelli.musicdownloader.ui.toast.ToastUtil
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.bumptech.glide.Glide
 

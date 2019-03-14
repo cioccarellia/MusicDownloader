@@ -2,5 +2,5 @@
 <resources>
     <attr format="string" name="fontPath"/>
     <item name="calligraphy_tag_id" type="id"/>
-    <bool name="isTablet">false</bool>
+    <bool name="isTablet">true</bool>
 </resources>
