@@ -16,8 +16,9 @@ object GradientGenerator {
         val gd = GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 intArrayOf(ContextCompat.getColor(App.context.applicationContext, startColor),
                         ContextCompat.getColor(App.context.baseContext, endColor)))
-        gd.cornerRadius = radius
-        return gd
+        return gd.apply {
+            cornerRadius = radius
+        }
     }
 
     fun random(): Drawable {
@@ -26,15 +27,14 @@ object GradientGenerator {
                 R.color.Amber_900, R.color.Amber_A400, R.color.Amber_A700,
 
                 R.color.Orange_600, R.color.Orange_700, R.color.Orange_800,
-                R.color.Orange_900, R.color.Orange_A400, R.color.Orange_A700,
-
-                R.color.DeepOrange_700)
+                R.color.Orange_900, R.color.Orange_A400, R.color.Orange_A700)
 
         val gd = GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 intArrayOf(ContextCompat.getColor(App.context.applicationContext, colorList.random()),
                         ContextCompat.getColor(App.context.baseContext, colorList.random())))
-        gd.cornerRadius = 0F
-        return gd
+        return gd.apply {
+            cornerRadius = 0F
+        }
     }
 
     val errorGradient: Drawable
@@ -42,8 +42,9 @@ object GradientGenerator {
             val gd = GradientDrawable(GradientDrawable.Orientation.TL_BR,
                     intArrayOf(ContextCompat.getColor(App.context.applicationContext, R.color.Red_400),
                             ContextCompat.getColor(App.context.baseContext, R.color.Red_A700)))
-            gd.cornerRadius = 0F
-            return gd
+            return gd.apply {
+                cornerRadius = 0F
+            }
         }
 
 
@@ -52,8 +53,9 @@ object GradientGenerator {
             val gd = GradientDrawable(GradientDrawable.Orientation.TL_BR,
                     intArrayOf(ContextCompat.getColor(App.context.applicationContext, R.color.Yellow_700),
                             ContextCompat.getColor(App.context.baseContext, R.color.Amber_900)))
-            gd.cornerRadius = 0F
-            return gd
+            return gd.apply {
+                cornerRadius = 0F
+            }
         }
 
     val successGradient: Drawable
@@ -61,7 +63,8 @@ object GradientGenerator {
             val gd = GradientDrawable(GradientDrawable.Orientation.TL_BR,
                     intArrayOf(ContextCompat.getColor(App.context.applicationContext, R.color.Green_A400),
                             ContextCompat.getColor(App.context.baseContext, R.color.Teal_A700)))
-            gd.cornerRadius = 0F
-            return gd
+            return gd.apply {
+                cornerRadius = 0F
+            }
         }
 }

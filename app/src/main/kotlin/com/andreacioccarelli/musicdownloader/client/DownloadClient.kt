@@ -51,10 +51,10 @@ class DownloadClient {
         }
     }
 
-    private fun getFileDownloadPath(fileName: String, trimToSdcard: Boolean = false): String {
+    private fun getFileDownloadPath(fileName: String, trimForSdCard: Boolean = false): String {
         val path = "MusicDownloader/$format/$fileName"
 
-        return if (trimToSdcard) path else Environment.getExternalStorageDirectory().absolutePath + "/" + path
+        return if (trimForSdCard) path else Environment.getExternalStorageDirectory().absolutePath + "/" + path
     }
 
     private suspend fun fetchVideoDownloadInformation(downloadInfo: DownloadInfo, format: Format): DirectLinkResponse {
@@ -173,7 +173,6 @@ class DownloadClient {
             UiController.displayDownloadStarted(activity, response)
         }
 
-
         GlobalScope.launch(Dispatchers.IO) {
             val fileName = "${response.fileName}.${response.format}"
             val fileDownloadLink = response.download.sanitizeUrl()
@@ -193,8 +192,10 @@ class DownloadClient {
                 setDescription(fileName)
                 allowScanningByMediaScanner()
                 setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                setDestinationInExternalPublicDir("", getFileDownloadPath(fileName, trimToSdcard = true))
+                setDestinationInExternalPublicDir("", getFileDownloadPath(fileName, trimForSdCard = true))
             }
+
+            delay(Random.nextLong(1000, 2000))
 
             downloadManager.enqueue(downloadRequest)
             checklist.remove(response.videoId)

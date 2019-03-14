@@ -14,7 +14,6 @@ import com.tapadoo.alerter.Alerter
  */
 
 object UiController {
-
     @UiThread
     fun displayRetrievingVideoInformation(activity: Activity?, downloads: List<DownloadInfo>) {
         if (activity == null) return
