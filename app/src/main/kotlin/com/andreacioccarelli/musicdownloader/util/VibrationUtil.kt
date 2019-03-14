@@ -11,7 +11,7 @@ import org.jetbrains.anko.vibrator
 
 @Suppress("unused")
 object VibrationUtil {
-    private const val VIBRATION_WEAK = 25L
+    private const val VIBRATION_WEAK = 20L
     private const val AMPLITUDE_WEAK = 100
 
     fun weak() {
@@ -22,8 +22,8 @@ object VibrationUtil {
         }
     }
 
-    private const val VIBRATION_MEDIUM = 50L
-    private const val AMPLITUDE_MEDIUM = 180
+    private const val VIBRATION_MEDIUM = 40L
+    private const val AMPLITUDE_MEDIUM = 150
 
     fun medium() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -33,7 +33,7 @@ object VibrationUtil {
         }
     }
 
-    private const val VIBRATION_STRONG = 100L
+    private const val VIBRATION_STRONG = 80L
     private const val AMPLITUDE_STRONG = 255
 
     fun strong() {

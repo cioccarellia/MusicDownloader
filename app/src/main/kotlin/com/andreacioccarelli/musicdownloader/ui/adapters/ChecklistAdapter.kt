@@ -22,7 +22,9 @@ import org.jetbrains.anko.find
  *  Designed and developed by Andrea Cioccarelli
  */
 
-class ChecklistAdapter(private val activity: Activity) : RecyclerView.Adapter<ChecklistAdapter.ViewHolder>() {
+class ChecklistAdapter(
+        private val activity: Activity
+) : RecyclerView.Adapter<ChecklistAdapter.ViewHolder>() {
 
     val data = checklist
             .getAll()
@@ -32,8 +34,6 @@ class ChecklistAdapter(private val activity: Activity) : RecyclerView.Adapter<Ch
         val v = LayoutInflater.from(parent.context).inflate(R.layout.result_item, parent, false)
         return ViewHolder(v)
     }
-
-    override fun getItemCount() = data.size
 
     override fun onBindViewHolder(holder: ViewHolder, i: Int) {
         Glide.with(activity)
@@ -75,8 +75,10 @@ class ChecklistAdapter(private val activity: Activity) : RecyclerView.Adapter<Ch
         }
 
         Handler().post {
-            // Maybe a title has just 1 line of text, and so we should give it
-            // a normal dimension, if compared to longer ones
+            /**
+             * A title could have just 1 line of text, and so we should give it
+             * a normal dimension, if compared to longer ones
+             **/
             if (holder.title.lineCount == 1) {
                 holder.title.height = activity.resources.getDimension(R.dimen.result_thumb_width).toInt()
             }
@@ -84,6 +86,8 @@ class ChecklistAdapter(private val activity: Activity) : RecyclerView.Adapter<Ch
             holder.titleLayout.visibility = View.VISIBLE
         }
     }
+
+    override fun getItemCount() = data.size
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         var icon: ImageView = v.findViewById(R.id.icon)

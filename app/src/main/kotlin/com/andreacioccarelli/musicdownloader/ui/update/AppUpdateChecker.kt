@@ -30,7 +30,6 @@ import okhttp3.OkHttpClient
  */
 
 object AppUpdateChecker {
-
     private val onPackageDownloadCompleated: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
@@ -125,5 +124,4 @@ object AppUpdateChecker {
             }
         }
     }
-
 }

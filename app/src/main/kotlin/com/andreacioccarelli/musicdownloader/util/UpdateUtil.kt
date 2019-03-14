@@ -23,13 +23,12 @@ object UpdateUtil {
     private const val APK_MIME = "application/vnd.android.package-archive"
 
     fun getNotificationTitle(check: UpdateCheck) = "${BuildConfig.VERSION_NAME} -> ${check.versionName}"
-    fun getNotificationContent() = "Downloading update package"
+    fun getNotificationContent() = "Downloading Update Package..."
 
     fun getDestinationSubpath(check: UpdateCheck): String {
         val subPath = Environment.DIRECTORY_DOWNLOADS + "/music-downloader-${check.versionName}.apk"
 
         clearDuplicatedInstallationPackage(subPath)
-
         return subPath
     }
 
@@ -59,12 +58,11 @@ object UpdateUtil {
 
             val intent = Intent(Intent.ACTION_INSTALL_PACKAGE, uri)
 
-
             intent.flags += Intent.FLAG_GRANT_READ_URI_PERMISSION
             intent.flags += Intent.FLAG_ACTIVITY_NEW_TASK
 
-
             val pm = context.packageManager
+
             if (intent.resolveActivity(pm) != null) {
                 context.startActivity(intent)
             }

@@ -27,7 +27,11 @@ import com.bumptech.glide.Glide
  *  Designed and developed by Andrea Cioccarelli
  */
 
-class SearchAdapter(response: YoutubeSearchResponse, private val activity: Activity, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
+class SearchAdapter(
+        response: YoutubeSearchResponse,
+        private val activity: Activity,
+        private val fragmentManager: FragmentManager
+) : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
 
     val data by lazy { ArrayList<Result>() }
 
@@ -40,8 +44,6 @@ class SearchAdapter(response: YoutubeSearchResponse, private val activity: Activ
         val v = LayoutInflater.from(parent.context).inflate(R.layout.result_item, parent, false)
         return ViewHolder(v)
     }
-
-    override fun getItemCount() = data.size
 
     override fun onBindViewHolder(holder: ViewHolder, i: Int) {
         Glide.with(activity)
@@ -76,16 +78,19 @@ class SearchAdapter(response: YoutubeSearchResponse, private val activity: Activ
             }
 
             Handler().post {
+                // Delayed by 15ms for animation effect / rendering safety
                 Handler().postDelayed({
                     if (title.lineCount == 1) {
                         title.height = activity.resources.getDimension(R.dimen.result_thumb_width).toInt()
                     }
 
                     titleLayout.visibility = View.VISIBLE
-                }, 3)
+                }, 15)
             }
         }
     }
+
+    override fun getItemCount() = data.size
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         var card: CardView = v.findViewById(R.id.card)
