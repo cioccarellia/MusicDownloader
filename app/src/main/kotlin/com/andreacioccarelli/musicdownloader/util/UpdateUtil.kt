@@ -46,16 +46,19 @@ object UpdateUtil {
                 "${Environment.DIRECTORY_DOWNLOADS}/music-downloader-$newVersionName.apk")
     }
 
+    const val AUTHORITY = "\"com.andreacioccarelli.musicdownloader.updater\""
+
     fun openUpdateInPackageManager(context: Context) {
         val cachedUpdatePackage = UpdateUtil.getPackagePath()
 
         logd(cachedUpdatePackage)
 
         if (Build.VERSION.SDK_INT >= 24) {
-            val uri = FileProvider.getUriForFile(context, "com.andreacioccarelli.musicdownloader.updater",
-                    File("${Environment.getExternalStorageDirectory().absolutePath}/" +
-                            "${Environment.DIRECTORY_DOWNLOADS}/music-downloader-${prefs.get(Keys.lastVersionName, "")}.apk"))
+            val apkFilePath = "${Environment.getExternalStorageDirectory().absolutePath}/" +
+                    "${Environment.DIRECTORY_DOWNLOADS}/music-downloader-${prefs.get(Keys.lastVersionName, "")}.apk"
+            val updateApkFile = File(apkFilePath)
 
+            val uri = FileProvider.getUriForFile(context, AUTHORITY, updateApkFile)
             val intent = Intent(Intent.ACTION_INSTALL_PACKAGE, uri)
 
             intent.flags += Intent.FLAG_GRANT_READ_URI_PERMISSION

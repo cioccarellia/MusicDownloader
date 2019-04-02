@@ -142,7 +142,6 @@ class MainActivity : BaseActivity() {
 
             if (isOffline) {
                 searchLayout.error = "Device is offline"
-
                 displayFormError()
                 return@setOnClickListener
             }
@@ -225,8 +224,6 @@ class MainActivity : BaseActivity() {
                         }
                     }
 
-
-
                     if (resultsRecyclerView.adapter?.itemCount == 1) {
                         delay(107)
                         resultsRecyclerView.getChildAt(0)?.performClick()
@@ -277,8 +274,6 @@ class MainActivity : BaseActivity() {
         }, 2500)
     }
 
-
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
@@ -287,7 +282,6 @@ class MainActivity : BaseActivity() {
     lateinit var checklistDialog: MaterialDialog
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.action_list -> {
-
             checklistDialog = MaterialDialog(this)
 
             if (checklist.isEmpty()) {

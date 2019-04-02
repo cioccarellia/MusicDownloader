@@ -28,4 +28,8 @@
     <style name="BottomSheetTheme" parent="@style/Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/BottomSheet</item>
     </style>
+
+    <style name="TextAppearance.FontPath" parent="android:TextAppearance">
+        <item name="fontPath">sans-bold.ttf</item>
+    </style>
 </resources>

@@ -18,10 +18,10 @@ Material Design MP3/MP4 Downloader.
 Today's music services are reaching our every corner and there is an overwhelming offer on any kind of market around music.
 Apple Music, Spotify, Amazon Music, YouTube Music just to quote some.
 They are all based on a client-server architecture where the user can acces millions of songs within a second, have them synchronized on the Cloud, get auto-tagged and good looking thumbnailed music, and so on.
-Then, on the other hand, there are people like me, that does not really care about paying for music and that just wants to have it free. But not for a 3 months trial or as long as I don't look for big titles, free as long as I have my titles on my storage, and that's what this app is about.
+Then, on the other hand, there are people like me, that does not really care about paying for music and that just wants to have it to listen on their phones, free. But not for a 3 months trial or as long as I don't try to download it offline, free as long as I have my music on my storage, and that's what this app is about.
 
 # Details
-This app is a simple single-activity project, using a fragment for the bottom sheet dialog, a recyclerview to display the list of the search results, a material dialog for the checklist section.
+This app is a simple single-activity App, it uses a fragment for the bottom sheet dialog, a RecyclerView to display the list of the search results, a material dialog for the checklist section.
 An EditText view is available for the user to type text, and a request is performed to YouTube servers (This app uses API v3) to retrieve the matching results. Another service is user to download the related MP3/MP4 file.
 Since the input is directly passed to Google YouTube APIs, you can also use search operators to filter the results.
 This app is optimized for speed and lightness. The final apk size is less than 4MB and it's packed with many goodies and tweaks to make it clean and blazing-fast (e.g. image caching, checklist preferences, tablet support).

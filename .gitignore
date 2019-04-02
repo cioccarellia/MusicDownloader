@@ -12,7 +12,6 @@
 *.class
 
 # Generated files
-bin/
 gen/
 out/
 
@@ -74,3 +73,15 @@ build
 .git
 local.properties
 app/release/output.json
+libs/
+release/
+src/androidTest/
+src/main/res/drawable-hdpi/
+src/main/res/drawable-mdpi/
+src/main/res/drawable-v24/
+src/main/res/drawable-xhdpi/
+src/main/res/drawable-xxhdpi/
+src/main/res/drawable-xxxhdpi/
+src/main/res/layout-land/
+src/main/res/values-v23/
+src/test/
