@@ -1,3 +1,10 @@
+# Built application files
+*.apk
+*.ap_
+
+# Mac Files
+*.DS_Store
+
 # Files for the ART/Dalvik VM
 *.dex
 
@@ -5,6 +12,7 @@
 *.class
 
 # Generated files
+bin/
 gen/
 out/
 
@@ -29,7 +37,13 @@ captures/
 
 # IntelliJ
 *.iml
-.idea
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries
+.idea/libraries
+.idea/caches
 
 # Keystore files
 # Uncomment the following line if you do not want to check your keystore files in.
@@ -52,3 +66,11 @@ fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
+
+# Extra
+.gradle
+.idea
+build
+.git
+local.properties
+app/release/output.json
