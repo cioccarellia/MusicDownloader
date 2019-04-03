@@ -61,7 +61,7 @@ class SearchAdapter(
             card.setOnLongClickListener {
                 VibrationUtil.medium()
                 if (checklist.contains(data[i].id.videoId)) {
-                    ToastUtil.success("Removed from checklist", R.drawable.remove_outline, duration = 0)
+                    ToastUtil.error("Removed from checklist", R.drawable.remove_outline, duration = 0)
                     checklist.remove(data[i].id.videoId)
                 } else {
                     ToastUtil.success("Added to checklist", R.drawable.add_outline, duration = 0)

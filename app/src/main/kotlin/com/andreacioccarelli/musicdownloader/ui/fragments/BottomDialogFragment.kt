@@ -97,7 +97,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
                 checklist.remove(remoteResult.id.videoId)
                 dismiss()
                 VibrationUtil.medium()
-                ToastUtil.success("Removed from Checklist", R.drawable.remove_outline)
+                ToastUtil.error("Removed from Checklist", R.drawable.remove_outline)
             }
 
             addTo.visibility = View.GONE
@@ -154,7 +154,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
             }
 
             override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
-                when(error) {
+                when (error) {
                     PlayerConstants.PlayerError.UNKNOWN ->                                  ToastUtil.error("An unknown error has occurred while playing video")
                     PlayerConstants.PlayerError.INVALID_PARAMETER_IN_REQUEST ->             ToastUtil.error("An internal error has occurred while playing video")
                     PlayerConstants.PlayerError.HTML_5_PLAYER ->                            ToastUtil.error("Internal HTML player error")
