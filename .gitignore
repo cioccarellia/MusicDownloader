@@ -1,7 +1,3 @@
-# Built application files
-*.apk
-*.ap_
-
 # Mac Files
 *.DS_Store
 
@@ -71,7 +67,6 @@ fastlane/readme.md
 .idea
 build
 .git
-local.properties
 app/release/output.json
 libs/
 release/
