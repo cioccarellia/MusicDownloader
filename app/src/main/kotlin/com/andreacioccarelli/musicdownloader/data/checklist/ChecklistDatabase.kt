@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
  *  Designed and developed by Andrea Cioccarelli
  */
 
-@Database(entities = [ChecklistEntry::class], version = 2)
+@Database(entities = [ChecklistEntry::class], version = 2, exportSchema = false)
 abstract class ChecklistDatabase : RoomDatabase() {
     abstract fun checklistDao(): ChecklistDao
 }
