@@ -88,7 +88,6 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
         val mp3 = view.find<CardView>(R.id.mp3)
         val mp4 = view.find<CardView>(R.id.mp4)
 
-
         val list = checklist.find(remoteResult.id.videoId)
         isInChecklist = list.isNotEmpty()
 
@@ -181,7 +180,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
         }
     }
 
-    private val watchLink = "$YOUTUBE_WATCH_URL${remoteResult.id.videoId}"
+    private fun getFullLink() = "$YOUTUBE_WATCH_URL${remoteResult.id.videoId}"
 
     private fun showChangeFileNameDialog() {
         val dialog = MaterialDialog(requireContext())
@@ -233,14 +232,14 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
         try {
             val intent = Intent(Intent.ACTION_VIEW)
             intent.run {
-                intent.data = watchLink.toUri()
+                intent.data = getFullLink().toUri()
                 setPackage(PACKAGE_YOUTUBE)
             }
 
             startActivity(intent)
         } catch (err: ActivityNotFoundException) {
             val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = watchLink.toUri()
+            intent.data = getFullLink().toUri()
             startActivity(intent)
         }
     }
@@ -266,7 +265,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
 
     private fun copyLink() {
         val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("", watchLink)
+        val clip = ClipData.newPlainText("", getFullLink())
         clipboard.primaryClip = clip
 
         ToastUtil.success("Link copied", R.drawable.copy)
@@ -279,7 +278,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
         sharingIntent.run {
             type = MIME_TEXT_PLAIN
             sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, title)
-            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, watchLink)
+            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, getFullLink())
         }
         startActivity(Intent.createChooser(sharingIntent, "Share link to"))
         VibrationUtil.medium()
@@ -291,7 +290,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
         dismiss()
 
         activity?.let {
-            val downloadInfo = DownloadInfo(watchLink, title)
+            val downloadInfo = DownloadInfo(getFullLink(), title)
             DownloadClient(activity, downloadInfo).exec(format)
         }
     }
