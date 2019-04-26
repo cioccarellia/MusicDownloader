@@ -7,15 +7,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.text.ClipboardManager
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.assent.Permission
 import com.afollestad.assent.askForPermissions
 import com.afollestad.assent.isAllGranted
 import com.andreacioccarelli.musicdownloader.R
-import com.andreacioccarelli.musicdownloader.extensions.isUrl
-import com.andreacioccarelli.musicdownloader.extensions.toEditable
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
 import com.andreacioccarelli.musicdownloader.ui.update.AppUpdateChecker
 import com.andreacioccarelli.musicdownloader.util.ConnectionStatus
@@ -38,7 +35,6 @@ open class BaseActivity : AppCompatActivity() {
 
     private val networkConnectionListener = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-
             if (NetworkUtil.connectionStatus == ConnectionStatus.ONLINE) {
                 if (wasOffline) {
                     Alerter.create(this@BaseActivity)

@@ -10,6 +10,7 @@ import android.net.Uri
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.checkbox.isCheckPromptChecked
+import com.andreacioccarelli.logkit.logw
 import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.BuildConfig
 import com.andreacioccarelli.musicdownloader.R
@@ -47,15 +48,18 @@ object AppUpdateChecker {
         }
     }
 
+    private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+        logw("Device offline, cannot check for updates now")
+    }
+
     fun checkForUpdates(activity: Activity) = onceFor4 {
-        GlobalScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(Dispatchers.IO + exceptionHandler) {
             val requestBuilder = UpdateRequestBuilder.get()
             val request = OkHttpClient().newCall(requestBuilder).execute()
 
             val jsonRequest = request.body()!!.string()
 
-            val gson = Gson()
-            val updateCheck = gson.fromJson(
+            val updateCheck = Gson().fromJson(
                     jsonRequest,
                     UpdateCheck::class.java)
 

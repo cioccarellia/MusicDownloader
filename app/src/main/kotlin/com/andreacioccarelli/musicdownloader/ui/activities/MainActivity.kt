@@ -98,7 +98,7 @@ class MainActivity : BaseActivity() {
         val text = clipboard.text
 
         text?.let {
-            if (it.isUrl && intent?.getStringExtra(Intent.EXTRA_TEXT) == null) {
+            if (it.isYoutubeUrl && intent?.getStringExtra(Intent.EXTRA_TEXT) == null) {
                 search.text = clipboard.text.toEditable()
                 performSearch(clipboard.text.toString())
             }

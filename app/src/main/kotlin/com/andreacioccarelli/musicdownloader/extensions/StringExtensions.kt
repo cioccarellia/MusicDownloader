@@ -13,6 +13,10 @@ fun String.toYoutubeUrl(): String = "https://www.youtube.com/watch?v=$this"
 val CharSequence.isUrl: Boolean
     get() = this.startsWith("http://") || this.startsWith("https://") || this.contains("youtu.be") || this.contains("youtube.com")
 
+val CharSequence.isYoutubeUrl: Boolean
+    get() = (this.startsWith("http://") || this.startsWith("https://")) && (this.contains("youtu.be") || this.contains("youtube.com"))
+
+
 fun String.sanitizeUrl() = replace("\"", "")
         .replace("\"", "")
         .replace("\\/", "/")
