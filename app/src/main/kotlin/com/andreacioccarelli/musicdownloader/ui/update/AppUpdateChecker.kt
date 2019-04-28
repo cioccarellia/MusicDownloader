@@ -31,10 +31,14 @@ import okhttp3.OkHttpClient
  */
 
 object AppUpdateChecker {
-    private val onPackageDownloadCompleated: BroadcastReceiver = object : BroadcastReceiver() {
+    private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+        logw("Device offline, cannot check for updates right now")
+    }
+
+    private val onPackageDownloadCompleted: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-            if (id == -1L) return
+            if (id < 0) return
 
             try {
                 Alerter.hide()
@@ -48,10 +52,6 @@ object AppUpdateChecker {
         }
     }
 
-    private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
-        logw("Device offline, cannot check for updates now")
-    }
-
     fun checkForUpdates(activity: Activity) = onceEvery4Times {
         GlobalScope.launch(Dispatchers.IO + exceptionHandler) {
             val requestBuilder = UpdateRequestBuilder.get()
@@ -61,69 +61,76 @@ object AppUpdateChecker {
 
             val updateCheck = Gson().fromJson(
                     jsonRequest,
-                    UpdateCheck::class.java)
+                    UpdateCheck::class.java
+            )
 
             App.prefs.put(Keys.lastVersionName, updateCheck.versionName)
 
-            if (updateCheck.versionCode > BuildConfig.VERSION_CODE && !App.prefs.get(Keys.ignoring + updateCheck.versionCode, false)) {
+            val isValidUpdate = updateCheck.versionCode > BuildConfig.VERSION_CODE
+            val isIgnored = App.prefs.get(Keys.ignoring + updateCheck.versionCode, false)
+            val isUpdateAlreadyDownloaded = UpdateUtil.getDownloadedPackageFile(updateCheck.versionName).exists()
+
+            if (isValidUpdate && !isIgnored) {
                 withContext(Dispatchers.Main) {
-                    MaterialDialog(activity)
-                            .title(text = "Update ${updateCheck.versionName} found!")
-                            .message(text = updateCheck.changelog)
-                            .positiveButton(text = if (UpdateUtil.getDownloadedPackageFile(updateCheck.versionName).exists())
-                                "INSTALL UPDATE" else "DOWNLOAD UPDATE") { dialog ->
-                                if (UpdateUtil.getDownloadedPackageFile(updateCheck.versionName).exists()) {
-                                    UpdateUtil.openUpdateInPackageManager(activity)
-                                    dialog.dismiss()
-                                } else {
-                                    val uri = Uri.parse(
-                                            if (updateCheck.downloadInfo.useBundledUpdateLink)
-                                                APK_URL
-                                            else
-                                                updateCheck.downloadInfo.updateLink!!
-                                    )
-                                    val downloadRequest = DownloadManager.Request(uri)
+                    MaterialDialog(activity).show {
+                        title(text = "Update ${updateCheck.versionName} found")
+                        message(text = updateCheck.changelog)
+                        positiveButton(text = if (isUpdateAlreadyDownloaded) "INSTALL UPDATE" else "DOWNLOAD UPDATE") { dialog ->
 
-                                    with(downloadRequest) {
-                                        setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
-                                        setAllowedOverRoaming(true)
-                                        setVisibleInDownloadsUi(true)
-                                        setAllowedOverMetered(true)
-                                        setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
-                                        setTitle(UpdateUtil.getNotificationTitle(updateCheck))
-                                        setDescription(UpdateUtil.getNotificationContent())
-                                        setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-
-                                        setDestinationInExternalPublicDir("", UpdateUtil.getDestinationSubpath(updateCheck))
-                                    }
-
-                                    val downloadManager = activity.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-                                    downloadManager.enqueue(downloadRequest)
-
-                                    activity.registerReceiver(onPackageDownloadCompleated, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-                                    dialog.dismiss()
-
-                                    Alerter.create(activity)
-                                            .setTitle(UpdateUtil.getNotificationContent())
-                                            .setText(UpdateUtil.getNotificationTitle(updateCheck))
-                                            .setBackgroundDrawable(GradientGenerator.successGradient)
-                                            .setIcon(R.drawable.download)
-                                            .setDuration(9_000)
-                                            .setDismissable(false)
-                                            .show()
-                                }
-                            }
-                            .negativeButton(text = "NO") { dialog ->
-                                if (dialog.isCheckPromptChecked() && UpdateUtil.getDownloadedPackageFile(updateCheck.versionName).exists()) {
-                                    UpdateUtil.clearDuplicatedInstallationPackage("music-downloader-${updateCheck.versionName}.apk")
-                                }
+                            if (isUpdateAlreadyDownloaded) {
+                                UpdateUtil.openUpdateInPackageManager(activity)
                                 dialog.dismiss()
+                            } else {
+                                // Downloading update package
+
+                                val uri = Uri.parse(
+                                        if (updateCheck.downloadInfo.useBundledUpdateLink) APK_URL
+                                        else updateCheck.downloadInfo.updateLink!!
+                                )
+                                val downloadRequest = DownloadManager.Request(uri)
+
+                                with(downloadRequest) {
+                                    setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+                                    setAllowedOverRoaming(true)
+                                    setVisibleInDownloadsUi(true)
+                                    setAllowedOverMetered(true)
+
+                                    setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+                                    setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+
+                                    setTitle(UpdateUtil.getNotificationTitle(updateCheck))
+                                    setDescription(UpdateUtil.getNotificationContent())
+
+                                    setDestinationInExternalPublicDir("", UpdateUtil.getDestinationSubpath(updateCheck))
+                                }
+
+                                val downloadManager = activity.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                                downloadManager.enqueue(downloadRequest)
+
+                                activity.registerReceiver(onPackageDownloadCompleted, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+                                dialog.dismiss()
+
+                                Alerter.create(activity)
+                                        .setTitle(UpdateUtil.getNotificationContent())
+                                        .setText(UpdateUtil.getNotificationTitle(updateCheck))
+                                        .setBackgroundDrawable(GradientGenerator.successGradient)
+                                        .setIcon(R.drawable.download)
+                                        .setDuration(9_000)
+                                        .setDismissable(false)
+                                        .show()
                             }
-                            .checkBoxPrompt(text = "Ignore this update", isCheckedDefault = false) { state ->
-                                App.prefs.put(Keys.ignoring + updateCheck.versionCode, state)
+                        }
+                        negativeButton(text = "NO") { dialog ->
+                            if (dialog.isCheckPromptChecked() && isUpdateAlreadyDownloaded) {
+                                UpdateUtil.clearDuplicatedInstallationPackage("music-downloader-${updateCheck.versionName}.apk")
                             }
-                            .noAutoDismiss()
-                            .show()
+                            dialog.dismiss()
+                        }
+                        checkBoxPrompt(text = "Ignore this update", isCheckedDefault = false) { state ->
+                            App.prefs.put(Keys.ignoring + updateCheck.versionCode, state)
+                        }
+                        noAutoDismiss()
+                    }
                 }
             }
         }

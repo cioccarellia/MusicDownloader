@@ -15,11 +15,10 @@ import com.andreacioccarelli.musicdownloader.data.serializers.UpdateCheck
 import java.io.File
 
 /**
- *  Designed and developed by Andrea Cioccarelli
+ * Designed and developed by Andrea Cioccarelli
  */
 
 object UpdateUtil {
-
     private const val APK_MIME = "application/vnd.android.package-archive"
 
     fun getNotificationTitle(check: UpdateCheck) = "${BuildConfig.VERSION_NAME} -> ${check.versionName}"
