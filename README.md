@@ -9,13 +9,13 @@
 [![Language](https://img.shields.io/badge/language-kotlin-orange.svg)](https://github.com/AndreaCioccarelli/MusicDownloader/blob/master/app/build.gradle)
 [![License](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/AndreaCioccarelli/MusicDownloader/blob/master/LICENSE)
 
-Material Design MP3/MP4 Downloader.
+Minimal material design MP3/MP4 downloader.
 
 # Screenshots
 <img src="https://raw.githubusercontent.com/AndreaCioccarelli/MusicDownloader/master/media/carousel.jpg">
 
 # A little bit of history
-Today's music services are reaching our every corner and there is an overwhelming offer on any kind of market around music.
+Today's music services are reaching our every corner; there is an overwhelming offer on any kind of market around Music.
 Apple Music, Spotify, Amazon Music, YouTube Music just to quote some.
 They are all based on a client-server architecture where the user can acces millions of songs within a second, have them synchronized on the Cloud, get auto-tagged and good looking thumbnailed music, and so on.
 Then, on the other hand, there are people like me, that does not really care about paying for music and that just wants to have it to listen on their phones, free. But not for a 3 months trial or as long as I don't try to download it offline, free as long as I have my music on my storage, and that's what this app is about.
