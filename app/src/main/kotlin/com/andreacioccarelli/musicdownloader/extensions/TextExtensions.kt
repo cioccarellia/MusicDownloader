@@ -16,7 +16,6 @@ fun EditText.dismissKeyboard() {
     imm.hideSoftInputFromWindow(this.windowToken, 0)
 }
 
-
 fun EditText.popUpKeyboard() {
     val imm = App.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.showSoftInput(this, SHOW_FORCED)

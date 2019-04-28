@@ -7,10 +7,10 @@ import com.andreacioccarelli.musicdownloader.constants.Keys
  *  Designed and developed by Andrea Cioccarelli
  */
 
-fun onceFor4(code: () -> Unit) {
-    val value = App.prefs.get(Keys.oneOf3, 3)
+fun onceEvery4Times(code: () -> Unit) {
+    val value = App.prefs.get(Keys.oneOf4, 3)
     if (value == 3) {
-        App.prefs.put(Keys.oneOf3, 0)
+        App.prefs.put(Keys.oneOf4, 0)
         code()
-    } else App.prefs.put(Keys.oneOf3, value + 1)
+    } else App.prefs.put(Keys.oneOf4, value + 1)
 }

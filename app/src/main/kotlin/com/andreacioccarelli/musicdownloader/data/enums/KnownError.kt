@@ -22,12 +22,10 @@ enum class KnownError {
      * */
     VIDEO_LENGTH,
 
-
     /**
      * An exception was raised while downloading a video list
      * */
     BATCH_FAILED,
-
 
     /**
      * An unknown error was thrown (for context, an unknown repose was provided by the server)

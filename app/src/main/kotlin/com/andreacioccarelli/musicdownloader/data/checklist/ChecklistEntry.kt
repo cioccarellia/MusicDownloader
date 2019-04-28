@@ -11,4 +11,5 @@ import androidx.room.PrimaryKey
 data class ChecklistEntry(
         @PrimaryKey val videoId: String,
         val title: String,
-        val thumbnailLink: String)
+        val thumbnailLink: String
+)

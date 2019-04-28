@@ -10,5 +10,5 @@ const val FILE = "settings"
 object Keys {
     const val ignoring = "@ignoring->"
     const val lastVersionName = "@last->"
-    const val oneOf3 = "@1of4"
+    const val oneOf4 = "@1of4"
 }

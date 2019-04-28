@@ -35,13 +35,14 @@ fun String.getVideoIdOrThrow(): String {
 }
 
 fun String.escapeHtml(): String {
-
     var str = this
+
+    // Suffixes
     str = str.replace("/", "")
     str = str.removeSuffix(".mp4")
     str = str.removeSuffix(".mp3")
 
-        // Prefixes
+    // Prefixes
     str = str.renameIfEqual(".", "_.")
     str = str.renameIfEqual("..", "__.")
     str = str.removePrefix(".")

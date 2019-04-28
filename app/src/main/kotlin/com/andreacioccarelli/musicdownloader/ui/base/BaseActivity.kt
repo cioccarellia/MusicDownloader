@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.assent.Permission
 import com.afollestad.assent.askForPermissions
 import com.afollestad.assent.isAllGranted
+import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
 import com.andreacioccarelli.musicdownloader.ui.update.AppUpdateChecker
@@ -19,6 +20,9 @@ import com.andreacioccarelli.musicdownloader.util.ConnectionStatus
 import com.andreacioccarelli.musicdownloader.util.NetworkUtil
 import com.tapadoo.alerter.Alerter
 import kotlinx.android.synthetic.main.activity_content.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 
 /**
@@ -75,6 +79,7 @@ open class BaseActivity : AppCompatActivity() {
         initNetwork()
         initPermissions()
         initUpdateChecker()
+        initAsyncObjects()
     }
 
     override fun attachBaseContext(newBase: Context?) {
@@ -105,6 +110,13 @@ open class BaseActivity : AppCompatActivity() {
 
     private fun initUpdateChecker() = AppUpdateChecker.checkForUpdates(this)
     private fun initNetwork() = registerReceiver(networkConnectionListener, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+    private fun initAsyncObjects() {
+        CoroutineScope(Dispatchers.Main).launch {
+            with(App) {
+                ::checklist.get()
+            }
+        }
+    }
 
     private fun unregisterReceivers() = try {
         unregisterReceiver(networkConnectionListener)

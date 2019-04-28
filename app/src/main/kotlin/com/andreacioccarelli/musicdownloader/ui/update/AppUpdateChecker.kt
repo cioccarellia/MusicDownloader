@@ -18,7 +18,7 @@ import com.andreacioccarelli.musicdownloader.constants.APK_URL
 import com.andreacioccarelli.musicdownloader.constants.Keys
 import com.andreacioccarelli.musicdownloader.data.requests.UpdateRequestBuilder
 import com.andreacioccarelli.musicdownloader.data.serializers.UpdateCheck
-import com.andreacioccarelli.musicdownloader.extensions.onceFor4
+import com.andreacioccarelli.musicdownloader.extensions.onceEvery4Times
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
 import com.andreacioccarelli.musicdownloader.util.UpdateUtil
 import com.google.gson.Gson
@@ -52,7 +52,7 @@ object AppUpdateChecker {
         logw("Device offline, cannot check for updates now")
     }
 
-    fun checkForUpdates(activity: Activity) = onceFor4 {
+    fun checkForUpdates(activity: Activity) = onceEvery4Times {
         GlobalScope.launch(Dispatchers.IO + exceptionHandler) {
             val requestBuilder = UpdateRequestBuilder.get()
             val request = OkHttpClient().newCall(requestBuilder).execute()
