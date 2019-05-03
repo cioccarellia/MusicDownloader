@@ -47,7 +47,6 @@ import java.io.IOException
  *  Designed and Developed by Andrea Cioccarelli
  */
 
-@SuppressLint("GoogleAppIndexingApiWarning")
 class MainActivity : BaseActivity() {
 
     private var isSearching = false
@@ -105,15 +104,16 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private var snack: Snackbar? = null
-    private val searches = mutableListOf<Int>()
-    private var searchCount = 0
-
     private fun initRecyclerView() {
         with(resultsRecyclerView) {
             layoutManager = LinearLayoutManager(this@MainActivity)
         }
     }
+
+
+    private var snack: Snackbar? = null
+    private val searches = mutableListOf<Int>()
+    private var searchCount = 0
 
     private fun initFab() {
         fab.setOnClickListener { view ->

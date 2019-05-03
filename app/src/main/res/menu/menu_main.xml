@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.activities.MainActivity">
 
-
     <item
         android:id="@+id/action_list"
         android:orderInCategory="207"

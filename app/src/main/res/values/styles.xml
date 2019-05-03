@@ -12,7 +12,9 @@
         <item name="android:textColorPrimary">@color/Grey_100</item>
         <item name="android:textColorSecondary">@color/Grey_150</item>
         <item name="android:textColorTertiary">@color/Grey_200</item>
+
         <item name="md_corner_radius">16dp</item>
+        <item name="md_color_button_text">@color/Orange_600</item>
     </style>
 
     <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">

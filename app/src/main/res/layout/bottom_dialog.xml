@@ -8,7 +8,6 @@
     android:paddingBottom="8dp"
     android:paddingTop="8dp">
 
-
     <androidx.cardview.widget.CardView
         android:foreground="?android:attr/selectableItemBackground"
         android:drawSelectorOnTop="false"
@@ -199,7 +198,6 @@
 
     </androidx.cardview.widget.CardView>
 
-
     <androidx.cardview.widget.CardView
         android:id="@+id/remove_from_list"
         android:layout_width="match_parent"
@@ -384,7 +382,5 @@
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
-
-
 
 </LinearLayout>

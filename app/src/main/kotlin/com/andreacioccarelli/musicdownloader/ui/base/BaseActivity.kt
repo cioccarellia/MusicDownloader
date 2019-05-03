@@ -44,7 +44,7 @@ open class BaseActivity : AppCompatActivity() {
                     Alerter.create(this@BaseActivity)
                             .setTitle("Connection detected")
                             .setText("Device is back online")
-                            .setDuration(4_000)
+                            .setDuration(3_000)
                             .setIcon(R.drawable.access_point_network)
                             .enableSwipeToDismiss()
                             .setBackgroundDrawable(GradientGenerator.successGradient)
@@ -58,7 +58,7 @@ open class BaseActivity : AppCompatActivity() {
                 Alerter.create(this@BaseActivity)
                         .setTitle("Device is offline")
                         .setText("You need an active internet connection to use this app")
-                        .setDuration(7_000)
+                        .setDuration(6_500)
                         .setIcon(R.drawable.access_point_network_off)
                         .enableSwipeToDismiss()
                         .setBackgroundDrawable(GradientGenerator.errorGradient)
@@ -106,7 +106,6 @@ open class BaseActivity : AppCompatActivity() {
             }
         } else areAllPermissionsGranted = true
     }
-
 
     private fun initUpdateChecker() = AppUpdateChecker.checkForUpdates(this)
     private fun initNetwork() = registerReceiver(networkConnectionListener, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
