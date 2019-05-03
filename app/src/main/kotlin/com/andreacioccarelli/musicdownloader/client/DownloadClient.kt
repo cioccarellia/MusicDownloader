@@ -5,6 +5,7 @@ import android.app.DownloadManager
 import android.content.Context
 import android.os.Environment
 import androidx.annotation.UiThread
+import androidx.annotation.WorkerThread
 import com.andreacioccarelli.logkit.logd
 import com.andreacioccarelli.logkit.loge
 import com.andreacioccarelli.musicdownloader.App
@@ -28,6 +29,7 @@ import kotlin.random.Random
  */
 
 class DownloadClient {
+
     private var activity: Activity?
     private val data: MutableList<DownloadInfo>
     private lateinit var format: Format
@@ -42,6 +44,7 @@ class DownloadClient {
         this.activity = activity
     }
 
+    @UiThread
     fun exec(outputFormat: Format) {
         format = outputFormat
         when {
@@ -57,6 +60,7 @@ class DownloadClient {
         return if (trimForSdCard) path else Environment.getExternalStorageDirectory().absolutePath + "/" + path
     }
 
+    @WorkerThread
     private suspend fun fetchVideoDownloadInformation(downloadInfo: DownloadInfo, format: Format): DirectLinkResponse {
         val videoId = downloadInfo.url.getVideoIdOrThrow()
 
@@ -127,9 +131,10 @@ class DownloadClient {
         }
     }
 
-
     @UiThread
-    private fun downloadFileList(totalVideos: List<DirectLinkResponse>) {
+    private fun downloadFileList(
+            totalVideos: List<DirectLinkResponse>
+    ) {
         val convertedVideos = totalVideos.filter {
             it.isSuccessful()
         }
@@ -150,10 +155,11 @@ class DownloadClient {
     }
 
     @UiThread
-    private fun downloadFile(downloadManager: DownloadManager = App.context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager,
-                             response: DirectLinkResponse,
-                             isSingle: Boolean = true) {
-
+    private fun downloadFile(
+            downloadManager: DownloadManager = App.context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager,
+            response: DirectLinkResponse,
+            isSingle: Boolean = true
+    ) {
         checklist.remove(response.videoId)
 
         if (response.isUnsuccessful()) {
