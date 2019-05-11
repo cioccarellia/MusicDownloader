@@ -3,7 +3,7 @@ package com.andreacioccarelli.musicdownloader.client
 import android.app.Activity
 import androidx.annotation.UiThread
 import com.andreacioccarelli.musicdownloader.R
-import com.andreacioccarelli.musicdownloader.data.enums.KnownError
+import com.andreacioccarelli.musicdownloader.data.enums.FailedConversionError
 import com.andreacioccarelli.musicdownloader.data.model.DownloadInfo
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
@@ -75,13 +75,13 @@ object UiController {
         }
     }
 
-    @UiThread fun displayError(activity: Activity?, error: KnownError, link: String) = displayError(activity, error, listOf(link))
-    @UiThread fun displayError(activity: Activity?, error: KnownError, links: List<String>) {
+    @UiThread fun displayError(activity: Activity?, error: FailedConversionError, link: String) = displayError(activity, error, listOf(link))
+    @UiThread fun displayError(activity: Activity?, error: FailedConversionError, links: List<String>) {
         if (activity == null) return
         if (activity.isDestroyed || activity.isFinishing) return
 
         when(error) {
-            KnownError.MALFORMED_URL -> {
+            FailedConversionError.MALFORMED_URL -> {
                 Alerter.create(activity)
                         .setIcon(R.drawable.link)
                         .setTitle("Malformed URL")
@@ -90,7 +90,7 @@ object UiController {
                         .setDuration(7_000)
                         .show()
             }
-            KnownError.UNADDRESSABLE_VIDEO -> {
+            FailedConversionError.UNADDRESSABLE_VIDEO -> {
                 Alerter.create(activity)
                         .setIcon(R.drawable.cloud_question)
                         .setTitle("Cannot Download Video")
@@ -99,7 +99,7 @@ object UiController {
                         .setDuration(7_000)
                         .show()
             }
-            KnownError.VIDEO_LENGTH -> {
+            FailedConversionError.VIDEO_LENGTH -> {
                 Alerter.create(activity)
                         .setIcon(R.drawable.timer)
                         .setTitle("Video Length Error")
@@ -109,7 +109,7 @@ object UiController {
                         .show()
             }
 
-            KnownError.UNKNOWN_ERROR -> {
+            FailedConversionError.UNKNOWN_ERROR -> {
                 Alerter.create(activity)
                         .setIcon(R.drawable.toast_error)
                         .setTitle("Unknown error")
@@ -119,7 +119,7 @@ object UiController {
                         .show()
             }
 
-            KnownError.BATCH_FAILED -> {
+            FailedConversionError.BATCH_FAILED -> {
                 Alerter.create(activity)
                         .setIcon(R.drawable.toast_error)
                         .setTitle("Downloading error")

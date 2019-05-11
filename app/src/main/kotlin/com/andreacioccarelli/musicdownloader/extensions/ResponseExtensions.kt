@@ -3,7 +3,7 @@
 package com.andreacioccarelli.musicdownloader.extensions
 
 import com.andreacioccarelli.musicdownloader.constants.*
-import com.andreacioccarelli.musicdownloader.data.enums.KnownError
+import com.andreacioccarelli.musicdownloader.data.enums.FailedConversionError
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
 
 /**
@@ -14,14 +14,13 @@ fun DirectLinkResponse.isSuccessful() = state == RESPONSE_OK
 fun DirectLinkResponse.isProcessing() = state == RESPONSE_PROCESSING || state == RESPONSE_WAIT
 fun DirectLinkResponse.isUnsuccessful() = state == RESPONSE_ERROR
 
-val DirectLinkResponse.error: KnownError?
-    get() {
-        if (!isUnsuccessful()) return null
+fun DirectLinkResponse.getConversionError(): FailedConversionError {
+    if (!isUnsuccessful()) return FailedConversionError.NO_ERROR
 
-        return when (reason) {
-            ERROR_LENGTH -> KnownError.VIDEO_LENGTH
-            ERROR_MALFORMED -> KnownError.MALFORMED_URL
-            ERROR_UNADDRESSABLE_VIDEO -> KnownError.UNADDRESSABLE_VIDEO
-            else -> KnownError.UNKNOWN_ERROR
-        }
+    return when (reason) {
+        ERROR_LENGTH -> FailedConversionError.VIDEO_LENGTH
+        ERROR_MALFORMED -> FailedConversionError.MALFORMED_URL
+        ERROR_UNADDRESSABLE_VIDEO -> FailedConversionError.UNADDRESSABLE_VIDEO
+        else -> FailedConversionError.UNKNOWN_ERROR
     }
+}

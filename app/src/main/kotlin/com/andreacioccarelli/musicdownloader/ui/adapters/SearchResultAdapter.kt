@@ -5,10 +5,6 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.andreacioccarelli.musicdownloader.App.Companion.checklist
@@ -19,6 +15,7 @@ import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchRespo
 import com.andreacioccarelli.musicdownloader.extensions.contains
 import com.andreacioccarelli.musicdownloader.extensions.escapeHtml
 import com.andreacioccarelli.musicdownloader.ui.fragments.BottomDialogFragment
+import com.andreacioccarelli.musicdownloader.ui.holders.ResultCardViewHolder
 import com.andreacioccarelli.musicdownloader.ui.toast.ToastUtil
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.bumptech.glide.Glide
@@ -31,7 +28,9 @@ class SearchResultAdapter(
         response: YoutubeSearchResponse,
         private val activity: Activity,
         private val fragmentManager: FragmentManager
-) : RecyclerView.Adapter<SearchResultAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<ResultCardViewHolder>() {
+
+    override fun getItemCount() = data.size
 
     val data by lazy { ArrayList<Result>() }
 
@@ -40,12 +39,12 @@ class SearchResultAdapter(
         data.addAll(response.items)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultCardViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.result_item, parent, false)
-        return ViewHolder(v)
+        return ResultCardViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, i: Int) {
+    override fun onBindViewHolder(holder: ResultCardViewHolder, i: Int) {
         Glide.with(activity)
                 .load(data[i].snippet.thumbnails.medium.url)
                 .thumbnail(0.1F)
@@ -85,14 +84,5 @@ class SearchResultAdapter(
                 titleLayout.visibility = View.VISIBLE
             }
         }
-    }
-
-    override fun getItemCount() = data.size
-
-    class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        var card: CardView = v.findViewById(R.id.card)
-        var icon: ImageView = v.findViewById(R.id.icon)
-        var titleLayout: RelativeLayout = v.findViewById(R.id.titleLayout)
-        var title: TextView = v.findViewById(R.id.title)
     }
 }

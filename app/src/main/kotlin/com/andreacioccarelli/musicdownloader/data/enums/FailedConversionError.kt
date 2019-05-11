@@ -4,7 +4,7 @@ package com.andreacioccarelli.musicdownloader.data.enums
  * Designed and Developed by Andrea Cioccarelli
  */
 
-enum class KnownError {
+enum class FailedConversionError {
     /**
      * The url is wrong, the id is malformed or the content isn't parsable
      * */
@@ -28,7 +28,8 @@ enum class KnownError {
     BATCH_FAILED,
 
     /**
-     * An unknown error was thrown (for context, an unknown repose was provided by the server)
+     * An unknown error was thrown (an unknown repose was provided by the server)
      * */
-    UNKNOWN_ERROR
+    UNKNOWN_ERROR,
+    NO_ERROR
 }

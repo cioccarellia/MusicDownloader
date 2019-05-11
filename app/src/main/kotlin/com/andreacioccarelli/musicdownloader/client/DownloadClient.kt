@@ -12,7 +12,7 @@ import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.constants.*
 import com.andreacioccarelli.musicdownloader.data.enums.Format
-import com.andreacioccarelli.musicdownloader.data.enums.KnownError
+import com.andreacioccarelli.musicdownloader.data.enums.FailedConversionError
 import com.andreacioccarelli.musicdownloader.data.model.DownloadInfo
 import com.andreacioccarelli.musicdownloader.data.requests.DownloadLinkRequestsBuilder
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
@@ -104,7 +104,7 @@ class DownloadClient {
             } catch (exception: RuntimeException) {
                 loge(exception)
                 withContext(Dispatchers.Main) {
-                    UiController.displayError(activity, KnownError.UNKNOWN_ERROR, data.map { it.fileName })
+                    UiController.displayError(activity, FailedConversionError.UNKNOWN_ERROR, data.map { it.fileName })
                 }
             }
         }
@@ -125,7 +125,7 @@ class DownloadClient {
             } catch (exception: RuntimeException) {
                 loge(exception)
                 withContext(Dispatchers.Main) {
-                    UiController.displayError(activity, KnownError.BATCH_FAILED, data.map { it.fileName })
+                    UiController.displayError(activity, FailedConversionError.BATCH_FAILED, data.map { it.fileName })
                 }
             }
         }
@@ -166,10 +166,10 @@ class DownloadClient {
             // If the conversion has failed and the download target was 1, we can print to the user the reason.
             if (isSingle) {
                 when (response.reason) {
-                    ERROR_LENGTH ->                 UiController.displayError(activity, KnownError.VIDEO_LENGTH, response.fileName)
-                    ERROR_MALFORMED ->              UiController.displayError(activity, KnownError.MALFORMED_URL, response.fileName)
-                    ERROR_UNADDRESSABLE_VIDEO ->    UiController.displayError(activity, KnownError.UNADDRESSABLE_VIDEO, response.fileName)
-                    else ->                         UiController.displayError(activity, KnownError.UNKNOWN_ERROR, response.fileName)
+                    ERROR_LENGTH ->                 UiController.displayError(activity, FailedConversionError.VIDEO_LENGTH, response.fileName)
+                    ERROR_MALFORMED ->              UiController.displayError(activity, FailedConversionError.MALFORMED_URL, response.fileName)
+                    ERROR_UNADDRESSABLE_VIDEO ->    UiController.displayError(activity, FailedConversionError.UNADDRESSABLE_VIDEO, response.fileName)
+                    else ->                         UiController.displayError(activity, FailedConversionError.UNKNOWN_ERROR, response.fileName)
                 }
             }
             return

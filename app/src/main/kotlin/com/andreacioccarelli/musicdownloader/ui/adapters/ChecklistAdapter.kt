@@ -5,15 +5,13 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.extensions.toYoutubeUrl
 import com.andreacioccarelli.musicdownloader.ui.activities.MainActivity
+import com.andreacioccarelli.musicdownloader.ui.holders.ChecklistCardViewHolder
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.bumptech.glide.Glide
 import org.jetbrains.anko.find
@@ -24,18 +22,20 @@ import org.jetbrains.anko.find
 
 class ChecklistAdapter(
         private val activity: Activity
-) : RecyclerView.Adapter<ChecklistAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<ChecklistCardViewHolder>() {
+
+    override fun getItemCount() = data.size
 
     val data = checklist
             .getAll()
             .toMutableList()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChecklistCardViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.result_item, parent, false)
-        return ViewHolder(v)
+        return ChecklistCardViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, i: Int) {
+    override fun onBindViewHolder(holder: ChecklistCardViewHolder, i: Int) {
         Glide.with(activity)
                 .load(data[holder.adapterPosition].thumbnailLink)
                 .thumbnail(0.1F)
@@ -85,14 +85,5 @@ class ChecklistAdapter(
 
             holder.titleLayout.visibility = View.VISIBLE
         }
-    }
-
-    override fun getItemCount() = data.size
-
-    class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        var icon: ImageView = v.findViewById(R.id.icon)
-        var titleLayout: RelativeLayout = v.findViewById(R.id.titleLayout)
-        var title: TextView = v.findViewById(R.id.title)
-        var card: CardView = v.findViewById(R.id.card)
     }
 }
