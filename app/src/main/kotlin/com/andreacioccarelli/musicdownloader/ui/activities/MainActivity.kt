@@ -40,7 +40,6 @@ import kotlinx.android.synthetic.main.activity_content.*
 import kotlinx.android.synthetic.main.activity_layout.*
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
-import java.io.IOException
 
 /**
  *  Designed and Developed by Andrea Cioccarelli
@@ -155,16 +154,30 @@ class MainActivity : BaseActivity() {
         }
     }
 
-
-    private val searches = mutableListOf<Int>()
+    private val searchList = mutableListOf<Int>()
     private var searchCount = 0
+
+    private var fetchExceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+        CoroutineScope(Dispatchers.Main.immediate).launch {
+            fab.show()
+            snack?.dismiss()
+            VibrationUtil.medium()
+
+            Alerter.create(this@MainActivity)
+                    .setTitle("No internet connection")
+                    .setText("Couldn't reach YouTube servers, please check your connection")
+                    .setIcon(ContextCompat.getDrawable(this@MainActivity, R.drawable.toast_warning)!!)
+                    .setBackgroundDrawable(GradientGenerator.appThemeGradient)
+                    .show()
+        }
+    }
 
     fun performSearch(implicitLink: String = "") {
         searchLayout.isErrorEnabled = false
         search.dismissKeyboard()
         recyclerView?.smoothScrollToPosition(0)
 
-        searches.add(searchCount++)
+        searchList.add(searchCount++)
         isSearching = true
 
         fab.hide()
@@ -182,68 +195,53 @@ class MainActivity : BaseActivity() {
 
         val query = if (implicitLink.isEmpty()) search.text else implicitLink
 
-        GlobalScope.launch(Dispatchers.IO) {
-            try {
-                val requestBuilder = YoutubeRequestBuilder.get(query!!)
-                val request = OkHttpClient().newCall(requestBuilder).execute()
+        GlobalScope.launch(Dispatchers.IO + fetchExceptionHandler) {
+            val requestBuilder = YoutubeRequestBuilder.get(query!!)
+            val request = OkHttpClient().newCall(requestBuilder).execute()
 
-                val jsonRequest = request.body()!!.string()
-                val response = Gson().fromJson(jsonRequest, YoutubeSearchResponse::class.java)
+            val jsonRequest = request.body()!!.string()
+            val response = Gson().fromJson(jsonRequest, YoutubeSearchResponse::class.java)
 
-                withContext(Dispatchers.Main.immediate) {
-                    if (!isSearching || searches.contains(searchCount)) {
-                        // Another search has just started, dismissing
-                        return@withContext
-                    }
+            withContext(Dispatchers.Main.immediate) {
+                if (!isSearching || searchList.contains(searchCount)) {
+                    // Another search has just started, dismissing
+                    return@withContext
+                }
 
-                    isSearching = false
-                    val numberOfResults = response.pageInfo.totalResults
+                isSearching = false
+                val numberOfResults = response.pageInfo.totalResults
 
-                    if (numberOfResults == 0) {
-                        recyclerView.visibility = View.GONE
-                        emptyResultImage.visibility = View.VISIBLE
-                    } else {
-                        emptyResultImage.visibility = View.GONE
-                        val searchAdapter = SearchResultAdapter(response, this@MainActivity, supportFragmentManager)
+                if (numberOfResults == 0) {
+                    recyclerView.visibility = View.GONE
+                    emptyResultImage.visibility = View.VISIBLE
+                } else {
+                    emptyResultImage.visibility = View.GONE
+                    val searchAdapter = SearchResultAdapter(response, this@MainActivity, supportFragmentManager)
 
-                        with(recyclerView) {
-                            visibility = View.VISIBLE
-                            adapter = ScaleInAnimationAdapter(searchAdapter).apply {
-                                setDuration(207)
-                                setFirstOnly(true)
-                                setHasFixedSize(true)
+                    with(recyclerView) {
+                        visibility = View.VISIBLE
+                        adapter = ScaleInAnimationAdapter(searchAdapter).apply {
+                            setDuration(207)
+                            setFirstOnly(true)
+                            setHasFixedSize(true)
 
-                                if (isTablet) {
-                                    setInterpolator(LinearOutSlowInInterpolator())
-                                } else {
-                                    setInterpolator(OvershootInterpolator())
-                                }
+                            if (isTablet) {
+                                setInterpolator(LinearOutSlowInInterpolator())
+                            } else {
+                                setInterpolator(OvershootInterpolator())
                             }
                         }
                     }
-
-                    if (recyclerView.adapter?.itemCount == 1) {
-                        delay(107)
-                        recyclerView.getChildAt(0)?.performClick()
-                    }
-
-                    fab.show()
-                    snack?.dismiss()
-                    search.clearFocus()
                 }
-            } catch (timeout: IOException) {
-                withContext(Dispatchers.Main) {
-                    fab.show()
-                    snack?.dismiss()
-                    VibrationUtil.medium()
 
-                    Alerter.create(this@MainActivity)
-                            .setTitle("No internet connection")
-                            .setText("Cannot reach YouTube servers, please check your connection")
-                            .setIcon(ContextCompat.getDrawable(this@MainActivity, R.drawable.toast_warning)!!)
-                            .setBackgroundDrawable(GradientGenerator.appThemeGradient)
-                            .show()
+                if (recyclerView.adapter?.itemCount == 1) {
+                    delay(107)
+                    recyclerView.getChildAt(0)?.performClick()
                 }
+
+                fab.show()
+                snack?.dismiss()
+                search.clearFocus()
             }
         }
     }
@@ -269,7 +267,7 @@ class MainActivity : BaseActivity() {
             fab?.show()
             searchLayout?.isErrorEnabled = false
             isShowingError = false
-        }, 2500)
+        }, 2000)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -289,12 +287,15 @@ class MainActivity : BaseActivity() {
 
             } else {
                 val checklistAdapter = ChecklistAdapter(this@MainActivity)
+                val extensions = listOf("MP3", "MP4")
+
                 checklistDialog = MaterialDialog(this).show {
                     title(text = "Checklist")
                     positiveButton(text = "DOWNLOAD ALL") {
                         MaterialDialog(this@MainActivity).show {
                             title(text = "Select Format")
-                            listItemsSingleChoice(items = listOf("MP3", "MP4"), initialSelection = 0) { _, index, _ ->
+                            listItemsSingleChoice(items = extensions, initialSelection = 0) { _, index, _ ->
+                                // Enum hack
                                 val format = Format.values()[index]
 
                                 DownloadClient(this@MainActivity,
