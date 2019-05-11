@@ -31,19 +31,20 @@
             android:gravity="start"
             android:paddingEnd="10dp"
             android:paddingStart="14dp"
+            android:layout_centerVertical="true"
             android:layout_toEndOf="@id/icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:gravity="center_vertical|start"
                 android:id="@+id/title"
                 android:textSize="19sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                tools:text="Eminem - Space Bound"
+                tools:text="Eminem"
                 android:textIsSelectable="false" />
 
         </RelativeLayout>

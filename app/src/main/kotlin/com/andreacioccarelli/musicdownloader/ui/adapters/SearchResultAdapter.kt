@@ -27,11 +27,11 @@ import com.bumptech.glide.Glide
  *  Designed and developed by Andrea Cioccarelli
  */
 
-class SearchAdapter(
+class SearchResultAdapter(
         response: YoutubeSearchResponse,
         private val activity: Activity,
         private val fragmentManager: FragmentManager
-) : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<SearchResultAdapter.ViewHolder>() {
 
     val data by lazy { ArrayList<Result>() }
 
@@ -66,11 +66,11 @@ class SearchAdapter(
                 } else {
                     ToastUtil.success("Added to checklist", R.drawable.add_outline, duration = 0)
                     checklist.add(
-                            ChecklistEntry(
-                                    data[i].id.videoId,
-                                    data[i].snippet.title.escapeHtml(),
-                                    data[i].snippet.thumbnails.medium.url
-                            )
+                        ChecklistEntry(
+                            data[i].id.videoId,
+                            data[i].snippet.title.escapeHtml(),
+                            data[i].snippet.thumbnails.medium.url
+                        )
                     )
                 }
 
@@ -78,14 +78,11 @@ class SearchAdapter(
             }
 
             Handler().post {
-                // Delayed by 15ms for animation effect / rendering safety
-                Handler().postDelayed({
-                    if (title.lineCount == 1) {
-                        title.height = activity.resources.getDimension(R.dimen.result_thumb_width).toInt()
-                    }
+                if (title.lineCount == 1) {
+                    title.height = activity.resources.getDimension(R.dimen.result_thumb_width).toInt()
+                }
 
-                    titleLayout.visibility = View.VISIBLE
-                }, 15)
+                titleLayout.visibility = View.VISIBLE
             }
         }
     }

@@ -49,7 +49,7 @@ class ChecklistAdapter(
                 val ref = (activity as MainActivity)
 
                 val search = ref.find<TextView>(R.id.search)
-                val rv: RecyclerView? = ref.find(R.id.resultsRecyclerView)
+                val rv: RecyclerView? = ref.find(R.id.recyclerView)
 
                 search.text = data[holder.adapterPosition].title
                 rv?.smoothScrollToPosition(0)

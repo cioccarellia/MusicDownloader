@@ -1,6 +1,5 @@
 package com.andreacioccarelli.musicdownloader.ui.activities
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -29,7 +28,7 @@ import com.andreacioccarelli.musicdownloader.data.requests.YoutubeRequestBuilder
 import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchResponse
 import com.andreacioccarelli.musicdownloader.extensions.*
 import com.andreacioccarelli.musicdownloader.ui.adapters.ChecklistAdapter
-import com.andreacioccarelli.musicdownloader.ui.adapters.SearchAdapter
+import com.andreacioccarelli.musicdownloader.ui.adapters.SearchResultAdapter
 import com.andreacioccarelli.musicdownloader.ui.base.BaseActivity
 import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
@@ -70,11 +69,6 @@ class MainActivity : BaseActivity() {
 
     private fun initInput() {
         with(search) {
-            onSubmit {
-                fab.performClick()
-                search.dismissKeyboard()
-            }
-
             setOnClickListener {
                 if (isSearching) {
                     isSearching = false
@@ -85,6 +79,11 @@ class MainActivity : BaseActivity() {
                 if (isShowingError) {
                     fab.show()
                 }
+            }
+
+            onSubmit {
+                fab.performClick()
+                search.dismissKeyboard()
             }
 
             popUpKeyboard()
@@ -105,15 +104,12 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initRecyclerView() {
-        with(resultsRecyclerView) {
+        with(recyclerView) {
             layoutManager = LinearLayoutManager(this@MainActivity)
         }
     }
 
-
     private var snack: Snackbar? = null
-    private val searches = mutableListOf<Int>()
-    private var searchCount = 0
 
     private fun initFab() {
         fab.setOnClickListener { view ->
@@ -133,7 +129,7 @@ class MainActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
-            if (search.text.isEmpty() || search.text.isBlank()) {
+            if (search.text!!.isEmpty() || search.text!!.isBlank()) {
                 searchLayout.error = "Fill in the search field"
 
                 displayFormError()
@@ -159,10 +155,14 @@ class MainActivity : BaseActivity() {
         }
     }
 
+
+    private val searches = mutableListOf<Int>()
+    private var searchCount = 0
+
     fun performSearch(implicitLink: String = "") {
         searchLayout.isErrorEnabled = false
         search.dismissKeyboard()
-        resultsRecyclerView?.smoothScrollToPosition(0)
+        recyclerView?.smoothScrollToPosition(0)
 
         searches.add(searchCount++)
         isSearching = true
@@ -184,31 +184,29 @@ class MainActivity : BaseActivity() {
 
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                val requestBuilder = YoutubeRequestBuilder.get(query)
+                val requestBuilder = YoutubeRequestBuilder.get(query!!)
                 val request = OkHttpClient().newCall(requestBuilder).execute()
 
                 val jsonRequest = request.body()!!.string()
-                val response = Gson().fromJson(
-                        jsonRequest,
-                        YoutubeSearchResponse::class.java)
+                val response = Gson().fromJson(jsonRequest, YoutubeSearchResponse::class.java)
 
-                withContext(Dispatchers.Main) {
+                withContext(Dispatchers.Main.immediate) {
                     if (!isSearching || searches.contains(searchCount)) {
                         // Another search has just started, dismissing
                         return@withContext
                     }
+
                     isSearching = false
+                    val numberOfResults = response.pageInfo.totalResults
 
-                    val searchResultsCount = response.pageInfo.totalResults
-
-                    if (searchResultsCount == 0) {
-                        emptyResult.visibility = View.VISIBLE
-                        resultsRecyclerView.visibility = View.GONE
+                    if (numberOfResults == 0) {
+                        recyclerView.visibility = View.GONE
+                        emptyResultImage.visibility = View.VISIBLE
                     } else {
-                        emptyResult.visibility = View.GONE
-                        val searchAdapter = SearchAdapter(response, this@MainActivity, supportFragmentManager)
+                        emptyResultImage.visibility = View.GONE
+                        val searchAdapter = SearchResultAdapter(response, this@MainActivity, supportFragmentManager)
 
-                        with(resultsRecyclerView) {
+                        with(recyclerView) {
                             visibility = View.VISIBLE
                             adapter = ScaleInAnimationAdapter(searchAdapter).apply {
                                 setDuration(207)
@@ -224,9 +222,9 @@ class MainActivity : BaseActivity() {
                         }
                     }
 
-                    if (resultsRecyclerView.adapter?.itemCount == 1) {
+                    if (recyclerView.adapter?.itemCount == 1) {
                         delay(107)
-                        resultsRecyclerView.getChildAt(0)?.performClick()
+                        recyclerView.getChildAt(0)?.performClick()
                     }
 
                     fab.show()
