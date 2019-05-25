@@ -14,8 +14,6 @@ import androidx.cardview.widget.CardView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.setActionButtonEnabled
-import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
 import com.andreacioccarelli.musicdownloader.App.Companion.checklist
@@ -31,18 +29,13 @@ import com.andreacioccarelli.musicdownloader.data.model.DownloadInfo
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.extensions.escapeHtml
 import com.andreacioccarelli.musicdownloader.extensions.toUri
-import com.andreacioccarelli.musicdownloader.ui.gradients.GradientGenerator
 import com.andreacioccarelli.musicdownloader.ui.toast.ToastUtil
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
+import com.andreacioccarelli.musicdownloader.util.YoutubeUtil
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import org.jetbrains.anko.find
-
 
 /**
  * Created by La mejor on 2018/Aug.
@@ -139,45 +132,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
     }
 
     private fun openVideoInDialog() {
-        val dialog = MaterialDialog(requireContext())
-                .customView(R.layout.video_player_dialog, scrollable = false)
-
-        dialog.window!!.setBackgroundDrawable(GradientGenerator.make(26F, R.color.Grey_1000, R.color.Grey_1000))
-
-        val youtubePlayer = dialog.getCustomView().find<YouTubePlayerView>(R.id.player)
-
-        youtubePlayer.enableAutomaticInitialization = false
-        youtubePlayer.initialize(object: YouTubePlayerListener {
-            override fun onReady(youTubePlayer: YouTubePlayer) {
-                youTubePlayer.loadVideo(remoteResult.id.videoId, 0f)
-            }
-
-            override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
-                when (error) {
-                    PlayerConstants.PlayerError.UNKNOWN ->                                  ToastUtil.error("An unknown error has occurred while playing video")
-                    PlayerConstants.PlayerError.INVALID_PARAMETER_IN_REQUEST ->             ToastUtil.error("An internal error has occurred while playing video")
-                    PlayerConstants.PlayerError.HTML_5_PLAYER ->                            ToastUtil.error("Internal HTML player error")
-                    PlayerConstants.PlayerError.VIDEO_NOT_FOUND ->                          ToastUtil.warn("Video not found")
-                    PlayerConstants.PlayerError.VIDEO_NOT_PLAYABLE_IN_EMBEDDED_PLAYER ->    ToastUtil.warn("MusicDownloader can't play this type of video")
-                }
-            }
-
-            override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {}
-            override fun onVideoDuration(youTubePlayer: YouTubePlayer, duration: Float) {}
-            override fun onVideoId(youTubePlayer: YouTubePlayer, videoId: String) {}
-            override fun onVideoLoadedFraction(youTubePlayer: YouTubePlayer, loadedFraction: Float) {}
-            override fun onApiChange(youTubePlayer: YouTubePlayer) {}
-            override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {}
-            override fun onPlaybackQualityChange(youTubePlayer: YouTubePlayer, playbackQuality: PlayerConstants.PlaybackQuality) {}
-            override fun onPlaybackRateChange(youTubePlayer: YouTubePlayer, playbackRate: PlayerConstants.PlaybackRate) {}
-        }, true)
-
-        with(dialog) {
-            show()
-            setOnDismissListener {
-                youtubePlayer.release()
-            }
-        }
+        YoutubeUtil.getVideoViewerDialog(requireContext(), remoteResult.id.videoId).show()
     }
 
     private fun getFullLink() = "$YOUTUBE_WATCH_URL${remoteResult.id.videoId}"

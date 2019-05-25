@@ -284,7 +284,6 @@ class MainActivity : BaseActivity() {
                 checklistDialog =  MaterialDialog(this).show {
                     customView(R.layout.empty_view_checklist)
                 }
-
             } else {
                 val checklistAdapter = ChecklistAdapter(this@MainActivity)
                 val extensions = listOf("MP3", "MP4")

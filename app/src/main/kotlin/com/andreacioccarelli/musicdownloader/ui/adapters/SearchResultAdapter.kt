@@ -18,6 +18,7 @@ import com.andreacioccarelli.musicdownloader.ui.fragments.BottomDialogFragment
 import com.andreacioccarelli.musicdownloader.ui.holders.ResultCardViewHolder
 import com.andreacioccarelli.musicdownloader.ui.toast.ToastUtil
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
+import com.andreacioccarelli.musicdownloader.util.YoutubeUtil
 import com.bumptech.glide.Glide
 
 /**
@@ -52,6 +53,12 @@ class SearchResultAdapter(
 
         with(holder) {
             title.text = data[i].snippet.title.escapeHtml()
+
+            icon.setOnLongClickListener {
+                YoutubeUtil.getVideoViewerDialog(activity, data[i].id.videoId).show()
+                true
+            }
+
             card.setOnClickListener {
                 val bottomSheetFragment = BottomDialogFragment(data[i])
                 bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
@@ -61,9 +68,11 @@ class SearchResultAdapter(
                 VibrationUtil.medium()
                 if (checklist.contains(data[i].id.videoId)) {
                     ToastUtil.error("Removed from checklist", R.drawable.remove_outline, duration = 0)
+
                     checklist.remove(data[i].id.videoId)
                 } else {
                     ToastUtil.success("Added to checklist", R.drawable.add_outline, duration = 0)
+
                     checklist.add(
                         ChecklistEntry(
                             data[i].id.videoId,
