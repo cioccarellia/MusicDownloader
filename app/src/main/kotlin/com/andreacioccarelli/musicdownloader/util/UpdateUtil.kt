@@ -19,6 +19,8 @@ import java.io.File
  */
 
 object UpdateUtil {
+
+    const val AUTHORITY = "com.andreacioccarelli.musicdownloader.updater"
     private const val APK_MIME = "application/vnd.android.package-archive"
 
     fun getNotificationTitle(check: UpdateCheck) = "${BuildConfig.VERSION_NAME} -> ${check.versionName}"
@@ -45,10 +47,8 @@ object UpdateUtil {
                 "${Environment.DIRECTORY_DOWNLOADS}/music-downloader-$newVersionName.apk")
     }
 
-    const val AUTHORITY = "\"com.andreacioccarelli.musicdownloader.updater\""
-
     fun openUpdateInPackageManager(context: Context) {
-        val cachedUpdatePackage = UpdateUtil.getPackagePath()
+        val cachedUpdatePackage = getPackagePath()
 
         logd(cachedUpdatePackage)
 

@@ -1,7 +1,7 @@
 {
-  "versionCode": 19,
-  "versionName": "1.3.9",
-  "changelog": "Changed SearchView look, added long-click actions for results, fixes",
+  "versionCode": 20,
+  "versionName": "1.3.10",
+  "changelog": "New icon click behaviour, Manrope font, improved UI responsiveness, bug fixes",
 
   "downloadInfo": {
     "useBundledUpdateLink": true,

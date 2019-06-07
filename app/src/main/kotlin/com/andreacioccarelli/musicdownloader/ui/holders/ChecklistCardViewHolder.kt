@@ -10,7 +10,7 @@ import com.andreacioccarelli.musicdownloader.R
 
 class ChecklistCardViewHolder(v: View) : RecyclerView.ViewHolder(v) {
     var icon: ImageView = v.findViewById(R.id.icon)
-    var titleLayout: RelativeLayout = v.findViewById(R.id.titleLayout)
+    var titleLayout: RelativeLayout = v.findViewById(R.id.title_layout)
     var title: TextView = v.findViewById(R.id.title)
     var card: CardView = v.findViewById(R.id.card)
 }

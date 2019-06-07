@@ -54,9 +54,8 @@ class SearchResultAdapter(
         with(holder) {
             title.text = data[i].snippet.title.escapeHtml()
 
-            icon.setOnLongClickListener {
+            iconLayout.setOnClickListener {
                 YoutubeUtil.getVideoViewerDialog(activity, data[i].id.videoId).show()
-                true
             }
 
             card.setOnClickListener {

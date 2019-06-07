@@ -22,6 +22,7 @@ import com.tapadoo.alerter.Alerter
 import kotlinx.android.synthetic.main.activity_content.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 
@@ -43,7 +44,6 @@ open class BaseActivity : AppCompatActivity() {
                 if (wasOffline) {
                     Alerter.create(this@BaseActivity)
                             .setTitle("Connection detected")
-                            .setText("Device is back online")
                             .setDuration(3_000)
                             .setIcon(R.drawable.access_point_network)
                             .enableSwipeToDismiss()
@@ -108,11 +108,16 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     private fun initUpdateChecker() = AppUpdateChecker.checkForUpdates(this)
+
     private fun initNetwork() = registerReceiver(networkConnectionListener, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+
     private fun initAsyncObjects() {
         CoroutineScope(Dispatchers.Main).launch {
+            delay(107)
+
             with(App) {
                 ::checklist.get()
+                ::prefs.get()
             }
         }
     }

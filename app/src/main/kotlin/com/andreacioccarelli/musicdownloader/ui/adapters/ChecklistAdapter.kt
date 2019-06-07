@@ -26,9 +26,11 @@ class ChecklistAdapter(
 
     override fun getItemCount() = data.size
 
-    val data = checklist
+    val data by lazy {
+        checklist
             .getAll()
             .toMutableList()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChecklistCardViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.result_item, parent, false)
@@ -40,18 +42,18 @@ class ChecklistAdapter(
                 .load(data[holder.adapterPosition].thumbnailLink)
                 .thumbnail(0.1F)
                 .into(holder.icon)
-        
+
         holder.title.text = data[holder.adapterPosition].title
 
         with(holder.card) {
             setOnClickListener {
-                // Dismisses dialog, puts text inside the box and searches
+                // Dismisses dialog, puts text inside the box and performs the search
                 val ref = (activity as MainActivity)
 
                 val search = ref.find<TextView>(R.id.search)
-                val rv: RecyclerView? = ref.find(R.id.recyclerView)
-
                 search.text = data[holder.adapterPosition].title
+
+                val rv = ref.find(R.id.recyclerView) as RecyclerView?
                 rv?.smoothScrollToPosition(0)
 
                 ref.performSearch(implicitLink = data[holder.adapterPosition].videoId.toYoutubeUrl())
