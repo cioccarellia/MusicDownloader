@@ -1,12 +1,13 @@
 package com.andreacioccarelli.musicdownloader.ui.activities
 
+import android.annotation.SuppressLint
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-import android.text.ClipboardManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -45,9 +46,15 @@ import okhttp3.OkHttpClient
  *  Designed and Developed by Andrea Cioccarelli
  */
 
+@SuppressLint("GoogleAppIndexingApiWarning")
 class MainActivity : BaseActivity() {
 
     private var isSearching = false
+    private var isShowingError = false
+    private var snack: Snackbar? = null
+
+    private val searchList = mutableListOf<Int>()
+    private var searchCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,12 +99,18 @@ class MainActivity : BaseActivity() {
 
     private fun initClipboard() {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val text = clipboard.text
+        val text = clipboard.primaryClip?.getItemAt(0)?.text
 
         text?.let {
             if (it.isYoutubeUrl && intent?.getStringExtra(Intent.EXTRA_TEXT) == null) {
-                search.text = clipboard.text.toEditable()
-                performSearch(clipboard.text.toString())
+                var submittedUrl: String = text.toString()
+
+                if (submittedUrl.contains("//m.youtube")) {
+                    submittedUrl = submittedUrl.replace("//m.youtube", "//youtube", ignoreCase = true)
+                }
+
+                search.text = submittedUrl.toEditable()
+                performSearch(submittedUrl)
             }
         }
     }
@@ -107,8 +120,6 @@ class MainActivity : BaseActivity() {
             layoutManager = LinearLayoutManager(this@MainActivity)
         }
     }
-
-    private var snack: Snackbar? = null
 
     private fun initFab() {
         fab.setOnClickListener { view ->
@@ -154,9 +165,6 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private val searchList = mutableListOf<Int>()
-    private var searchCount = 0
-
     private var fetchExceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
         CoroutineScope(Dispatchers.Main.immediate).launch {
             fab.show()
@@ -193,10 +201,16 @@ class MainActivity : BaseActivity() {
             snack?.show()
         } else snack?.show()
 
-        val query = if (implicitLink.isEmpty()) search.text else implicitLink
+        var query = if (implicitLink.isEmpty()) {
+            search.text.toString()
+        } else implicitLink
+
+        if (query.contains("//m.youtube")) {
+            query = query.replace("//m.youtube", "//youtube", ignoreCase = true)
+        }
 
         GlobalScope.launch(Dispatchers.IO + fetchExceptionHandler) {
-            val requestBuilder = YoutubeRequestBuilder.get(query!!)
+            val requestBuilder = YoutubeRequestBuilder.get(query)
             val request = OkHttpClient().newCall(requestBuilder).execute()
 
             val jsonRequest = request.body()!!.string()
@@ -257,7 +271,6 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private var isShowingError = false
     private fun displayFormError() {
         isShowingError = true
         fab.hide()
