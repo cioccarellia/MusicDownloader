@@ -10,7 +10,7 @@
         fontPath="sans-bold.ttf"
         app:showFullScreenButton="false"
         app:autoPlay="false"
-        app:showYouTubeButton="false"
+        app:showYouTubeButton="true"
         android:textAppearance="@style/TextAppearance.FontPath"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
