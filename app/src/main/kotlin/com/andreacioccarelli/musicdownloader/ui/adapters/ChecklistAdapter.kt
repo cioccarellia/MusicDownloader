@@ -14,6 +14,9 @@ import com.andreacioccarelli.musicdownloader.ui.activities.MainActivity
 import com.andreacioccarelli.musicdownloader.ui.holders.ChecklistCardViewHolder
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.find
 
 /**
@@ -63,7 +66,10 @@ class ChecklistAdapter(
             setOnLongClickListener {
                 VibrationUtil.weak()
 
-                checklist.remove(data[holder.adapterPosition])
+                CoroutineScope(Dispatchers.Default).launch {
+                    checklist.remove(data[holder.adapterPosition])
+                }
+
                 data.removeAt(holder.adapterPosition)
                 notifyItemRemoved(holder.adapterPosition)
 

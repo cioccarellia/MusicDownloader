@@ -14,7 +14,7 @@ import androidx.room.Query
 @Dao
 interface ChecklistDao {
     @Insert(onConflict = REPLACE)
-    fun add(entry: ChecklistEntry)
+    suspend fun add(entry: ChecklistEntry)
 
     @Query("SELECT * FROM checklist")
     fun getAll(): List<ChecklistEntry>
@@ -23,8 +23,8 @@ interface ChecklistDao {
     fun find(link: String): List<ChecklistEntry>
 
     @Query("DELETE from checklist WHERE videoId LIKE :link")
-    fun remove(link: String)
+    suspend fun remove(link: String)
 
     @Delete
-    fun remove(entry: ChecklistEntry)
+    suspend fun remove(entry: ChecklistEntry)
 }

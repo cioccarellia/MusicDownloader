@@ -213,7 +213,7 @@ class MainActivity : BaseActivity() {
             val requestBuilder = YoutubeRequestBuilder.get(query)
             val request = OkHttpClient().newCall(requestBuilder).execute()
 
-            val jsonRequest = request.body()!!.string()
+            val jsonRequest = request.body!!.string()
             val response = Gson().fromJson(jsonRequest, YoutubeSearchResponse::class.java)
 
             withContext(Dispatchers.Main.immediate) {

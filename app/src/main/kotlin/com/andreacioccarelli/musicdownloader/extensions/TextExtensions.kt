@@ -5,7 +5,9 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodManager.SHOW_FORCED
 import android.widget.EditText
+import android.widget.TextView
 import com.andreacioccarelli.musicdownloader.App
+import com.andreacioccarelli.musicdownloader.R
 
 /**
  *  Designed and developed by Andrea Cioccarelli
@@ -32,5 +34,13 @@ fun EditText.onSubmit(code: () -> Unit) {
             EditorInfo.IME_ACTION_NEXT -> code()
         }
         true
+    }
+}
+
+fun TextView.applyChecklistBadge(applyBadge: Boolean) {
+    if (applyBadge) {
+        setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.badge_checklisted, 0)
+    } else {
+        setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
     }
 }

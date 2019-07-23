@@ -7,7 +7,7 @@
 
     <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
         android:id="@+id/player"
-        fontPath="sans-bold.ttf"
+        fontPath="manrope-bold.ttf"
         app:showFullScreenButton="false"
         app:autoPlay="false"
         app:showYouTubeButton="true"

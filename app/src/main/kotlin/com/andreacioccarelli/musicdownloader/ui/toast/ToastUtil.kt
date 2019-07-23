@@ -1,5 +1,6 @@
 package com.andreacioccarelli.musicdownloader.ui.toast
 
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.R
@@ -11,7 +12,7 @@ import es.dmoral.toasty.Toasty
 
 @Suppress("unused")
 object ToastUtil {
-    private const val toastDuration = 5000
+    private const val toastDuration = Toast.LENGTH_LONG
 
     fun success(text: String,
                 @DrawableRes icon: Int = R.drawable.toast_check,

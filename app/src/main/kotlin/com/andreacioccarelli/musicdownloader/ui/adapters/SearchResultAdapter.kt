@@ -5,6 +5,7 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.andreacioccarelli.musicdownloader.App.Companion.checklist
@@ -12,23 +13,27 @@ import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistEntry
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchResponse
+import com.andreacioccarelli.musicdownloader.extensions.breakHtml
 import com.andreacioccarelli.musicdownloader.extensions.contains
-import com.andreacioccarelli.musicdownloader.extensions.escapeHtml
 import com.andreacioccarelli.musicdownloader.ui.fragments.BottomDialogFragment
 import com.andreacioccarelli.musicdownloader.ui.holders.ResultCardViewHolder
 import com.andreacioccarelli.musicdownloader.ui.toast.ToastUtil
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.andreacioccarelli.musicdownloader.util.YoutubeUtil
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  *  Designed and developed by Andrea Cioccarelli
  */
 
 class SearchResultAdapter(
-        response: YoutubeSearchResponse,
-        private val activity: Activity,
-        private val fragmentManager: FragmentManager
+    response: YoutubeSearchResponse,
+    private val activity: Activity,
+    private val fragmentManager: FragmentManager
 ) : RecyclerView.Adapter<ResultCardViewHolder>() {
 
     override fun getItemCount() = data.size
@@ -45,40 +50,40 @@ class SearchResultAdapter(
         return ResultCardViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: ResultCardViewHolder, i: Int) {
+    override fun onBindViewHolder(holder: ResultCardViewHolder, uncheckedIndex: Int) {
+        val i = holder.adapterPosition
+
         Glide.with(activity)
                 .load(data[i].snippet.thumbnails.medium.url)
                 .thumbnail(0.1F)
                 .into(holder.icon)
 
         with(holder) {
-            title.text = data[i].snippet.title.escapeHtml()
+            title.text = data[i].snippet.title.breakHtml()
 
             iconLayout.setOnClickListener {
                 YoutubeUtil.getVideoViewerDialog(activity, data[i].id.videoId).show()
             }
 
             card.setOnClickListener {
-                val bottomSheetFragment = BottomDialogFragment(data[i])
+                val bottomSheetFragment = BottomDialogFragment(data[i], holder)
                 bottomSheetFragment.show(fragmentManager, bottomSheetFragment.tag)
             }
 
             card.setOnLongClickListener {
                 VibrationUtil.medium()
                 if (checklist.contains(data[i].id.videoId)) {
-                    ToastUtil.error("Removed from checklist", R.drawable.remove_outline, duration = 0)
+                    ToastUtil.error("Removed from checklist", R.drawable.remove_outline, duration = Toast.LENGTH_SHORT)
 
-                    checklist.remove(data[i].id.videoId)
+                    CoroutineScope(Dispatchers.Default).launch {
+                        checklist.remove(data[i].id.videoId)
+                    }
                 } else {
-                    ToastUtil.success("Added to checklist", R.drawable.add_outline, duration = 0)
+                    ToastUtil.success("Added to checklist", R.drawable.add_outline, duration = Toast.LENGTH_SHORT)
 
-                    checklist.add(
-                        ChecklistEntry(
-                            data[i].id.videoId,
-                            data[i].snippet.title.escapeHtml(),
-                            data[i].snippet.thumbnails.medium.url
-                        )
-                    )
+                    CoroutineScope(Dispatchers.Default).launch {
+                        checklist.add(ChecklistEntry(data[i]))
+                    }
                 }
 
                 true
@@ -90,6 +95,18 @@ class SearchResultAdapter(
                 }
 
                 titleLayout.visibility = View.VISIBLE
+
+                CoroutineScope(Dispatchers.Default).launch {
+                    if (checklist.contains(data[i].id.videoId)) {
+                        withContext(Dispatchers.Main) {
+                            title.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.badge_checklisted, 0)
+                        }
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            title.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                        }
+                    }
+                }
             }
         }
     }

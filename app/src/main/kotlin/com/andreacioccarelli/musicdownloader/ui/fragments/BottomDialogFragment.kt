@@ -27,15 +27,21 @@ import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistEntry
 import com.andreacioccarelli.musicdownloader.data.enums.Format
 import com.andreacioccarelli.musicdownloader.data.model.DownloadInfo
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
-import com.andreacioccarelli.musicdownloader.extensions.escapeHtml
+import com.andreacioccarelli.musicdownloader.extensions.applyChecklistBadge
+import com.andreacioccarelli.musicdownloader.extensions.breakHtml
 import com.andreacioccarelli.musicdownloader.extensions.toUri
+import com.andreacioccarelli.musicdownloader.ui.holders.ResultCardViewHolder
 import com.andreacioccarelli.musicdownloader.ui.toast.ToastUtil
 import com.andreacioccarelli.musicdownloader.util.VibrationUtil
 import com.andreacioccarelli.musicdownloader.util.YoutubeUtil
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.find
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * Created by La mejor on 2018/Aug.
@@ -43,7 +49,10 @@ import org.jetbrains.anko.find
  */
 
 @SuppressLint("ValidFragment")
-class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment() {
+class BottomDialogFragment(
+        private val remoteResult: Result,
+        private val adapter: ResultCardViewHolder
+) : BottomSheetDialogFragment() {
 
     private var isInChecklist = false
     private lateinit var titleTextView: TextView
@@ -57,7 +66,7 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
         val view = inflater.inflate(R.layout.bottom_dialog, container, false)
         VibrationUtil.medium()
 
-        title = remoteResult.snippet.title.escapeHtml()
+        title = remoteResult.snippet.title.breakHtml()
 
         titleTextView = view.find(R.id.thumb_title)
         titleTextView.text = title
@@ -86,26 +95,39 @@ class BottomDialogFragment(val remoteResult: Result) : BottomSheetDialogFragment
 
         if (isInChecklist) {
             removeFrom.setOnClickListener {
-                checklist.remove(remoteResult.id.videoId)
-                dismiss()
+                CoroutineScope(Dispatchers.Default).launch {
+                    checklist.remove(remoteResult.id.videoId)
+                }
+
                 VibrationUtil.medium()
-                ToastUtil.error("Removed from Checklist", R.drawable.remove_outline)
+                dismiss()
+
+                context?.runOnUiThread {
+                    adapter.title.applyChecklistBadge(false)
+                    ToastUtil.error("Removed from Checklist", R.drawable.remove_outline)
+                }
             }
 
             addTo.visibility = View.GONE
         } else {
             addTo.setOnClickListener {
-                checklist.add(
-                        ChecklistEntry(
-                                remoteResult.id.videoId,
-                                title,
-                                remoteResult.snippet.thumbnails.medium.url
-                        )
-                )
+                CoroutineScope(Dispatchers.Default).launch {
+                    checklist.add(
+                         ChecklistEntry(
+                              remoteResult.id.videoId,
+                              title,
+                              remoteResult.snippet.thumbnails.medium.url
+                         )
+                    )
+                }
 
-                dismiss()
                 VibrationUtil.medium()
-                ToastUtil.success("Added to Checklist", R.drawable.add_outline)
+                dismiss()
+
+                context?.runOnUiThread {
+                    adapter.title.applyChecklistBadge(true)
+                    ToastUtil.success("Added to Checklist", R.drawable.add_outline)
+                }
             }
 
             removeFrom.visibility = View.GONE

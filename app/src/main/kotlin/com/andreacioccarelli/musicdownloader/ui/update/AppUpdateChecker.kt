@@ -35,7 +35,7 @@ object AppUpdateChecker {
         logw("Device offline, cannot check for updates right now")
     }
 
-    private val onPackageDownloadCompleted: BroadcastReceiver = object : BroadcastReceiver() {
+    private val onPackageDownloadedReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
             if (id < 0) return
@@ -53,13 +53,13 @@ object AppUpdateChecker {
     }
 
     fun checkForUpdates(
-            activity: Activity
+        activity: Activity
     ) = onceEvery4Times {
         GlobalScope.launch(Dispatchers.IO + exceptionHandler) {
             val requestBuilder = UpdateRequestBuilder.get()
             val request = OkHttpClient().newCall(requestBuilder).execute()
 
-            val jsonRequest = request.body()!!.string()
+            val jsonRequest = request.body!!.string()
 
             val check = Gson().fromJson(
                     jsonRequest,
@@ -78,8 +78,8 @@ object AppUpdateChecker {
     }
 
     private suspend fun displayUpdateFoundDialog(
-            activity: Activity,
-            check: UpdateCheck
+        activity: Activity,
+        check: UpdateCheck
     ) {
         val isUpdateAlreadyDownloaded = UpdateUtil.getDownloadedPackageFile(check.versionName).exists()
 
@@ -118,7 +118,7 @@ object AppUpdateChecker {
                         val downloadManager = activity.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                         downloadManager.enqueue(downloadRequest)
 
-                        activity.registerReceiver(onPackageDownloadCompleted, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+                        activity.registerReceiver(onPackageDownloadedReceiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
                         dialog.dismiss()
 
                         Alerter.create(activity)

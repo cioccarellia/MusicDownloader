@@ -34,7 +34,7 @@ fun String.getVideoIdOrThrow(): String {
     else throw IllegalStateException("Invalid YouTube video id: $this")
 }
 
-fun String.escapeHtml(): String {
+fun String.breakHtml(): String {
     var str = this
 
     // Suffixes

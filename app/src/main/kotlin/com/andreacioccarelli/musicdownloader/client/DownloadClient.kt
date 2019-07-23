@@ -67,7 +67,7 @@ class DownloadClient {
         val requestBuilder = DownloadLinkRequestsBuilder.get(videoId, format)
         val request = OkHttpClient().newCall(requestBuilder).execute()
 
-        val response = Gson().fromJson(request.body()!!.string(), DirectLinkResponse::class.java)
+        val response = Gson().fromJson(request.body!!.string(), DirectLinkResponse::class.java)
 
         logd(response)
 
@@ -160,7 +160,9 @@ class DownloadClient {
             response: DirectLinkResponse,
             isSingle: Boolean = true
     ) {
-        checklist.remove(response.videoId)
+        CoroutineScope(Dispatchers.Default).launch {
+            checklist.remove(response.videoId)
+        }
 
         if (response.isUnsuccessful()) {
             // If the conversion has failed and the download target was 1, we can print to the user the reason.
