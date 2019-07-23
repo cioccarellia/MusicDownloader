@@ -16,6 +16,7 @@ import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.setActionButtonEnabled
 import com.afollestad.materialdialogs.input.getInputField
 import com.afollestad.materialdialogs.input.input
+import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.client.DownloadClient
@@ -50,8 +51,8 @@ import org.jetbrains.anko.runOnUiThread
 
 @SuppressLint("ValidFragment")
 class BottomDialogFragment(
-        private val remoteResult: Result,
-        private val adapter: ResultCardViewHolder
+    private val remoteResult: Result,
+    private val adapter: ResultCardViewHolder
 ) : BottomSheetDialogFragment() {
 
     private var isInChecklist = false
@@ -97,6 +98,7 @@ class BottomDialogFragment(
             removeFrom.setOnClickListener {
                 CoroutineScope(Dispatchers.Default).launch {
                     checklist.remove(remoteResult.id.videoId)
+                    App.checklistedIds.remove(remoteResult.id.videoId)
                 }
 
                 VibrationUtil.medium()
@@ -119,6 +121,7 @@ class BottomDialogFragment(
                               remoteResult.snippet.thumbnails.medium.url
                          )
                     )
+                    App.checklistedIds.add(remoteResult.id.videoId)
                 }
 
                 VibrationUtil.medium()

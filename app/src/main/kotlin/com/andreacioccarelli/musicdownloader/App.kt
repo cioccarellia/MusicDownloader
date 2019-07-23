@@ -33,6 +33,15 @@ class App : Application() {
 
             db.build().checklistDao()
         }
+
+        val checklistedIds by lazy {
+            mutableListOf<String>()
+                .also {
+                    it.addAll(
+                        checklist.getAll().map { it.videoId }
+                    )
+                }
+        }
     }
 
     override fun onCreate() {

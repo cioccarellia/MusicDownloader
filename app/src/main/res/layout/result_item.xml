@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical|start"
                 android:id="@+id/title"
-                android:textSize="19sp"
+                android:textSize="18sp"
                 android:layout_centerVertical="true"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 tools:text="Title"

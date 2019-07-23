@@ -8,11 +8,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
+import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistEntry
 import com.andreacioccarelli.musicdownloader.data.serializers.Result
 import com.andreacioccarelli.musicdownloader.data.serializers.YoutubeSearchResponse
+import com.andreacioccarelli.musicdownloader.extensions.applyChecklistBadge
 import com.andreacioccarelli.musicdownloader.extensions.breakHtml
 import com.andreacioccarelli.musicdownloader.extensions.contains
 import com.andreacioccarelli.musicdownloader.ui.fragments.BottomDialogFragment
@@ -24,7 +26,6 @@ import com.bumptech.glide.Glide
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  *  Designed and developed by Andrea Cioccarelli
@@ -74,15 +75,19 @@ class SearchResultAdapter(
                 VibrationUtil.medium()
                 if (checklist.contains(data[i].id.videoId)) {
                     ToastUtil.error("Removed from checklist", R.drawable.remove_outline, duration = Toast.LENGTH_SHORT)
+                    title.applyChecklistBadge(false)
 
                     CoroutineScope(Dispatchers.Default).launch {
                         checklist.remove(data[i].id.videoId)
+                        App.checklistedIds.remove(data[i].id.videoId)
                     }
                 } else {
                     ToastUtil.success("Added to checklist", R.drawable.add_outline, duration = Toast.LENGTH_SHORT)
+                    title.applyChecklistBadge(true)
 
                     CoroutineScope(Dispatchers.Default).launch {
                         checklist.add(ChecklistEntry(data[i]))
+                        App.checklistedIds.add(data[i].id.videoId)
                     }
                 }
 
@@ -96,16 +101,10 @@ class SearchResultAdapter(
 
                 titleLayout.visibility = View.VISIBLE
 
-                CoroutineScope(Dispatchers.Default).launch {
-                    if (checklist.contains(data[i].id.videoId)) {
-                        withContext(Dispatchers.Main) {
-                            title.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.badge_checklisted, 0)
-                        }
-                    } else {
-                        withContext(Dispatchers.Main) {
-                            title.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-                        }
-                    }
+                if (App.checklistedIds.contains(data[i].id.videoId)) {
+                    title.applyChecklistBadge(true)
+                } else {
+                    title.applyChecklistBadge(false)
                 }
             }
         }

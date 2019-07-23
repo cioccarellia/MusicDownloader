@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.extensions.toYoutubeUrl
@@ -30,8 +31,7 @@ class ChecklistAdapter(
     override fun getItemCount() = data.size
 
     val data by lazy {
-        checklist
-            .getAll()
+        checklist.getAll()
             .toMutableList()
     }
 
@@ -40,13 +40,15 @@ class ChecklistAdapter(
         return ChecklistCardViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: ChecklistCardViewHolder, i: Int) {
+    override fun onBindViewHolder(holder: ChecklistCardViewHolder, uncheckedIndex: Int) {
+        val i = holder.adapterPosition
+        
         Glide.with(activity)
-                .load(data[holder.adapterPosition].thumbnailLink)
+                .load(data[i].thumbnailLink)
                 .thumbnail(0.1F)
                 .into(holder.icon)
 
-        holder.title.text = data[holder.adapterPosition].title
+        holder.title.text = data[i].title
 
         with(holder.card) {
             setOnClickListener {
@@ -54,30 +56,34 @@ class ChecklistAdapter(
                 val ref = (activity as MainActivity)
 
                 val search = ref.find<TextView>(R.id.search)
-                search.text = data[holder.adapterPosition].title
+                search.text = data[i].title
 
                 val rv = ref.find(R.id.recyclerView) as RecyclerView?
                 rv?.smoothScrollToPosition(0)
 
-                ref.performSearch(implicitLink = data[holder.adapterPosition].videoId.toYoutubeUrl())
+                ref.performSearch(implicitLink = data[i].videoId.toYoutubeUrl())
                 ref.checklistDialog.dismiss()
             }
 
             setOnLongClickListener {
+                val entry = data[i]
+
                 VibrationUtil.weak()
+                App.checklistedIds.remove(entry.videoId)
 
                 CoroutineScope(Dispatchers.Default).launch {
-                    checklist.remove(data[holder.adapterPosition])
+                    checklist.remove(entry)
                 }
 
-                data.removeAt(holder.adapterPosition)
-                notifyItemRemoved(holder.adapterPosition)
+                data.removeAt(i)
+                notifyItemRemoved(i)
 
                 if (data.isEmpty()) {
                     // If the last remaining item is removed, safely close the dialog
                     val ref = (activity as? MainActivity)
                     ref?.checklistDialog?.dismiss()
                 }
+
                 true
             }
         }
