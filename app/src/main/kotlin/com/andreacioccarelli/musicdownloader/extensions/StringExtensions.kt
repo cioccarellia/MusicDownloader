@@ -28,10 +28,25 @@ fun String.renameIfEqual(pattern: String, renaming: String): String {
 
 fun CharSequence.toEditable() = SpannableStringBuilder(this)
 
-fun String.getVideoIdOrThrow(): String {
-    if (this.contains("?v="))
-        return split("?v=")[1].split("&")[0]
+fun String.attemptExtractingVideoId(): String {
+    if (this.contains("?v=")) return split("?v=")[1].split("&")[0]
     else throw IllegalStateException("Invalid YouTube video id: $this")
+}
+
+fun String.breakHtm() = apply {
+    renameIfEqual(".", "_.")
+    renameIfEqual("..", "__.")
+    removePrefix(".")
+
+    replace("/", "")
+    replace("&#180;", "´")
+    replace("&#39;", "'")
+    replace("&amp;", "&")
+    replace("&lt;", "<")
+    replace("&gt;", ">")
+    replace("&quot;", "\"")
+    replace("&apos;", "'")
+
 }
 
 fun String.breakHtml(): String {
@@ -49,26 +64,26 @@ fun String.breakHtml(): String {
 
     // Accents
     val replaceList = mapOf(
-            "&#192;" to "À", "&#193;" to "Á", "&#194;" to "Â", "&#195;" to "Ã",
-            "&#196;" to "Ä", "&#197;" to "Å", "&#198;" to "Æ", "&#199;" to "Ç",
-            "&#200;" to "È", "&#201;" to "É", "&#202;" to "Ê", "&#203;" to "Ë",
-            "&#204;" to "Ì", "&#205;" to "Í", "&#206;" to "Î", "&#207;" to "Ï",
-            "&#208;" to "Ð", "&#209;" to "Ñ", "&#210;" to "Ò", "&#211;" to "Ó",
-            "&#212;" to "Ô", "&#213;" to "Õ", "&#214;" to "Ö", "&#216;" to "Ø",
-            "&#217;" to "Ù", "&#218;" to "Ú", "&#219;" to "Û", "&#210;" to "Ü",
+        /*"&#192;" to "À", "&#193;" to "Á", "&#194;" to "Â", "&#195;" to "Ã",
+        "&#196;" to "Ä", "&#197;" to "Å", "&#198;" to "Æ", "&#199;" to "Ç",
+        "&#200;" to "È", "&#201;" to "É", "&#202;" to "Ê", "&#203;" to "Ë",
+        "&#204;" to "Ì", "&#205;" to "Í", "&#206;" to "Î", "&#207;" to "Ï",
+        "&#208;" to "Ð", "&#209;" to "Ñ", "&#210;" to "Ò", "&#211;" to "Ó",
+        "&#212;" to "Ô", "&#213;" to "Õ", "&#214;" to "Ö", "&#216;" to "Ø",
+        "&#217;" to "Ù", "&#218;" to "Ú", "&#219;" to "Û", "&#210;" to "Ü",
 
+        "&#224;" to "à", "&#225;" to "á", "&#226;" to "â", "&#227;" to "ã",
+        "&#228;" to "ä", "&#229;" to "å", "&#230;" to "æ", "&#231;" to "ç",
+        "&#232;" to "è", "&#233;" to "é", "&#234;" to "ê", "&#235;" to "ë",
+        "&#236;" to "ì", "&#237;" to "í", "&#238;" to "î", "&#239;" to "ï",
+        "&#240;" to "ð", "&#241;" to "ñ", "&#242;" to "ò", "&#243;" to "ó",
+        "&#244;" to "ô", "&#245;" to "õ", "&#246;" to "ö", "&#248;" to "ø",
+        "&#249;" to "ù", "&#250;" to "ú", "&#251;" to "û", "&#252;" to "ü",
+        "&#253;" to "ý", "&#254;" to "þ", */
 
-            "&#224;" to "à", "&#225;" to "á", "&#226;" to "â", "&#227;" to "ã",
-            "&#228;" to "ä", "&#229;" to "å", "&#230;" to "æ", "&#231;" to "ç",
-            "&#232;" to "è", "&#233;" to "é", "&#234;" to "ê", "&#235;" to "ë",
-            "&#236;" to "ì", "&#237;" to "í", "&#238;" to "î", "&#239;" to "ï",
-            "&#240;" to "ð", "&#241;" to "ñ", "&#242;" to "ò", "&#243;" to "ó",
-            "&#244;" to "ô", "&#245;" to "õ", "&#246;" to "ö", "&#248;" to "ø",
-            "&#249;" to "ù", "&#250;" to "ú", "&#251;" to "û", "&#252;" to "ü",
-            "&#253;" to "ý", "&#254;" to "þ", "&#180;" to "´", "&#39;" to "'",
-
-            "&amp;" to "&", "&lt;" to "<", "&gt;" to ">",
-            "&quot;" to "\"", "&apos;" to "'"
+        "&#180;" to "´", "&#39;" to "'",
+        "&amp;" to "&", "&lt;" to "<", "&gt;" to ">",
+        "&quot;" to "\"", "&apos;" to "'"
     )
 
     replaceList.forEach {

@@ -62,7 +62,7 @@ class DownloadClient {
 
     @WorkerThread
     private suspend fun fetchVideoDownloadInformation(downloadInfo: DownloadInfo, format: Format): DirectLinkResponse {
-        val videoId = downloadInfo.url.getVideoIdOrThrow()
+        val videoId = downloadInfo.url.attemptExtractingVideoId()
 
         val requestBuilder = DownloadLinkRequestsBuilder.get(videoId, format)
         val request = OkHttpClient().newCall(requestBuilder).execute()

@@ -7,7 +7,7 @@ import kotlin.reflect.KProperty
  */
 
 object Delegates {
-    fun <T> singleValue() = SingleValue<T>()
+    fun <T> ctx() = SingleValue<T>()
 }
 
 class SingleValue<T> {

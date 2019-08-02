@@ -8,6 +8,10 @@ import com.andreacioccarelli.musicdownloader.constants.KEY
 import com.andreacioccarelli.musicdownloader.data.checklist.ChecklistDatabase
 import com.andreacioccarelli.musicdownloader.extensions.Delegates
 import com.andreacioccarelli.musicdownloader.ui.typeface.Typefaces
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig
 
 /**
@@ -17,7 +21,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig
 class App : Application() {
 
     companion object {
-        var context by Delegates.singleValue<Application>()
+        var context by Delegates.ctx<Application>()
         val prefs by lazy { CryptoPrefs(context.applicationContext, FILE, KEY, false) }
 
         val checklist by lazy {
@@ -35,12 +39,13 @@ class App : Application() {
         }
 
         val checklistedIds by lazy {
-            mutableListOf<String>()
-                .also {
-                    it.addAll(
-                        checklist.getAll().map { it.videoId }
-                    )
-                }
+            mutableListOf<String>().also {
+                it.addAll(
+                    checklist.getAll().map { video ->
+                        video.videoId
+                    }
+                )
+            }
         }
     }
 
@@ -54,5 +59,11 @@ class App : Application() {
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         )
+
+        CoroutineScope(Dispatchers.Default).launch {
+            delay(107)
+            ::checklist.get()
+            ::checklistedIds.get()
+        }
     }
 }
