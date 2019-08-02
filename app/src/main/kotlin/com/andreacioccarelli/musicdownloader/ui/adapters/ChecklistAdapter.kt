@@ -51,6 +51,7 @@ class ChecklistAdapter(
             setOnClickListener {
                 // Dismisses dialog, puts text inside the box and performs the search
                 val ref = (activity as MainActivity)
+                logd(holder.adapterPosition, data[holder.adapterPosition], App.checklistedIds)
 
                 val search = ref.find<TextView>(R.id.search)
                 search.text = data[initialIndex].title
