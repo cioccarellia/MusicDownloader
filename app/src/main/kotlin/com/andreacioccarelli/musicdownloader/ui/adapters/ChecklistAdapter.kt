@@ -59,7 +59,7 @@ class ChecklistAdapter(
                 val rv = ref.find(R.id.recyclerView) as RecyclerView?
                 rv?.smoothScrollToPosition(0)
 
-                ref.performSearch(implicitLink = data[initialIndex].videoId.toYoutubeUrl())
+                ref.performSearch(implicitLink = data[holder.adapterPosition].videoId.toYoutubeUrl())
                 ref.checklistDialog.dismiss()
             }
 
