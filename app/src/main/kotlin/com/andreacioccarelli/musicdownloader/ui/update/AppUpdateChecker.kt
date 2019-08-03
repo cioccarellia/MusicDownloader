@@ -140,6 +140,7 @@ object AppUpdateChecker {
                 checkBoxPrompt(text = "Ignore this update", isCheckedDefault = false) { state ->
                     App.prefs.put(Keys.ignoring + check.versionCode, state)
                 }
+                cancelable(false)
                 noAutoDismiss()
             }
         }

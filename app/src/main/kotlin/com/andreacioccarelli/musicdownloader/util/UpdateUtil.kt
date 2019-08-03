@@ -20,7 +20,7 @@ import java.io.File
 
 object UpdateUtil {
 
-    const val AUTHORITY = "com.andreacioccarelli.musicdownloader.updater"
+    private const val AUTHORITY = "com.andreacioccarelli.musicdownloader.updater"
     private const val APK_MIME = "application/vnd.android.package-archive"
 
     fun getNotificationTitle(check: UpdateCheck) = "${BuildConfig.VERSION_NAME} -> ${check.versionName}"
