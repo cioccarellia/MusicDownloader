@@ -157,7 +157,7 @@ class BottomDialogFragment(
     }
 
     private fun openVideoInDialog() {
-        YoutubeUtil.getVideoViewerDialog(requireContext(), remoteResult.id.videoId).show()
+        YoutubeUtil.getVideoPreviewDialog(requireContext(), remoteResult.id.videoId).show()
     }
 
     private fun getFullLink() = "$YOUTUBE_WATCH_URL${remoteResult.id.videoId}"

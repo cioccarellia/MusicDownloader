@@ -6,8 +6,6 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ui.activities.MainActivity"
-    android:paddingStart="20dp"
-    android:paddingEnd="20dp"
     tools:showIn="@layout/activity_layout">
 
     <com.google.android.material.textfield.TextInputLayout
@@ -19,6 +17,8 @@
         android:layout_centerHorizontal="true"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginTop="60dp">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -37,9 +37,11 @@
         android:paddingTop="4dp"
         android:id="@+id/recyclerView"
         tools:listitem="@layout/result_item"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_below="@id/searchLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent" />
 
     <include
         android:layout_below="@+id/searchLayout"
