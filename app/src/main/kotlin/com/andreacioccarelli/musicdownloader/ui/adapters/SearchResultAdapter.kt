@@ -39,11 +39,12 @@ class SearchResultAdapter(
 
     override fun getItemCount() = data.size
 
-    val data by lazy { ArrayList<Result>() }
+    val data = ArrayList<Result>()
 
     init {
         data.clear()
         data.addAll(response.items)
+        data.sortByDescending { App.checklistedIds.contains(it.id.videoId) }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultCardViewHolder {
@@ -51,9 +52,9 @@ class SearchResultAdapter(
         return ResultCardViewHolder(v)
     }
 
-    override fun onBindViewHolder(holder: ResultCardViewHolder, uncheckedIndex: Int) {
-        val i = holder.adapterPosition
-
+    override fun onBindViewHolder(holder: ResultCardViewHolder, i: Int) {
+        val videoId = data[i].id.videoId
+        
         Glide.with(activity)
                 .load(data[i].snippet.thumbnails.medium.url)
                 .thumbnail(0.1F)
@@ -63,7 +64,7 @@ class SearchResultAdapter(
             title.text = data[i].snippet.title.breakHtml()
 
             iconLayout.setOnClickListener {
-                YoutubeUtil.getVideoPreviewDialog(activity, data[i].id.videoId).show()
+                YoutubeUtil.getVideoPreviewDialog(activity, videoId).show()
             }
 
             card.setOnClickListener {
@@ -73,13 +74,13 @@ class SearchResultAdapter(
 
             card.setOnLongClickListener {
                 VibrationUtil.medium()
-                if (checklist.contains(data[i].id.videoId)) {
+                if (checklist.contains(videoId)) {
                     ToastUtil.error("Removed from checklist", R.drawable.remove_outline, duration = Toast.LENGTH_SHORT)
                     title.applyChecklistBadge(false)
 
                     CoroutineScope(Dispatchers.Default).launch {
-                        checklist.remove(data[i].id.videoId)
-                        App.checklistedIds.remove(data[i].id.videoId)
+                        checklist.remove(videoId)
+                        App.checklistedIds.remove(videoId)
                     }
                 } else {
                     ToastUtil.success("Added to checklist", R.drawable.add_outline, duration = Toast.LENGTH_SHORT)
@@ -87,7 +88,7 @@ class SearchResultAdapter(
 
                     CoroutineScope(Dispatchers.Default).launch {
                         checklist.add(ChecklistEntry(data[i]))
-                        App.checklistedIds.add(data[i].id.videoId)
+                        App.checklistedIds.add(videoId)
                     }
                 }
 
@@ -101,7 +102,7 @@ class SearchResultAdapter(
 
                 titleLayout.visibility = View.VISIBLE
 
-                if (App.checklistedIds.contains(data[i].id.videoId)) {
+                if (App.checklistedIds.contains(videoId)) {
                     title.applyChecklistBadge(true)
                 } else {
                     title.applyChecklistBadge(false)

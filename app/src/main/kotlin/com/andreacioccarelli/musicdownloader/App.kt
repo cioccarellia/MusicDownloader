@@ -10,9 +10,10 @@ import com.andreacioccarelli.musicdownloader.extensions.Delegates
 import com.andreacioccarelli.musicdownloader.ui.typeface.Typefaces
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig
+import kotlin.LazyThreadSafetyMode.NONE
 
 /**
  *  Designed and developed by Andrea Cioccarelli
@@ -22,12 +23,13 @@ class App : Application() {
 
     companion object {
         var context by Delegates.ctx<Application>()
-        val prefs by lazy { CryptoPrefs(context.applicationContext, FILE, KEY, false) }
+        val client by lazy(NONE) { OkHttpClient() }
+        val prefs by lazy { CryptoPrefs(context, FILE, KEY, shouldEncrypt = false) }
 
         val checklist by lazy {
             val db = Room.databaseBuilder(
-                    context,
-                    ChecklistDatabase::class.java, "checklist"
+                context,
+                ChecklistDatabase::class.java, "checklist"
             )
 
             with(db) {
@@ -61,7 +63,6 @@ class App : Application() {
         )
 
         CoroutineScope(Dispatchers.Default).launch {
-            delay(107)
             ::checklist.get()
             ::checklistedIds.get()
         }

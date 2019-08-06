@@ -21,6 +21,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.list.customListAdapter
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
+import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.R
 import com.andreacioccarelli.musicdownloader.client.DownloadClient
@@ -40,7 +41,6 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
 import kotlinx.android.synthetic.main.activity_content.*
 import kotlinx.android.synthetic.main.activity_layout.*
 import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
 
 /**
  *  Designed and Developed by Andrea Cioccarelli
@@ -211,7 +211,9 @@ class MainActivity : BaseActivity() {
 
         GlobalScope.launch(Dispatchers.IO + fetchExceptionHandler) {
             val requestBuilder = YoutubeRequestBuilder.get(query)
-            val request = OkHttpClient().newCall(requestBuilder).execute()
+            
+            val call = App.client.newCall(requestBuilder)
+            val request = call.execute()
 
             val jsonRequest = request.body!!.string()
             val response = Gson().fromJson(jsonRequest, YoutubeSearchResponse::class.java)

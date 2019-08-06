@@ -11,8 +11,8 @@ import com.andreacioccarelli.logkit.loge
 import com.andreacioccarelli.musicdownloader.App
 import com.andreacioccarelli.musicdownloader.App.Companion.checklist
 import com.andreacioccarelli.musicdownloader.constants.*
-import com.andreacioccarelli.musicdownloader.data.enums.Format
 import com.andreacioccarelli.musicdownloader.data.enums.FailedConversionError
+import com.andreacioccarelli.musicdownloader.data.enums.Format
 import com.andreacioccarelli.musicdownloader.data.model.DownloadInfo
 import com.andreacioccarelli.musicdownloader.data.requests.DownloadLinkRequestsBuilder
 import com.andreacioccarelli.musicdownloader.data.serializers.DirectLinkResponse
@@ -132,9 +132,7 @@ class DownloadClient {
     }
 
     @UiThread
-    private fun downloadFileList(
-            totalVideos: List<DirectLinkResponse>
-    ) {
+    private fun downloadFileList(totalVideos: List<DirectLinkResponse>) {
         val convertedVideos = totalVideos.filter {
             it.isSuccessful()
         }
@@ -156,12 +154,13 @@ class DownloadClient {
 
     @UiThread
     private fun downloadFile(
-            downloadManager: DownloadManager = App.context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager,
-            response: DirectLinkResponse,
-            isSingle: Boolean = true
+        downloadManager: DownloadManager = App.context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager,
+        response: DirectLinkResponse,
+        isSingle: Boolean = true
     ) {
         CoroutineScope(Dispatchers.Default).launch {
             checklist.remove(response.videoId)
+            App.checklistedIds.add(response.videoId)
         }
 
         if (response.isUnsuccessful()) {
@@ -207,6 +206,7 @@ class DownloadClient {
 
             downloadManager.enqueue(downloadRequest)
             checklist.remove(response.videoId)
+            App.checklistedIds.add(response.videoId)
         }
     }
 }
