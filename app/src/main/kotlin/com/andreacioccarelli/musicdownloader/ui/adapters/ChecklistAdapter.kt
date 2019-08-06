@@ -49,17 +49,19 @@ class ChecklistAdapter(
 
         with(holder.card) {
             setOnClickListener {
+                val i = holder.adapterPosition
+                
                 // Dismisses dialog, puts text inside the box and performs the search
                 val ref = (activity as MainActivity)
-                logd(holder.adapterPosition, data[holder.adapterPosition], App.checklistedIds)
+                logd(i, data[i], App.checklistedIds)
 
                 val search = ref.find<TextView>(R.id.search)
-                search.text = data[holder.adapterPosition].title
+                search.text = data[i].title
 
                 val rv = ref.find(R.id.recyclerView) as RecyclerView?
                 rv?.smoothScrollToPosition(0)
 
-                ref.performSearch(implicitLink = data[holder.adapterPosition].videoId.toYoutubeUrl())
+                ref.performSearch(implicitLink = data[i].videoId.toYoutubeUrl())
                 ref.checklistDialog.dismiss()
             }
 
