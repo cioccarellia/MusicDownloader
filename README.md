@@ -12,7 +12,7 @@
 Minimal Youtube MP3/MP4 downloader.
 
 # Screenshots
-<img src="https://raw.githubusercontent.com/AndreaCioccarelli/MusicDownloader/master/media/carousel.jpg">
+<img src="https://raw.githubusercontent.com/cioccarellia/MusicDownloader/master/media/carousel.jpg">
 
 # Backgrounding
 Today's music services are reaching our every corner; there is an overwhelming offer on any kind of market around Music.
